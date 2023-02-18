@@ -13,4 +13,16 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\DrivingSchool.Data\DrivingSchool.Data.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.3" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.3" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    </ItemGroup>
+
 </Project>
