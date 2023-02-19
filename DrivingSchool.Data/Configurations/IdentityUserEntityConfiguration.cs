@@ -17,16 +17,16 @@ public class IdentityUserEntityConfiguration : IEntityTypeConfiguration<Identity
         builder.Property(e => e.PasswordHash).HasColumnName("password_hash");
         builder.Property(e => e.PhoneNumber).HasColumnName("phone_number");
 
-        builder
-            .Ignore(e => e.ConcurrencyStamp)
-            .Ignore(e => e.EmailConfirmed)
-            .Ignore(e => e.LockoutEnabled)
-            .Ignore(e => e.LockoutEnd)
-            .Ignore(e => e.NormalizedEmail)
-            .Ignore(e => e.SecurityStamp)
-            .Ignore(e => e.AccessFailedCount)
-            .Ignore(e => e.NormalizedUserName)
-            .Ignore(e => e.PhoneNumberConfirmed)
-            .Ignore(e => e.TwoFactorEnabled);
+        builder.Property(e => e.ConcurrencyStamp).HasColumnName("concurrency_stamp");
+        builder.Property(e => e.EmailConfirmed).HasColumnName("email_confirmed");
+        builder.Property(e => e.LockoutEnabled).HasColumnName("lockout_enabled");
+        builder.Property(e => e.AccessFailedCount).HasColumnName("access_failed_count");
+        builder.Property(e => e.LockoutEnd).HasColumnName("lockout_end");
+        builder.Property(e => e.NormalizedEmail).HasColumnName("normalized_email");
+        builder.Property(e => e.NormalizedUserName).HasColumnName("normalized_user_name");
+        builder.Property(e => e.SecurityStamp).HasColumnName("security_stamp");
+        builder.Property(e => e.PhoneNumberConfirmed).HasColumnName("phone_number_confirmed");
+        builder.Property(e => e.TwoFactorEnabled).HasColumnName("two_factor_enabled");
+        ;
     }
 }

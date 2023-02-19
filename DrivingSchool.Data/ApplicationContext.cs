@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using DrivingSchool.Data.Configurations;
+﻿using DrivingSchool.Data.Configurations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +13,8 @@ public class ApplicationContext : DbContext
 
     public DbSet<IdentityUser<int>> Users { get; set; } = null!;
     public DbSet<IdentityRole<int>> Roles { get; set; } = null!;
+    public DbSet<IdentityUserRole<int>> UserRoles { get; set; } = null!;
+    public DbSet<IdentityUserClaim<int>> UserClaims { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

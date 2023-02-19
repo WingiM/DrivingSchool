@@ -1,0 +1,23 @@
+﻿@using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal
+@inject NavigationManager NavigationManager;
+
+
+@code {
+
+    private void Logout()
+    {
+        NavigationManager.NavigateTo("/logout", true);
+    }
+
+}
+
+<AuthorizeView>
+    <Authorized>
+        <a href="Cabinet">Hello, @context.User.Identity?.Name!</a>
+        <button type="submit" class="nav-link btn btn-link" @onclick="() => Logout()">Log out</button>
+    </Authorized>
+    <NotAuthorized>
+        <a href="RegistrationPage">Register</a>
+        <a href="LoginPage">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>

@@ -1,4 +1,7 @@
+using DrivingSchool;
 using DrivingSchool.Data;
+using DrivingSchool.Middleware;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +11,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddData(builder.Configuration.GetConnectionString("DefaultConnection")!);
-builder.Services.AddIdentity<IdentityUser<int>, IdentityRole<int>>(options =>
+builder.Services.AddDefaultIdentity<IdentityUser<int>>(options =>
     {
         options.Password.RequireDigit = false;
         options.Password.RequiredLength = 5;
@@ -18,7 +21,8 @@ builder.Services.AddIdentity<IdentityUser<int>, IdentityRole<int>>(options =>
     })
     .AddRoles<IdentityRole<int>>()
     .AddEntityFrameworkStores<ApplicationContext>();
-
+builder.Services
+    .AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -32,7 +36,9 @@ else
 {
     app.UseMigrationsEndPoint();
 }
-
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseMiddleware<AuthenticationMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
