@@ -3,6 +3,7 @@ using DrivingSchool.Data;
 using DrivingSchool.Middleware;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ builder.Services.AddDefaultIdentity<IdentityUser<int>>(options =>
     })
     .AddRoles<IdentityRole<int>>()
     .AddEntityFrameworkStores<ApplicationContext>();
+builder.Services.AddMudServices();
 builder.Services
     .AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 var app = builder.Build();

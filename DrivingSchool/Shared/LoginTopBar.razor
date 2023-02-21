@@ -1,6 +1,18 @@
-﻿@using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal
-@inject NavigationManager NavigationManager;
+﻿@inject NavigationManager NavigationManager;
 
+
+<AuthorizeView>
+    <Authorized>
+        <div class="d-flex gap-4">
+            <a href="Cabinet">Hello, @context.User.Identity?.Name!</a>
+            <button type="submit" class="nav-link btn btn-link" @onclick="() => Logout()">Log out</button>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <a href="RegistrationPage">Register</a>
+        <a href="LoginPage">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
 
@@ -10,14 +22,3 @@
     }
 
 }
-
-<AuthorizeView>
-    <Authorized>
-        <a href="Cabinet">Hello, @context.User.Identity?.Name!</a>
-        <button type="submit" class="nav-link btn btn-link" @onclick="() => Logout()">Log out</button>
-    </Authorized>
-    <NotAuthorized>
-        <a href="RegistrationPage">Register</a>
-        <a href="LoginPage">Log in</a>
-    </NotAuthorized>
-</AuthorizeView>

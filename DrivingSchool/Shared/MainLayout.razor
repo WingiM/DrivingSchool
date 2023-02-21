@@ -1,20 +1,33 @@
-﻿@inherits LayoutComponentBase
+﻿@using MudBlazor.Utilities
+@inherits LayoutComponentBase
 
 <PageTitle>DrivingSchool</PageTitle>
 
-<div class="page">
-    <div class="sidebar">
+
+<MudLayout>
+    <MudAppBar Color="Color.Primary" Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
+        <MudSpacer/>
+        <LoginTopBar/>
+    </MudAppBar>
+    <MudDrawer @bind-Open="@_drawerOpen" Elevation="2">
         <NavMenu/>
-    </div>
+    </MudDrawer>
+    <MudMainContent>@Body</MudMainContent>
+</MudLayout>
 
-    <main>
-        <div class="top-row px-4">
-            <LoginTopBar/>
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+<MudThemeProvider Theme="new MudTheme() { Palette = new Palette() { Primary = Colors.Red.Darken2 } }"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+@code {
+
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+}
