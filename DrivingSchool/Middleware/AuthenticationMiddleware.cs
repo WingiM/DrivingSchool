@@ -21,11 +21,11 @@ public class AuthenticationMiddleware
     {
         if (context.Request.Path == "/login" && context.Request.Query.ContainsKey("key"))
         {
-            var key = Guid.Parse(context.Request.Query["key"]);
+            var key = Guid.Parse(context.Request.Query["key"]!);
             var info = Logins[key];
 
             var result =
-                await signInManager.PasswordSignInAsync(info.Email, info.Password, false, lockoutOnFailure: true);
+                await signInManager.PasswordSignInAsync(info.Email, info.Password, false, lockoutOnFailure: false);
             info.Password = null;
             if (result.Succeeded)
             {
