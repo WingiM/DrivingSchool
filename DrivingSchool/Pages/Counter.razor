@@ -1,7 +1,4 @@
 ﻿@page "/counter"
-@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser<int>> SignInManager
-@inject UserManager<IdentityUser<int>> UserManager
 
 <PageTitle>Counter</PageTitle>
 
@@ -11,7 +8,7 @@
 <AuthorizeView>
     <Authorized>
         <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
-        <p>@context.User.Identity.Name</p>
+        <p>@context.User.Identity?.Name</p>
     </Authorized>
     <NotAuthorized>
         <p>Sasi</p>

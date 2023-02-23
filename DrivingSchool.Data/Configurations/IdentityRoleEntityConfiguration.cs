@@ -13,8 +13,7 @@ public class IdentityRoleEntityConfiguration : IEntityTypeConfiguration<Identity
 
         builder.Property(e => e.Id).HasColumnName("id");
         builder.Property(e => e.Name).HasColumnName("name");
-        builder
-            .Ignore(e => e.ConcurrencyStamp)
-            .Ignore(e => e.NormalizedName);
+        builder.Property(e => e.ConcurrencyStamp).HasColumnName("concurrency_stamp");
+        builder.Property(e => e.NormalizedName).HasColumnName("normalized_name");
     }
 }

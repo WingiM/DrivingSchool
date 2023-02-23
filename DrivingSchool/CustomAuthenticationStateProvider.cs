@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using DrivingSchool.Domain.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
@@ -63,5 +64,5 @@ public class CustomAuthenticationStateProvider : RevalidatingServerAuthenticatio
         return principalStamp == userStamp;
     }
 
-    protected override TimeSpan RevalidationInterval => TimeSpan.FromSeconds(10);
+    protected override TimeSpan RevalidationInterval => TimeSpan.FromMinutes(10);
 }

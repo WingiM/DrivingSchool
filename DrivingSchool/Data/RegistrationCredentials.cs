@@ -1,9 +1,13 @@
-﻿namespace DrivingSchool.Data;
+﻿using DrivingSchool.Domain.Enums;
+
+namespace DrivingSchool.Data;
 
 public class RegistrationCredentials
 {
-    public string Name { get; set; }
-    public string Username { get; set; }
-    public string Email { get; set; }
-    public string Password { get; set; }
+    public string Surname { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public string Patronymic { get; set; } = null!;
+    public string PhoneNumber { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public Roles Role { get; set; }
 }

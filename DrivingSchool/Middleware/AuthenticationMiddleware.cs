@@ -1,13 +1,15 @@
 ﻿using System.Collections.Concurrent;
 using DrivingSchool.Data;
+using DrivingSchool.Domain.Models;
+using DrivingSchool.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 
 namespace DrivingSchool.Middleware;
 
 public class AuthenticationMiddleware
 {
-    public static IDictionary<Guid, RegistrationCredentials> Logins { get; private set; }
-        = new ConcurrentDictionary<Guid, RegistrationCredentials>();
+    public static IDictionary<Guid, LoginCredentials> Logins { get; private set; }
+        = new ConcurrentDictionary<Guid, LoginCredentials>();
 
 
     private readonly RequestDelegate _next;
@@ -24,9 +26,9 @@ public class AuthenticationMiddleware
             var key = Guid.Parse(context.Request.Query["key"]!);
             var info = Logins[key];
 
-            var result =
-                await signInManager.PasswordSignInAsync(info.Email, info.Password, false, lockoutOnFailure: false);
-            info.Password = null;
+            var result = await signInManager.PasswordSignInAsync(info.Email, info.Password,
+                info.RememberMe, lockoutOnFailure: false);
+            info.Password = string.Empty;
             if (result.Succeeded)
             {
                 Logins.Remove(key);

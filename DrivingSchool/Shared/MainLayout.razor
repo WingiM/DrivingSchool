@@ -13,11 +13,15 @@
     <MudDrawer @bind-Open="@_drawerOpen" Elevation="2">
         <NavMenu/>
     </MudDrawer>
-    <MudMainContent>@Body</MudMainContent>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
+            @Body
+        </MudContainer>
+    </MudMainContent>
 </MudLayout>
 
 
-<MudThemeProvider Theme="new MudTheme() { Palette = new Palette() { Primary = Colors.Red.Darken2 } }"/>
+<MudThemeProvider Theme="new MudTheme() { Palette = new Palette() { Primary = Colors.Red.Darken2, Secondary = Colors.DeepOrange.Lighten2} }"/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
