@@ -1,0 +1,75 @@
+﻿@page "/registration"
+@using DrivingSchool.Data
+@using DrivingSchool.Domain.Enums
+@using DrivingSchool.Validators
+@using IAuthorizationService = Domain.Services.IAuthorizationService;
+@using DrivingSchool.Domain.Extensions;
+@inject IAuthorizationService AuthorizationService;
+@attribute [Authorize(Roles = "Administrator")]
+
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h4">Регистрация пользователя</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudForm Model="@_model" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+        <MudCardContent>
+            <MudTextField @bind-Value="_model.Surname" For="() => _model.Surname" Immediate="false" Label="Фамилия"/>
+            <MudTextField @bind-Value="_model.Name" For="() => _model.Name" Immediate="false" Label="Имя"/>
+            <MudTextField @bind-Value="_model.Patronymic" For="() => _model.Patronymic" Immediate="false" Label="Отчество"/>
+            <MudTextField @bind-Value="_model.Email" For="() => _model.Email" Immediate="false" Label="Электронная почта"/>
+            <MudTextField @bind-Value="_model.PhoneNumber" For="() => _model.PhoneNumber" Immediate="false"
+                          Label="Номер телефона" Mask="@(new PatternMask("+0 (000) 000 00-00"))"/>
+            <MudSelect @bind-Value="_model.Role" ToStringFunc="@_converter" Label="Роль пользователя" AnchorOrigin="Origin.BottomCenter" Clearable>
+                @foreach (Roles role in Enum.GetValues(typeof(Roles)))
+                {
+                    <MudSelectItem Value="role"/>
+                }
+            </MudSelect>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Disabled="@_loading" Variant="Variant.Filled" Color="Color.Primary" OnClick="async () => await Register()">Регистрация</MudButton>
+            @if (_loading)
+            {
+                <MudProgressCircular Style="margin-left: 10px;" Color="Color.Primary" Indeterminate="true"/>
+            }
+        </MudCardActions>
+    </MudForm>
+</MudCard>
+
+@code {
+    private bool _loading = false;
+    readonly Func<Roles, string?> _converter = p => p.GetDisplayName();
+
+    [Inject]
+    ISnackbar Snackbar { get; set; } = null!;
+
+    MudForm _form = null!;
+    readonly RegistrationValidator _validator = new();
+    readonly RegistrationCredentials _model = new();
+
+    private async Task Register()
+    {
+        _loading = true;
+        await _form.Validate();
+        if (!_form.IsValid)
+        {
+            Snackbar.Add("Не все данные заполнены верно!");
+            _loading = false;
+            return;
+        }
+
+        var res = await AuthorizationService.RegisterAsync(_model.Surname, _model.Name, _model.Patronymic,
+            _model.PhoneNumber, _model.Email, _model.Role);
+        _loading = false;
+        if (res.Success)
+        {
+            Snackbar.Add("Пользователь успешно добавлен", Severity.Success);
+            return;
+        }
+
+        Snackbar.Add($"Произошла ошибка при добавлении пользователя: {res.Message}", Severity.Error);
+    }
+
+}

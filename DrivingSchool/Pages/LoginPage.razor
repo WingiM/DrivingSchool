@@ -1,0 +1,71 @@
+﻿@page "/login"
+@using Microsoft.AspNetCore.Identity
+@using DrivingSchool.Validators
+@using DrivingSchool.Data
+@using DrivingSchool.Middleware
+@inject SignInManager<IdentityUser<int>> SignInManager
+@inject UserManager<IdentityUser<int>> UserManager
+@inject NavigationManager NavigationManager
+
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h4">Авторизация</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudForm Model="@_model" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+        <MudCardContent>
+            <MudTextField @bind-Value="_model.Email" For="() => _model.Email" Immediate="false" Label="Логин"/>
+            <MudTextField @bind-Value="_model.Password" For="() => _model.Password" Immediate="false" Label="Пароль" InputType="InputType.Password"/>
+            <MudDivider/>
+            <MudCheckBox @bind-Checked="@_model.RememberMe" Color="Color.Primary" Label="Запомнить меня" LabelPosition="LabelPosition.End"/>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="async () => await Login()">Авторизоваться</MudButton>
+        </MudCardActions>
+    </MudForm>
+</MudCard>
+
+@code {
+
+    [Inject]
+    ISnackbar Snackbar { get; set; } = null!;
+
+    MudForm _form = null!;
+    readonly LoginValidator _validator = new();
+    readonly LoginCredentials _model = new();
+
+    private async Task Login()
+    {
+        await _form.Validate();
+        if (!_form.IsValid)
+        {
+            Snackbar.Add("Не все данные заполнены верно!");
+            return;
+        }
+
+        var user = await UserManager.FindByEmailAsync(_model.Email);
+        if (user == null)
+        {
+            Snackbar.Add("Пользователя с такими данными не существует", Severity.Error);
+            return;
+        }
+
+
+        if (await SignInManager.CanSignInAsync(user))
+        {
+            var result = await SignInManager.CheckPasswordSignInAsync(user, _model.Password, true);
+            if (result.Succeeded)
+            {
+                Guid key = Guid.NewGuid();
+                AuthenticationMiddleware.Logins[key] = _model;
+                NavigationManager.NavigateTo($"/login?key={key}", true);
+                return;
+            }
+            Snackbar.Add("Неправильный логин или пароль", Severity.Error);
+            return;
+        }
+        Snackbar.Add("Ваш аккаунт заблокирован, свяжитесь с администратором", Severity.Error);
+    }
+
+}

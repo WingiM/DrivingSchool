@@ -5,15 +5,27 @@
 <h1>Counter</h1>
 
 <p role="status">Current count: @currentCount</p>
-
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<AuthorizeView>
+    <Authorized>
+        <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+        <p>@context.User.Identity?.Name</p>
+    </Authorized>
+    <NotAuthorized>
+        <p>Sasi</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     private int currentCount = 0;
 
     private void IncrementCount()
     {
+        // var name = Guid.NewGuid().ToString();
         currentCount++;
+        // var user = new IdentityUser<int>(name);
+        // var u = await UserManager.CreateAsync(user, "Kredit!200");
+        // if (u.Succeeded)
+        //     await SignInManager.PasswordSignInAsync(name, "Kredit!200", false, false);
     }
 
 }
