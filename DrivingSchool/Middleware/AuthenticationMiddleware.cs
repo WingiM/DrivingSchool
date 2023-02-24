@@ -38,7 +38,7 @@ public class AuthenticationMiddleware
         else if (context.Request.Path == "/logout")
         {
             await signInManager.SignOutAsync();
-            context.Response.Redirect("/RegistrationPage");
+            context.Response.Redirect("/login");
         }
         else
         {

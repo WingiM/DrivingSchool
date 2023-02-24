@@ -1,5 +1,10 @@
-﻿using System.Security.Cryptography;
+﻿using System.Security.Claims;
+using System.Security.Cryptography;
+using DrivingSchool.Domain.Constants;
+using DrivingSchool.Domain.Enums;
+using DrivingSchool.Domain.Extensions;
 using DrivingSchool.Domain.Repositories;
+using DrivingSchool.Domain.Results;
 using Microsoft.AspNetCore.Identity;
 
 namespace DrivingSchool.Domain.Services.Impl;
@@ -8,28 +13,28 @@ public class AuthorizationService : IAuthorizationService
 {
     private readonly IMailingService _mailingService;
     private readonly UserManager<IdentityUser<int>> _identityManager;
-    private readonly IUserRepository _userRepository;
+    private readonly IUserService _userService;
     private readonly UserSecrets _userSecrets;
 
-    public AuthorizationService(UserManager<IdentityUser<int>> identityManager, IUserRepository userRepository,
+    public AuthorizationService(UserManager<IdentityUser<int>> identityManager, IUserService userService,
         UserSecrets userSecrets, IMailingService mailingService)
     {
         _identityManager = identityManager;
-        _userRepository = userRepository;
+        _userService = userService;
         _userSecrets = userSecrets;
         _mailingService = mailingService;
     }
 
-    public async Task<bool> RegisterAsync(string surname, string name, string patronymic, string phoneNumber,
-        string email)
+    public async Task<BaseResult> RegisterAsync(string surname, string name, string patronymic, string phoneNumber,
+        string email, Roles role)
     {
-        var identityUser = new IdentityUser<int> { Email = email, UserName = email };
+        var identityUser = new IdentityUser<int> { Email = email, UserName = email, PhoneNumber = phoneNumber };
 
         if (await _identityManager.FindByEmailAsync(email) is not null)
         {
-            return false;
+            return new BaseResult { Message = ResultMessages.UserWithThisEmailAlreadyExists };
         }
-        
+
         var user = new User
         {
             Surname = surname,
@@ -40,11 +45,25 @@ public class AuthorizationService : IAuthorizationService
 
         var password = GeneratePasswordForUser();
         var result = await _identityManager.CreateAsync(identityUser, password);
-        if (!result.Succeeded) return false;
+        if (!result.Succeeded) return new BaseResult() { Message = ResultMessages.InternalRegisterError };
+        await _identityManager.AddToRoleAsync(identityUser, role.GetDisplayName()!);
 
-        await _userRepository.CreateUserAsync(user);
-        await _mailingService.SendUserRegisteredMessageAsync(user, password);
-        return true;
+        await _userService.CreateUserAsync(user);
+        await AddDefaultClaimsToUserAsync(user);
+        var mailingResult = await _mailingService.SendUserRegisteredMessageAsync(user, password);
+        if (mailingResult)
+        {
+            var code = await _identityManager.GenerateEmailConfirmationTokenAsync(identityUser);
+            await _identityManager.ConfirmEmailAsync(identityUser, code);
+        }
+
+        return new BaseResult() { Success = true };
+    }
+
+    private async Task AddDefaultClaimsToUserAsync(User user)
+    {
+        await _identityManager.AddClaimAsync(user.Identity,
+            new Claim("avatarLetters", $"{user.Surname[0]}{user.Name[0]}"));
     }
 
     private string GeneratePasswordForUser()

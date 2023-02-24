@@ -2,7 +2,6 @@
 @using Microsoft.AspNetCore.Identity
 @using DrivingSchool.Validators
 @using DrivingSchool.Data
-@using DrivingSchool.Domain.Models
 @using DrivingSchool.Middleware
 @inject SignInManager<IdentityUser<int>> SignInManager
 @inject UserManager<IdentityUser<int>> UserManager
@@ -16,8 +15,10 @@
     </MudCardHeader>
     <MudForm Model="@_model" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
         <MudCardContent>
-            <MudTextField @bind-Value="_model.Email" For="() => _model.Email" Immediate="true" Label="Логин"/>
-            <MudTextField @bind-Value="_model.Password" For="() => _model.Password" Immediate="true" Label="Пароль"/>
+            <MudTextField @bind-Value="_model.Email" For="() => _model.Email" Immediate="false" Label="Логин"/>
+            <MudTextField @bind-Value="_model.Password" For="() => _model.Password" Immediate="false" Label="Пароль" InputType="InputType.Password"/>
+            <MudDivider/>
+            <MudCheckBox @bind-Checked="@_model.RememberMe" Color="Color.Primary" Label="Запомнить меня" LabelPosition="LabelPosition.End"/>
         </MudCardContent>
         <MudCardActions>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="async () => await Login()">Авторизоваться</MudButton>

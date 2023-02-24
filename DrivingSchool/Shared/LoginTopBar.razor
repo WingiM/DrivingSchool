@@ -1,20 +1,26 @@
-﻿@inject NavigationManager NavigationManager;
-
+﻿@using DrivingSchool.Domain.Constants
+@inject NavigationManager NavigationManager;
 
 <AuthorizeView>
     <Authorized>
-        <div class="d-flex gap-4">
-            <a href="Cabinet">Hello, @context.User.Identity?.Name!</a>
-            <button type="submit" class="nav-link btn btn-link" @onclick="() => Logout()">Log out</button>
+        <div class="d-flex gap-4" style="align-items: center;justify-content: center;">
+            <a class="appbar" href="Cabinet">
+                <MudAvatar Color="Color.Secondary">
+                    @(context.User.Claims.FirstOrDefault(x => x.Type == UserDefaultClaims.AvatarLetters)?.Value ?? "А")
+                </MudAvatar>
+            </a>
+            <a class="appbar" @onclick="() => Logout()">Выйти</a>
         </div>
     </Authorized>
     <NotAuthorized>
         <div class="d-flex gap-4">
-            <a href="/registration">Register</a>
-            <a href="/login">Log in</a>
+            <a class="appbar" href="/login">Войти</a>
         </div>
     </NotAuthorized>
 </AuthorizeView>
+<style>
+  a.appbar { color: white; }
+</style>
 
 @code {
 

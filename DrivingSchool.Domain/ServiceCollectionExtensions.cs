@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(mailSettings);
 
         services.AddScoped<IAuthorizationService, AuthorizationService>();
+        services.AddScoped<IUserService, UserService>();
         services.AddTransient<IMailingService, MailingService>();
         return services;
     }

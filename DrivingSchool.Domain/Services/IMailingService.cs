@@ -2,6 +2,6 @@
 
 public interface IMailingService
 {
-    public Task FormAndSendMessage(MailingMessage mailingMessage);
-    public Task SendUserRegisteredMessageAsync(User user, string password);
+    public Task<bool> FormAndSendMessage(MailingMessage mailingMessage);
+    public Task<bool> SendUserRegisteredMessageAsync(User user, string password);
 }
