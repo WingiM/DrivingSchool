@@ -5,11 +5,18 @@ using DrivingSchool.Middleware;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using MudBlazor.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Host.UseSerilog((hostingContext, loggerConfiguration) => 
+    loggerConfiguration
+        .ReadFrom
+        .Configuration(hostingContext.Configuration)
+        .WriteTo.Console()
+);
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddData(builder.Configuration.GetConnectionString("DefaultConnection")!);
@@ -28,7 +35,7 @@ builder.Services.AddMudServices();
 builder.Services
     .AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 var app = builder.Build();
-
+app.UseSerilogRequestLogging();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -40,6 +47,7 @@ else
 {
     app.UseMigrationsEndPoint();
 }
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<AuthenticationMiddleware>();
