@@ -3,4 +3,5 @@
 public interface IUserRepository
 {
     public Task CreateUserAsync(User user);
+    public Task<bool> IsUserExistsByPhoneNumberAsync(string phoneNumber);
 }

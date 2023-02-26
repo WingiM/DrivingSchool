@@ -1,6 +1,7 @@
 ﻿using DrivingSchool.Data.Models;
 using DrivingSchool.Domain.Models;
 using DrivingSchool.Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace DrivingSchool.Data.Repositories;
 
@@ -25,5 +26,10 @@ public class UserRepository : IUserRepository
 
         await _context.Users.AddAsync(userDb);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<bool> IsUserExistsByPhoneNumberAsync(string phoneNumber)
+    {
+        return await _context.UserIdentities.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber) is not null;
     }
 }

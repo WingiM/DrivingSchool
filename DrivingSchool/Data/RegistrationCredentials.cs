@@ -4,10 +4,10 @@ namespace DrivingSchool.Data;
 
 public class RegistrationCredentials
 {
-    public string Surname { get; set; } = null!;
-    public string Name { get; set; } = null!;
-    public string Patronymic { get; set; } = null!;
-    public string PhoneNumber { get; set; } = null!;
-    public string Email { get; set; } = null!;
+    public string Surname { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Patronymic { get; set; } = string.Empty;
+    public string PhoneNumber { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
     public Roles Role { get; set; }
 }
