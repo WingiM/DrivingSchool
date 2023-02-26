@@ -24,8 +24,7 @@ public class AuthorizationService : IAuthorizationService
         _mailingService = mailingService;
     }
 
-    public async Task<BaseResult> RegisterAsync(string surname, string name, string patronymic, string phoneNumber,
-        string email, Roles role)
+    public async Task<BaseResult> RegisterAsync(User user, string phoneNumber, string email, Roles role)
     {
         var identityUser = new IdentityUser<int> { Email = email, UserName = email, PhoneNumber = phoneNumber };
 
@@ -39,14 +38,7 @@ public class AuthorizationService : IAuthorizationService
             return new BaseResult { Message = ResultMessages.UserWithThisPhoneNumberAlreadyExists };
         }
 
-        var user = new User
-        {
-            Surname = surname,
-            Name = name,
-            Patronymic = patronymic,
-            Identity = identityUser
-        };
-
+        user.Identity = identityUser;
         var password = GeneratePasswordForUser();
         var result = await _identityManager.CreateAsync(identityUser, password);
         if (!result.Succeeded) return new BaseResult() { Message = ResultMessages.InternalRegisterError };

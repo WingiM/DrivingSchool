@@ -1,5 +1,9 @@
 ﻿@page "/cabinet"
-@inject AuthenticationStateProvider AuthenticationState
+@attribute [Authorize]
 
 <PageTitle>Мой кабинет</PageTitle>
-<UserDisplay Login="@(AuthenticationState.GetAuthenticationStateAsync().Result.User.Identity?.Name)"/>
+<AuthorizeView>
+    <Authorized>
+        <UserDisplay Login="@(@context.User.Identity?.Name)" ReadOnly="@(!context.User.IsInRole("Administrator"))"/>
+    </Authorized>
+</AuthorizeView>

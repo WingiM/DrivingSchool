@@ -17,7 +17,7 @@ public class ExceptionMiddleware
         {
             await _next.Invoke(context);
         }
-        catch (NotFoundException e)
+        catch (NotFoundException)
         {
             context.Response.Redirect("/notfound");
         }

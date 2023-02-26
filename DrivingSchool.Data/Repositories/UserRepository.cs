@@ -46,6 +46,7 @@ public class UserRepository : IUserRepository
             Surname = user.Surname,
             Name = user.Name,
             Patronymic = user.Patronymic,
+            BirthDate = user.BirthDate,
             Identity = identity
         };
     }
@@ -61,6 +62,7 @@ public class UserRepository : IUserRepository
             Surname = user.Surname,
             Name = user.Name,
             Patronymic = user.Patronymic,
+            BirthDate = user.BirthDate,
             Identity = identity
         };
     }

@@ -1,4 +1,6 @@
-﻿namespace DrivingSchool.Domain.Services;
+﻿using System.Security.Claims;
+
+namespace DrivingSchool.Domain.Services;
 
 public interface IUserService
 {
@@ -6,4 +8,5 @@ public interface IUserService
     public Task<bool> IsUserExistsByPhoneNumberAsync(string phoneNumber);
     public Task<User> GetUserByLoginAsync(string login);
     public Task<User> GetUserByIdAsync(int id);
+    public Task<IEnumerable<Claim>> GetUserClaimsByIdAsync(int id);
 }

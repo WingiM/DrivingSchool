@@ -1,8 +1,6 @@
-﻿using DrivingSchool.Domain.Enums;
+﻿namespace DrivingSchool.Data;
 
-namespace DrivingSchool.Data;
-
-public class RegistrationCredentials
+public class EditUser
 {
     public string Surname { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
@@ -10,5 +8,4 @@ public class RegistrationCredentials
     public string PhoneNumber { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public DateTime? BirthDate { get; set; }
-    public Roles Role { get; set; }
 }

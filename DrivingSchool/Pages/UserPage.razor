@@ -2,7 +2,7 @@
 @attribute [Authorize(Roles = "Administrator")]
 
 <PageTitle>Редактирование пользователя</PageTitle>
-<UserDisplay Id="Id" CanEdit="true"/>
+<UserDisplay Id="Id"/>
 @code {
     [Parameter]
     public int Id { get; set; }

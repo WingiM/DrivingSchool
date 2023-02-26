@@ -8,6 +8,7 @@ public class UserDb
     public required string Surname { get; init; }
     public required string Name { get; init; }
     public required string Patronymic { get; init; }
+    public DateTime BirthDate { get; init; }
     
     public required int IdentityId { get; init; }
     public IdentityUser<int> Identity { get; init; } = null!;

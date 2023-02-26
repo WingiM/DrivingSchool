@@ -1,14 +1,18 @@
-﻿using DrivingSchool.Domain.Repositories;
+﻿using System.Security.Claims;
+using DrivingSchool.Domain.Repositories;
+using Microsoft.AspNetCore.Identity;
 
 namespace DrivingSchool.Domain.Services.Impl;
 
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly UserManager<IdentityUser<int>> _userManager;
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, UserManager<IdentityUser<int>> userManager)
     {
         _userRepository = userRepository;
+        _userManager = userManager;
     }
 
     public async Task CreateUserAsync(User user)
@@ -29,5 +33,10 @@ public class UserService : IUserService
     public async Task<User> GetUserByIdAsync(int id)
     {
         return await _userRepository.GetUserByIdAsync(id);
+    }
+
+    public async Task<IEnumerable<Claim>> GetUserClaimsByIdAsync(int id)
+    {
+        return await _userManager.GetClaimsAsync(new IdentityUser<int> { Id = id });
     }
 }

@@ -5,6 +5,5 @@ namespace DrivingSchool.Domain.Services;
 
 public interface IAuthorizationService
 {
-    public Task<BaseResult> RegisterAsync(string surname, string name, string patronymic, string phoneNumber,
-        string email, Roles role);
+    public Task<BaseResult> RegisterAsync(User user, string phoneNumber, string email, Roles role);
 }

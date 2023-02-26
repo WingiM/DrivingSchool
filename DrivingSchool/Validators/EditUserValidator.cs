@@ -1,13 +1,12 @@
 ﻿using DrivingSchool.Data;
-using DrivingSchool.Domain.Enums;
 using DrivingSchool.Validators.ValidationMessages;
 using FluentValidation;
 
 namespace DrivingSchool.Validators;
 
-public class RegistrationValidator : AbstractValidator<RegistrationCredentials>
+public class EditUserValidator : AbstractValidator<EditUser>
 {
-    public RegistrationValidator()
+    public EditUserValidator()
     {
         RuleFor(x => x.Email)
             .Cascade(CascadeMode.Stop)
@@ -15,10 +14,6 @@ public class RegistrationValidator : AbstractValidator<RegistrationCredentials>
             .WithMessage(RegisterValidatorMessages.EmailNotEmpty)
             .EmailAddress()
             .WithMessage(RegisterValidatorMessages.NotEmail);
-
-        RuleFor(x => x.Role)
-            .Must(x => Enum.IsDefined(typeof(Roles), x))
-            .WithMessage(RegisterValidatorMessages.SelectRole);
 
         RuleFor(x => x.PhoneNumber)
             .NotEmpty()
@@ -49,7 +44,7 @@ public class RegistrationValidator : AbstractValidator<RegistrationCredentials>
     {
         var result =
             await ValidateAsync(
-                ValidationContext<RegistrationCredentials>.CreateWithOptions((RegistrationCredentials)model,
+                ValidationContext<EditUser>.CreateWithOptions((EditUser)model,
                     x => x.IncludeProperties(propertyName)));
         return result.IsValid ? Array.Empty<string>() : result.Errors.Select(e => e.ErrorMessage);
     };
