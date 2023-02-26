@@ -15,4 +15,9 @@ public class UserService : IUserService
     {
         await _userRepository.CreateUserAsync(user);
     }
+
+    public async Task<bool> IsUserExistsByPhoneNumberAsync(string phoneNumber)
+    {
+        return await _userRepository.IsUserExistsByPhoneNumberAsync(phoneNumber);
+    }
 }

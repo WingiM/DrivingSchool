@@ -1,6 +1,5 @@
 ﻿using DrivingSchool.Data.Configurations;
 using DrivingSchool.Data.Models;
-using DrivingSchool.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

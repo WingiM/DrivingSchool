@@ -1,7 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using DrivingSchool.Data;
-using DrivingSchool.Domain.Models;
-using DrivingSchool.Domain.Services;
 using Microsoft.AspNetCore.Identity;
 
 namespace DrivingSchool.Middleware;
