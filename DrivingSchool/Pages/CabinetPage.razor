@@ -1,0 +1,5 @@
+﻿@page "/cabinet"
+@inject AuthenticationStateProvider AuthenticationState
+
+<PageTitle>Мой кабинет</PageTitle>
+<UserDisplay Login="@(AuthenticationState.GetAuthenticationStateAsync().Result.User.Identity?.Name)"/>

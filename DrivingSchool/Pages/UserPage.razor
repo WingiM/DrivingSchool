@@ -1,0 +1,9 @@
+﻿@page "/user/{Id:int}"
+@attribute [Authorize(Roles = "Administrator")]
+
+<PageTitle>Редактирование пользователя</PageTitle>
+<UserDisplay Id="Id" CanEdit="true"/>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+}

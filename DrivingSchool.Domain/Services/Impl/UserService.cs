@@ -20,4 +20,14 @@ public class UserService : IUserService
     {
         return await _userRepository.IsUserExistsByPhoneNumberAsync(phoneNumber);
     }
+
+    public async Task<User> GetUserByLoginAsync(string login)
+    {
+        return await _userRepository.GetUserByLoginAsync(login);
+    }
+
+    public async Task<User> GetUserByIdAsync(int id)
+    {
+        return await _userRepository.GetUserByIdAsync(id);
+    }
 }
