@@ -1,6 +1,5 @@
 ﻿using DrivingSchool.Domain.Services;
 using DrivingSchool.Domain.Services.Impl;
-using DrivingSchool.Domain.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

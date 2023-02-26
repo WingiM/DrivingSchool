@@ -3,7 +3,6 @@ using System.Security.Cryptography;
 using DrivingSchool.Domain.Constants;
 using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Extensions;
-using DrivingSchool.Domain.Repositories;
 using DrivingSchool.Domain.Results;
 using Microsoft.AspNetCore.Identity;
 
@@ -33,6 +32,11 @@ public class AuthorizationService : IAuthorizationService
         if (await _identityManager.FindByEmailAsync(email) is not null)
         {
             return new BaseResult { Message = ResultMessages.UserWithThisEmailAlreadyExists };
+        }
+
+        if (await _userService.IsUserExistsByPhoneNumberAsync(phoneNumber))
+        {
+            return new BaseResult { Message = ResultMessages.UserWithThisPhoneNumberAlreadyExists };
         }
 
         var user = new User
