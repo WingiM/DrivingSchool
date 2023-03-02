@@ -7,25 +7,37 @@
 
 @if (_userLoaded)
 {
-    <MudForm Model="@_model" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
-        <MudCard>
-            <MudCardHeader>
-                <CardHeaderAvatar>
-                    <MudAvatar Color="Color.Primary">
-                        @(_userClaims.FirstOrDefault(x => x.Type == UserDefaultClaims.AvatarLetters)?.Value ?? "D")
-                    </MudAvatar>
-                </CardHeaderAvatar>
-                <CardHeaderContent>
-                    <div class="d-flex flex-grow-1 gap-4">
-                        <MudTextField @bind-Value="_model.Surname" ReadOnly="ReadOnly" For="() => _model.Surname" Immediate="false" Label="Фамилия"/>
-                        <MudTextField @bind-Value="_model.Name" ReadOnly="ReadOnly" For="() => _model.Name" Immediate="false" Label="Имя"/>
-                        <MudTextField @bind-Value="_model.Patronymic" ReadOnly="ReadOnly" For="() => _model.Patronymic" Immediate="false" Label="Отчество"/>
-                    </div>
-                    <MudText Typo="Typo.body2">@_user!.BirthDate.ToShortDateString()</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-        </MudCard>
-    </MudForm>
+    <MudExpansionPanels MultiExpansion="true">
+        <MudExpansionPanel Text="Основная информация">
+            <MudCard>
+                <MudForm Model="@_model" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+                    <MudCardHeader>
+                        <CardHeaderAvatar>
+                            <MudAvatar Color="Color.Primary">
+                                @(_userClaims.FirstOrDefault(x => x.Type == UserDefaultClaims.AvatarLetters)?.Value ?? "D")
+                            </MudAvatar>
+                        </CardHeaderAvatar>
+                        <CardHeaderContent>
+                            <MudStack Row="true">
+                                <MudTextField @bind-Value="_model.Surname" ReadOnly="ReadOnly" For="() => _model.Surname" Immediate="false" Label="Фамилия"/>
+                                <MudTextField @bind-Value="_model.Name" ReadOnly="ReadOnly" For="() => _model.Name" Immediate="false" Label="Имя"/>
+                                <MudTextField @bind-Value="_model.Patronymic" ReadOnly="ReadOnly" For="() => _model.Patronymic" Immediate="false" Label="Отчество"/>
+                            </MudStack>
+                            <MudDatePicker @bind-Date="_model.BirthDate" OpenTo="OpenTo.Year" MaxDate="DrivingSchoolRestrictions.MaximumBirthDate" For="() => _model.BirthDate" Label="Дата рождения"/>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudTextField @bind-Value="_model.Email" InputType="InputType.Email" Label="Электронная почта" ReadOnly="true"/>
+                        <MudTextField @bind-Value="_model.PhoneNumber" InputType="InputType.Telephone" Label="Номер телефона" ReadOnly="true"/>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Disabled="@_formLoading" Variant="Variant.Filled" Color="Color.Primary" OnClick="async () => await SaveChanges()">Сохранить изменения</MudButton>
+                    </MudCardActions>
+                </MudForm>
+            </MudCard>
+        </MudExpansionPanel>
+        <MudExpansionPanel Text="Паспортные данные"></MudExpansionPanel>
+    </MudExpansionPanels>
 }
 else
 {
@@ -52,6 +64,7 @@ else
     readonly EditUserValidator _validator = new();
     private EditUser _model = null!;
 
+    private bool _formLoading;
     private bool _userLoaded;
     private User _user = null!;
     private IEnumerable<Claim> _userClaims = Enumerable.Empty<Claim>();
@@ -71,6 +84,10 @@ else
         };
 
         _userLoaded = true;
+    }
+
+    private async Task SaveChanges()
+    {
     }
 
 }

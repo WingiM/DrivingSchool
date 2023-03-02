@@ -1,6 +1,5 @@
 ﻿using DrivingSchool.Domain.Constants;
 using MailKit.Net.Smtp;
-using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using MimeKit;
 
@@ -58,7 +57,7 @@ public class MailingService : IMailingService
 
             message.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
-            await smtp.ConnectAsync(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
+            await smtp.ConnectAsync(_mailSettings.Host, _mailSettings.Port, true);
             await smtp.AuthenticateAsync(_mailSettings.Mail, _mailSettings.Password);
             await smtp.SendAsync(message);
             _logger.LogInformation(

@@ -4,6 +4,7 @@ namespace DrivingSchool.Domain.Enums;
 
 public enum Roles
 {
-    [Display(Name = "Administrator")] Administrator = 1,
-    [Display(Name = "Student")] Student = 2
+    [Display(Name = "Администратор")] Administrator = 1,
+    [Display(Name = "Студент")] Student = 2,
+    [Display(Name = "Учитель")] Teacher = 3,
 }
