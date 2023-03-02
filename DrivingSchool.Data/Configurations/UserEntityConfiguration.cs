@@ -16,5 +16,6 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserDb>
         builder.Property(x => x.Name).HasColumnName("name");
         builder.Property(x => x.Patronymic).HasColumnName("patronymic");
         builder.Property(x => x.IdentityId).HasColumnName("identity_id");
+        builder.Property(x => x.BirthDate).HasColumnName("birth_date");
     }
 }

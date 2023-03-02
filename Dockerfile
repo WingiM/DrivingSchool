@@ -9,10 +9,10 @@ COPY ["DrivingSchool/DrivingSchool.csproj", "DrivingSchool/"]
 RUN dotnet restore "DrivingSchool/DrivingSchool.csproj"
 COPY . .
 WORKDIR "/src/DrivingSchool"
-RUN dotnet build "DrivingSchool.csproj" -c Release -o /app/build
+RUN dotnet build "DrivingSchool.csproj" -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "DrivingSchool.csproj" -c Release -o /app/publish
+RUN dotnet publish "DrivingSchool.csproj" -o /app/publish
 
 FROM base AS final
 WORKDIR /app

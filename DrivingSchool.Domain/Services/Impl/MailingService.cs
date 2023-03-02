@@ -34,6 +34,7 @@ public class MailingService : IMailingService
         {
             var message = new MimeMessage();
             message.Sender = MailboxAddress.Parse(_mailSettings.Mail);
+            message.From.Add(new MailboxAddress(_mailSettings.DisplayName, _mailSettings.Mail));
             message.To.Add(MailboxAddress.Parse(mailingMessage.ToEmail));
             message.Subject = mailingMessage.Subject;
             var builder = new BodyBuilder
@@ -58,7 +59,10 @@ public class MailingService : IMailingService
 
             message.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
-            await smtp.ConnectAsync(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
+            if (_mailSettings.Port == 465)
+                await smtp.ConnectAsync(_mailSettings.Host, _mailSettings.Port, true);
+            else
+                await smtp.ConnectAsync(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
             await smtp.AuthenticateAsync(_mailSettings.Mail, _mailSettings.Password);
             await smtp.SendAsync(message);
             _logger.LogInformation(

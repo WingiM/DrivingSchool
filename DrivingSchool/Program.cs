@@ -36,6 +36,7 @@ builder.Services
     .AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 var app = builder.Build();
 app.UseSerilogRequestLogging();
+app.UseMiddleware<ExceptionMiddleware>();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

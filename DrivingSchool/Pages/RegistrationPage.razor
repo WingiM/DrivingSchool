@@ -1,11 +1,12 @@
 ﻿@page "/registration"
 @using DrivingSchool.Data
+@using DrivingSchool.Domain.Constants
 @using DrivingSchool.Domain.Enums
 @using DrivingSchool.Validators
 @using IAuthorizationService = Domain.Services.IAuthorizationService;
 @using DrivingSchool.Domain.Extensions;
 @inject IAuthorizationService AuthorizationService;
-@attribute [Authorize(Roles = "Administrator")]
+@attribute [Authorize(Roles = "Администратор")]
 
 <MudCard>
     <MudCardHeader>
@@ -18,6 +19,7 @@
             <MudTextField @bind-Value="_model.Surname" For="() => _model.Surname" Immediate="false" Label="Фамилия"/>
             <MudTextField @bind-Value="_model.Name" For="() => _model.Name" Immediate="false" Label="Имя"/>
             <MudTextField @bind-Value="_model.Patronymic" For="() => _model.Patronymic" Immediate="false" Label="Отчество"/>
+            <MudDatePicker @bind-Date="_model.BirthDate" OpenTo="OpenTo.Year" MaxDate="DrivingSchoolRestrictions.MaximumBirthDate" For="() => _model.BirthDate" Label="Дата рождения"/>
             <MudTextField @bind-Value="_model.Email" For="() => _model.Email" Immediate="false" Label="Электронная почта"/>
             <MudTextField @bind-Value="_model.PhoneNumber" For="() => _model.PhoneNumber" Immediate="false"
                           Label="Номер телефона" Mask="@(new PatternMask("+0 (000) 000 00-00"))"/>
@@ -39,7 +41,7 @@
 </MudCard>
 
 @code {
-    private bool _loading = false;
+    private bool _loading;
     readonly Func<Roles, string?> _converter = p => p.GetDisplayName();
 
     [Inject]
@@ -60,8 +62,8 @@
             return;
         }
 
-        var res = await AuthorizationService.RegisterAsync(_model.Surname, _model.Name, _model.Patronymic,
-            _model.PhoneNumber, _model.Email, _model.Role);
+        var user = new User { Surname = _model.Surname, Name = _model.Name, Patronymic = _model.Patronymic, BirthDate = _model.BirthDate!.Value };
+        var res = await AuthorizationService.RegisterAsync(user, _model.PhoneNumber, _model.Email, _model.Role);
         _loading = false;
         if (res.Success)
         {

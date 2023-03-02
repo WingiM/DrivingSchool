@@ -27,6 +27,5 @@ public class IdentityUserEntityConfiguration : IEntityTypeConfiguration<Identity
         builder.Property(e => e.SecurityStamp).HasColumnName("security_stamp");
         builder.Property(e => e.PhoneNumberConfirmed).HasColumnName("phone_number_confirmed");
         builder.Property(e => e.TwoFactorEnabled).HasColumnName("two_factor_enabled");
-        ;
     }
 }
