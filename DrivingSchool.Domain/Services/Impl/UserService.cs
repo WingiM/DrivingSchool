@@ -20,6 +20,12 @@ public class UserService : IUserService
         await _userRepository.CreateUserAsync(user);
     }
 
+    public async Task<BaseResult> UpdateUserAsync(User user)
+    {
+        var res = await _userRepository.UpdateUserAsync(user);
+        return new DatabaseEntityCreationResult { Success = true, CreatedEntityId = res };
+    }
+
     public async Task<bool> IsUserExistsByPhoneNumberAsync(string phoneNumber)
     {
         return await _userRepository.IsUserExistsByPhoneNumberAsync(phoneNumber);

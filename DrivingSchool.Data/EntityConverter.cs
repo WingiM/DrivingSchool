@@ -12,7 +12,8 @@ public static class EntityConverter
             : new Passport
             {
                 Id = passportDb.Id, Number = passportDb.Number, Series = passportDb.Series,
-                IssuedBy = passportDb.IssuedBy, IssueDate = passportDb.IssueDate, IssuerCode = passportDb.IssuerCode,
+                IssuedBy = passportDb.IssuedBy, IssueDate = passportDb.IssueDate.ToUniversalTime(), 
+                IssuerCode = passportDb.IssuerCode,
                 PlaceOfBirth = passportDb.PlaceOfBirth, UserId = passportDb.UserId
             };
     }
@@ -24,7 +25,8 @@ public static class EntityConverter
             : new PassportDb
             {
                 Id = passport.Id, Number = passport.Number, Series = passport.Series,
-                IssuedBy = passport.IssuedBy, IssueDate = passport.IssueDate, IssuerCode = passport.IssuerCode,
+                IssuedBy = passport.IssuedBy, IssueDate = passport.IssueDate.ToUniversalTime(), 
+                IssuerCode = passport.IssuerCode,
                 PlaceOfBirth = passport.PlaceOfBirth, UserId = passport.UserId
             };
     }
@@ -33,9 +35,24 @@ public static class EntityConverter
     {
         return new User
         {
-            Id = userDb.Id, BirthDate = userDb.BirthDate, Surname = userDb.Surname,
+            Id = userDb.Id, BirthDate = userDb.BirthDate.ToUniversalTime(), Surname = userDb.Surname,
             Name = userDb.Name, Patronymic = userDb.Patronymic, Passport = ConvertPassport(userDb.Passport),
             Identity = userDb.Identity
+        };
+    }
+
+    public static UserDb ConvertUser(User user)
+    {
+        return new UserDb
+        {
+            Id = user.Id,
+            BirthDate = user.BirthDate.ToUniversalTime(),
+            Surname = user.Surname,
+            Name = user.Name,
+            Patronymic = user.Patronymic,
+            Passport = ConvertPassport(user.Passport),
+            Identity = user.Identity,
+            IdentityId = user.Identity.Id
         };
     }
 }

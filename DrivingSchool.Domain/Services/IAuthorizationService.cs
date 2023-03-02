@@ -1,5 +1,4 @@
 ﻿using DrivingSchool.Domain.Enums;
-using DrivingSchool.Domain.Results;
 
 namespace DrivingSchool.Domain.Services;
 

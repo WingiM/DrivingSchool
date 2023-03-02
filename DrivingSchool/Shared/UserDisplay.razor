@@ -4,6 +4,7 @@
 @using DrivingSchool.Validators
 @inject NavigationManager NavigationManager
 @inject IUserService UserService
+@inject IPassportService PassportService
 
 @if (_userLoaded)
 {
@@ -161,22 +162,43 @@ else
 
     private async Task SaveUserChanges()
     {
+        _formLoading = true;
         var user = new User
         {
-            Surname = _userModel.Surname, Name = _userModel.Name, 
-            Patronymic = _userModel.Patronymic, BirthDate = _userModel.BirthDate!.Value
+            Surname = _userModel.Surname, Name = _userModel.Name,
+            Patronymic = _userModel.Patronymic, BirthDate = _userModel.BirthDate!.Value,
+            Id = Id == 0 ? _user.Id : Id, Identity = _user.Identity
         };
+
+        var res = await UserService.UpdateUserAsync(user);
+        _formLoading = false;
+        if (!res.Success)
+        {
+            Snackbar.Add($"Ошибка сохранения: {res.Message}", Severity.Error);
+            return;
+        }
+        Snackbar.Add("Успешно сохранено", Severity.Success);
     }
 
     private async Task SavePassportChanges()
     {
+        _formLoading = true;
         var passport = new Passport
         {
-            Series = _passportModel.Series, Number = _passportModel.Number, 
-            IssueDate = _passportModel.IssueDate!.Value, IssuedBy = _passportModel.IssuedBy, 
+            Series = _passportModel.Series, Number = _passportModel.Number,
+            IssueDate = _passportModel.IssueDate!.Value, IssuedBy = _passportModel.IssuedBy,
             IssuerCode = _passportModel.IssuerCode, PlaceOfBirth = _passportModel.PlaceOfBirth,
-            UserId = Id
+            UserId = Id == 0 ? _user.Id : Id, Id = _user.Passport?.Id ?? 0
         };
+
+        var res = await PassportService.AddOrUpdatePassportAsync(passport);
+        _formLoading = false;
+        if (!res.Success)
+        {
+            Snackbar.Add($"Ошибка сохранения: {res.Message}", Severity.Error);
+            return;
+        }
+        Snackbar.Add("Успешно сохранено", Severity.Success);
     }
 
 }

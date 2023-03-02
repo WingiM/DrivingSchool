@@ -1,46 +1,42 @@
-﻿using DrivingSchool.Data.Models;
-using DrivingSchool.Domain.Exceptions;
+﻿using DrivingSchool.Domain.Exceptions;
 using DrivingSchool.Domain.Models;
 using DrivingSchool.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace DrivingSchool.Data.Repositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository : BaseRepository, IUserRepository
 {
-    private readonly ApplicationContext _context;
-
-    public UserRepository(ApplicationContext context)
+    public UserRepository(ApplicationContext context) : base(context)
     {
-        _context = context;
-        _context.Passports.Load();
     }
 
     public async Task CreateUserAsync(User user)
     {
-        var userDb = new UserDb
-        {
-            Surname = user.Surname,
-            Name = user.Name,
-            Patronymic = user.Patronymic,
-            IdentityId = user.Identity.Id,
-            Passport = EntityConverter.ConvertPassport(user.Passport)
-        };
+        await Context.Users.AddAsync(EntityConverter.ConvertUser(user));
+        await Context.SaveChangesAsync();
+    }
 
-        await _context.Users.AddAsync(userDb);
-        await _context.SaveChangesAsync();
+    public async Task<int> UpdateUserAsync(User user)
+    {
+        var entity = EntityConverter.ConvertUser(user);
+        Context.Users.Update(entity);
+        await Context.SaveChangesAsync();
+        return entity.Id;
     }
 
     public async Task<bool> IsUserExistsByPhoneNumberAsync(string phoneNumber)
     {
-        return await _context.UserIdentities.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber) is not null;
+        return await Context.UserIdentities.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber) is not null;
     }
 
     public async Task<User> GetUserByLoginAsync(string login)
     {
-        var identity = await _context.UserIdentities.SingleOrDefaultAsync(x => x.UserName == login) ??
+        var identity = await Context.UserIdentities.SingleOrDefaultAsync(x => x.UserName == login) ??
                        throw new NotFoundException();
-        var user = await _context.Users.SingleAsync(x => x.IdentityId == identity.Id);
+        var user = await Context.Users
+            .Include(x => x.Passport)
+            .SingleAsync(x => x.IdentityId == identity.Id);
         user.Identity = identity;
 
         return EntityConverter.ConvertUser(user);
@@ -48,8 +44,10 @@ public class UserRepository : IUserRepository
 
     public async Task<User> GetUserByIdAsync(int id)
     {
-        var user = await _context.Users.SingleOrDefaultAsync(x => x.Id == id) ?? throw new NotFoundException();
-        var identity = await _context.UserIdentities.SingleAsync(x => x.Id == user.IdentityId);
+        var user = await Context.Users
+            .Include(x => x.Passport)
+            .SingleOrDefaultAsync(x => x.Id == id) ?? throw new NotFoundException();
+        var identity = await Context.UserIdentities.SingleAsync(x => x.Id == user.IdentityId);
         user.Identity = identity;
 
         return EntityConverter.ConvertUser(user);

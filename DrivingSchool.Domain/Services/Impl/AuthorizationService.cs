@@ -3,7 +3,6 @@ using System.Security.Cryptography;
 using DrivingSchool.Domain.Constants;
 using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Extensions;
-using DrivingSchool.Domain.Results;
 using Microsoft.AspNetCore.Identity;
 
 namespace DrivingSchool.Domain.Services.Impl;
