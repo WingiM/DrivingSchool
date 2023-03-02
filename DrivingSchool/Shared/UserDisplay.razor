@@ -2,15 +2,16 @@
 @using DrivingSchool.Data
 @using DrivingSchool.Domain.Constants
 @using DrivingSchool.Validators
+@using IAuthorizationService = DrivingSchool.Domain.Services.IAuthorizationService
 @inject NavigationManager NavigationManager
 @inject IUserService UserService
 @inject IPassportService PassportService
+@inject IEncryptionService EncryptionService
+@inject IAuthorizationService AuthorizationService
 
 @if (_userLoaded)
 {
-    <MudExpansionPanels MultiExpansion="true">
-        <MudExpansionPanel Text="Основная информация">
-            <MudCard>
+    <MudCard>
                 <MudForm Model="@_userModel" @ref="@_userEditForm" Validation="@(_userValidator.ValidateValue)" ValidationDelay="0">
                     <MudCardHeader>
                         <CardHeaderAvatar>
@@ -34,7 +35,23 @@
                     </MudCardHeader>
                     <MudCardContent>
                         <MudTextField @bind-Value="_userModel.Email" InputType="InputType.Email"
-                                      Label="Электронная почта" ReadOnly="true"/>
+                                      Label="Электронная почта" ReadOnly="ReadOnly"/>
+                        <AuthorizeView Roles="Администратор">
+                            <Authorized>
+                                <MudStack Row="true">
+                                    <MudText>Статус верификации:</MudText>
+                                    @if (_user.Identity.EmailConfirmed)
+                                    {
+                                        <MudText Color="Color.Success">Верифицирован</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText Color="Color.Error">Не верифицирован</MudText>
+                                        <MudButton OnClick="SendVerification">Повторно отправить сообщение на почту</MudButton>
+                                    }
+                                </MudStack>
+                            </Authorized>
+                        </AuthorizeView>
                         <MudTextField @bind-Value="_userModel.PhoneNumber" InputType="InputType.Telephone"
                                       Label="Номер телефона" ReadOnly="true"/>
                     </MudCardContent>
@@ -53,7 +70,7 @@
                     </MudCardActions>
                 </MudForm>
             </MudCard>
-        </MudExpansionPanel>
+    <MudExpansionPanels MultiExpansion="true">
         <MudExpansionPanel Text="Паспортные данные">
             <MudCard>
                 <MudForm Model="@_passportModel" @ref="@_passportEditForm"
@@ -169,6 +186,7 @@ else
             Patronymic = _userModel.Patronymic, BirthDate = _userModel.BirthDate!.Value,
             Id = Id == 0 ? _user.Id : Id, Identity = _user.Identity
         };
+        _user.Identity.Email = _userModel.Email;
 
         var res = await UserService.UpdateUserAsync(user);
         _formLoading = false;
@@ -201,4 +219,15 @@ else
         Snackbar.Add("Успешно сохранено", Severity.Success);
     }
 
+    private async Task SendVerification()
+    {
+        var res = await AuthorizationService.VerifyUser(_user, EncryptionService.GeneratePasswordForUser());
+        if (res)
+        {
+            Snackbar.Add("Письмо отправлено успешно", Severity.Success);
+            return;
+        }
+
+        Snackbar.Add("Ошибка при отправке письма. Свяжитесь с администратором", Severity.Error);
+    }
 }

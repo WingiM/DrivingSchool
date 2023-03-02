@@ -22,6 +22,7 @@ public class UserRepository : BaseRepository, IUserRepository
         var entity = EntityConverter.ConvertUser(user);
         Context.Users.Update(entity);
         await Context.SaveChangesAsync();
+        Context.ChangeTracker.Clear();
         return entity.Id;
     }
 

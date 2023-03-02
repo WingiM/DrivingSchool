@@ -22,8 +22,21 @@ public class UserService : IUserService
 
     public async Task<BaseResult> UpdateUserAsync(User user)
     {
+        var existingUser = await _userRepository.GetUserByIdAsync(user.Id);
+        if (existingUser.Identity.Email != user.Identity.Email)
+        {
+            await ChangeUserEmail(user, user.Identity.Email!);
+        }
         var res = await _userRepository.UpdateUserAsync(user);
+
         return new DatabaseEntityCreationResult { Success = true, CreatedEntityId = res };
+    }
+    
+    public async Task ChangeUserEmail(User user, string newEmail)
+    {
+        var identity = user.Identity;
+        await _userManager.SetUserNameAsync(identity, newEmail);
+        await _userManager.SetEmailAsync(identity, newEmail);
     }
 
     public async Task<bool> IsUserExistsByPhoneNumberAsync(string phoneNumber)

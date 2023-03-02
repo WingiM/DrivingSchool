@@ -15,6 +15,7 @@ public class PassportRepository : BaseRepository, IPassportRepository
         var entity = EntityConverter.ConvertPassport(passport)!;
         Context.Passports.Update(entity);
         await Context.SaveChangesAsync();
+        Context.ChangeTracker.Clear();
         return entity.Id;
     }
 
