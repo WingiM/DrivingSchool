@@ -1,5 +1,7 @@
 ﻿using DrivingSchool.Domain.Services;
 using DrivingSchool.Domain.Services.Impl;
+using DrivingSchool.Domain.Validation;
+using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,8 +19,12 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(mailSettings);
 
         services.AddScoped<IAuthorizationService, AuthorizationService>();
+        services.AddScoped<IEncryptionService, EncryptionService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IPassportService, PassportService>();
         services.AddTransient<IMailingService, MailingService>();
+
+        services.AddFluentValidationAutoValidation().AddValidatorsFromAssembly(typeof(PassportValidator).Assembly);
         return services;
     }
 }

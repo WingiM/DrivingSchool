@@ -1,0 +1,9 @@
+﻿@page "/cabinet"
+@attribute [Authorize]
+
+<PageTitle>Мой кабинет</PageTitle>
+<AuthorizeView>
+    <Authorized>
+        <UserDisplay Login="@(@context.User.Identity?.Name)" ReadOnly="@(!context.User.IsInRole("Администратор"))"/>
+    </Authorized>
+</AuthorizeView>
