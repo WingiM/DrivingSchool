@@ -11,5 +11,6 @@ public class UserDb
     public DateTime BirthDate { get; init; }
     
     public required int IdentityId { get; init; }
-    public IdentityUser<int> Identity { get; init; } = null!;
+    public IdentityUser<int> Identity { get; set; } = null!;
+    public PassportDb? Passport { get; init; }
 }

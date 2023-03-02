@@ -13,6 +13,7 @@ public class UserRepository : IUserRepository
     public UserRepository(ApplicationContext context)
     {
         _context = context;
+        _context.Passports.Load();
     }
 
     public async Task CreateUserAsync(User user)
@@ -22,7 +23,8 @@ public class UserRepository : IUserRepository
             Surname = user.Surname,
             Name = user.Name,
             Patronymic = user.Patronymic,
-            IdentityId = user.Identity.Id
+            IdentityId = user.Identity.Id,
+            Passport = EntityConverter.ConvertPassport(user.Passport)
         };
 
         await _context.Users.AddAsync(userDb);
@@ -39,31 +41,17 @@ public class UserRepository : IUserRepository
         var identity = await _context.UserIdentities.SingleOrDefaultAsync(x => x.UserName == login) ??
                        throw new NotFoundException();
         var user = await _context.Users.SingleAsync(x => x.IdentityId == identity.Id);
+        user.Identity = identity;
 
-        return new User
-        {
-            Id = user.Id,
-            Surname = user.Surname,
-            Name = user.Name,
-            Patronymic = user.Patronymic,
-            BirthDate = user.BirthDate,
-            Identity = identity
-        };
+        return EntityConverter.ConvertUser(user);
     }
 
     public async Task<User> GetUserByIdAsync(int id)
     {
         var user = await _context.Users.SingleOrDefaultAsync(x => x.Id == id) ?? throw new NotFoundException();
         var identity = await _context.UserIdentities.SingleAsync(x => x.Id == user.IdentityId);
+        user.Identity = identity;
 
-        return new User
-        {
-            Id = user.Id,
-            Surname = user.Surname,
-            Name = user.Name,
-            Patronymic = user.Patronymic,
-            BirthDate = user.BirthDate,
-            Identity = identity
-        };
+        return EntityConverter.ConvertUser(user);
     }
 }

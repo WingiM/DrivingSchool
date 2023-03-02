@@ -10,7 +10,7 @@
     <MudExpansionPanels MultiExpansion="true">
         <MudExpansionPanel Text="Основная информация">
             <MudCard>
-                <MudForm Model="@_model" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+                <MudForm Model="@_userModel" @ref="@_userEditForm" Validation="@(_userValidator.ValidateValue)" ValidationDelay="0">
                     <MudCardHeader>
                         <CardHeaderAvatar>
                             <MudAvatar Color="Color.Primary">
@@ -19,24 +19,83 @@
                         </CardHeaderAvatar>
                         <CardHeaderContent>
                             <MudStack Row="true">
-                                <MudTextField @bind-Value="_model.Surname" ReadOnly="ReadOnly" For="() => _model.Surname" Immediate="false" Label="Фамилия"/>
-                                <MudTextField @bind-Value="_model.Name" ReadOnly="ReadOnly" For="() => _model.Name" Immediate="false" Label="Имя"/>
-                                <MudTextField @bind-Value="_model.Patronymic" ReadOnly="ReadOnly" For="() => _model.Patronymic" Immediate="false" Label="Отчество"/>
+                                <MudTextField @bind-Value="_userModel.Surname" ReadOnly="ReadOnly"
+                                              For="() => _userModel.Surname" Immediate="false" Label="Фамилия"/>
+                                <MudTextField @bind-Value="_userModel.Name" ReadOnly="ReadOnly"
+                                              For="() => _userModel.Name" Immediate="false" Label="Имя"/>
+                                <MudTextField @bind-Value="_userModel.Patronymic" ReadOnly="ReadOnly"
+                                              For="() => _userModel.Patronymic" Immediate="false" Label="Отчество"/>
                             </MudStack>
-                            <MudDatePicker @bind-Date="_model.BirthDate" OpenTo="OpenTo.Year" MaxDate="DrivingSchoolRestrictions.MaximumBirthDate" For="() => _model.BirthDate" Label="Дата рождения"/>
+                            <MudDatePicker @bind-Date="_userModel.BirthDate" OpenTo="OpenTo.Year"
+                                           MaxDate="DrivingSchoolRestrictions.MaximumBirthDate"
+                                           For="() => _userModel.BirthDate" Label="Дата рождения"/>
                         </CardHeaderContent>
                     </MudCardHeader>
                     <MudCardContent>
-                        <MudTextField @bind-Value="_model.Email" InputType="InputType.Email" Label="Электронная почта" ReadOnly="true"/>
-                        <MudTextField @bind-Value="_model.PhoneNumber" InputType="InputType.Telephone" Label="Номер телефона" ReadOnly="true"/>
+                        <MudTextField @bind-Value="_userModel.Email" InputType="InputType.Email"
+                                      Label="Электронная почта" ReadOnly="true"/>
+                        <MudTextField @bind-Value="_userModel.PhoneNumber" InputType="InputType.Telephone"
+                                      Label="Номер телефона" ReadOnly="true"/>
                     </MudCardContent>
                     <MudCardActions>
-                        <MudButton Disabled="@_formLoading" Variant="Variant.Filled" Color="Color.Primary" OnClick="async () => await SaveChanges()">Сохранить изменения</MudButton>
+                        @if (!ReadOnly)
+                        {
+                            <MudButton Disabled="@_formLoading" Variant="Variant.Filled" Color="Color.Primary"
+                                       OnClick="async () => await SaveUserChanges()">
+                                Сохранить изменения
+                            </MudButton>
+                            @if (_formLoading)
+                            {
+                                <MudProgressCircular Style="margin-left: 10px;" Color="Color.Primary" Indeterminate="true"/>
+                            }
+                        }
                     </MudCardActions>
                 </MudForm>
             </MudCard>
         </MudExpansionPanel>
-        <MudExpansionPanel Text="Паспортные данные"></MudExpansionPanel>
+        <MudExpansionPanel Text="Паспортные данные">
+            <MudCard>
+                <MudForm Model="@_passportModel" @ref="@_passportEditForm"
+                         Validation="@(_passportValidator.ValidateValue)" ValidationDelay="0">
+                    <MudCardContent>
+                        <MudStack Row="true">
+                            <MudTextField @bind-Value="_passportModel.Series" For="() => _passportModel.Series"
+                                          ReadOnly="ReadOnly" Label="Серия" Immediate="false"
+                                          Mask="@(new PatternMask("00 00") { CleanDelimiters = true })"/>
+                            <MudTextField @bind-Value="_passportModel.Number" For="() => _passportModel.Number"
+                                          ReadOnly="ReadOnly" Label="Номер" Immediate="false"
+                                          Mask="@(new PatternMask("000 000") { CleanDelimiters = true })"/>
+                        </MudStack>
+                        <MudStack Row="true">
+                            <MudTextField @bind-Value="_passportModel.IssuerCode" For="() => _passportModel.IssuerCode"
+                                          ReadOnly="ReadOnly" Label="Код подразделения" Immediate="false"
+                                          Mask="@(new PatternMask("000-000") { CleanDelimiters = true })"/>
+                            <MudDatePicker @bind-Date="_passportModel.IssueDate" OpenTo="OpenTo.Year"
+                                           For="() => _passportModel.IssueDate" Label="Дата выдачи"
+                                           ReadOnly="ReadOnly"/>
+                        </MudStack>
+                        <MudTextField @bind-Value="_passportModel.IssuedBy" For="() => _passportModel.IssuedBy"
+                                      ReadOnly="ReadOnly" Label="Кем выдано" Immediate="false"
+                                      Placeholder="Точно по паспорту" Variant="Variant.Text"/>
+                        <MudTextField @bind-Value="_passportModel.PlaceOfBirth" For="() => _passportModel.PlaceOfBirth"
+                                      ReadOnly="ReadOnly" Label="Место рождения" Immediate="false" Variant="Variant.Text"/>
+                    </MudCardContent>
+                    <MudCardActions>
+                        @if (!ReadOnly)
+                        {
+                            <MudButton Disabled="@_formLoading" Variant="Variant.Filled" Color="Color.Primary"
+                                       OnClick="async () => await SavePassportChanges()">
+                                Сохранить изменения
+                            </MudButton>
+                            @if (_formLoading)
+                            {
+                                <MudProgressCircular Style="margin-left: 10px;" Color="Color.Primary" Indeterminate="true"/>
+                            }
+                        }
+                    </MudCardActions>
+                </MudForm>
+            </MudCard>
+        </MudExpansionPanel>
     </MudExpansionPanels>
 }
 else
@@ -60,9 +119,13 @@ else
     [Inject]
     ISnackbar Snackbar { get; set; } = null!;
 
-    MudForm _form = null!;
-    readonly EditUserValidator _validator = new();
-    private EditUser _model = null!;
+    MudForm _userEditForm = null!;
+    readonly EditUserValidator _userValidator = new();
+    private EditUser _userModel = null!;
+
+    MudForm _passportEditForm = null!;
+    readonly EditPassportValidator _passportValidator = new();
+    private EditPassport _passportModel = new();
 
     private bool _formLoading;
     private bool _userLoaded;
@@ -77,17 +140,43 @@ else
             _user = await UserService.GetUserByIdAsync(Id);
         _userClaims = await UserService.GetUserClaimsByIdAsync(_user.Id);
 
-        _model = new EditUser
+        _userModel = new EditUser
         {
             BirthDate = _user.BirthDate, Name = _user.Name, Patronymic = _user.Patronymic, Surname = _user.Surname,
             Email = _user.Identity.Email!, PhoneNumber = _user.Identity.PhoneNumber!
         };
 
+        var passport = _user.Passport;
+        if (passport is not null)
+        {
+            _passportModel = new EditPassport
+            {
+                Id = passport.Id, Number = passport.Number, Series = passport.Series, IssueDate = passport.IssueDate,
+                IssuerCode = passport.IssuerCode, IssuedBy = passport.IssuedBy, PlaceOfBirth = passport.PlaceOfBirth
+            };
+        }
+
         _userLoaded = true;
     }
 
-    private async Task SaveChanges()
+    private async Task SaveUserChanges()
     {
+        var user = new User
+        {
+            Surname = _userModel.Surname, Name = _userModel.Name, 
+            Patronymic = _userModel.Patronymic, BirthDate = _userModel.BirthDate!.Value
+        };
+    }
+
+    private async Task SavePassportChanges()
+    {
+        var passport = new Passport
+        {
+            Series = _passportModel.Series, Number = _passportModel.Number, 
+            IssueDate = _passportModel.IssueDate!.Value, IssuedBy = _passportModel.IssuedBy, 
+            IssuerCode = _passportModel.IssuerCode, PlaceOfBirth = _passportModel.PlaceOfBirth,
+            UserId = Id
+        };
     }
 
 }
