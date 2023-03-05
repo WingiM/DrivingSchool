@@ -1,4 +1,5 @@
 ﻿using DrivingSchool.Data.Models;
+using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Models;
 
 namespace DrivingSchool.Data;
@@ -37,7 +38,7 @@ public static class EntityConverter
         {
             Id = userDb.Id, BirthDate = userDb.BirthDate.ToUniversalTime(), Surname = userDb.Surname,
             Name = userDb.Name, Patronymic = userDb.Patronymic, Passport = ConvertPassport(userDb.Passport),
-            Identity = userDb.Identity
+            Identity = userDb.Identity, Role = (Roles)userDb.RoleId
         };
     }
 
@@ -52,7 +53,8 @@ public static class EntityConverter
             Patronymic = user.Patronymic,
             Passport = ConvertPassport(user.Passport),
             Identity = user.Identity,
-            IdentityId = user.Identity.Id
+            IdentityId = user.Identity.Id,
+            RoleId = (int)user.Role
         };
     }
 }

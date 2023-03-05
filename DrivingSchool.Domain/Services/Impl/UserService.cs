@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Repositories;
 using Microsoft.AspNetCore.Identity;
 
@@ -27,11 +28,12 @@ public class UserService : IUserService
         {
             await ChangeUserEmail(user, user.Identity.Email!);
         }
+
         var res = await _userRepository.UpdateUserAsync(user);
 
         return new DatabaseEntityCreationResult { Success = true, CreatedEntityId = res };
     }
-    
+
     public async Task ChangeUserEmail(User user, string newEmail)
     {
         var identity = user.Identity;
@@ -57,5 +59,11 @@ public class UserService : IUserService
     public async Task<IEnumerable<Claim>> GetUserClaimsByIdAsync(int id)
     {
         return await _userManager.GetClaimsAsync(new IdentityUser<int> { Id = id });
+    }
+
+    public async Task<ListDataResult<User>> ListUsers(int itemCount, int pageNumber, string searchText,
+        string field = UserSortingField.Id, bool desc = false)
+    {
+        return await _userRepository.ListUsers(itemCount, pageNumber, searchText, field, desc);
     }
 }

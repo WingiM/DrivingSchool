@@ -1,28 +1,35 @@
 ﻿using System.Security.Claims;
 using DrivingSchool.Domain.Constants;
-using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Extensions;
+using DrivingSchool.Domain.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace DrivingSchool.Domain.Services.Impl;
 
 public class AuthorizationService : IAuthorizationService
 {
+    private readonly ILogger<AuthorizationService> _logger;
     private readonly IMailingService _mailingService;
+    private readonly IDatabaseAccessRepository _databaseAccessRepository;
     private readonly UserManager<IdentityUser<int>> _identityManager;
     private readonly IUserService _userService;
     private readonly IEncryptionService _encryptionService;
 
     public AuthorizationService(UserManager<IdentityUser<int>> identityManager, IUserService userService,
-        IEncryptionService encryptionService, IMailingService mailingService)
+        IEncryptionService encryptionService, IMailingService mailingService,
+        IDatabaseAccessRepository databaseAccessRepository, ILogger<AuthorizationService> logger)
     {
         _identityManager = identityManager;
         _userService = userService;
         _encryptionService = encryptionService;
         _mailingService = mailingService;
+        _databaseAccessRepository = databaseAccessRepository;
+        _logger = logger;
     }
 
-    public async Task<BaseResult> RegisterAsync(User user, string phoneNumber, string email, Roles role)
+    public async Task<BaseResult> RegisterAsync(User user, string phoneNumber, string email,
+        bool sendVerificationEmail = false)
     {
         var identityUser = new IdentityUser<int> { Email = email, UserName = email, PhoneNumber = phoneNumber };
 
@@ -39,24 +46,34 @@ public class AuthorizationService : IAuthorizationService
         user.Identity = identityUser;
         var password = _encryptionService.GeneratePasswordForUser();
         var result = await _identityManager.CreateAsync(identityUser, password);
-        if (!result.Succeeded) return new BaseResult { Message = ResultMessages.InternalRegisterError };
-        await _identityManager.AddToRoleAsync(identityUser, role.GetDisplayName()!);
+        if (!result.Succeeded)
+        {
+            _logger.LogInformation("Registration not completed: {Error}", result);
+            return new BaseResult { Message = ResultMessages.InternalRegisterError };
+        }
+        await _identityManager.AddToRoleAsync(identityUser, user.Role.GetDisplayName()!);
 
         await _userService.CreateUserAsync(user);
         await AddDefaultClaimsToUserAsync(user);
-        await VerifyUser(user, password);
+        if (sendVerificationEmail)
+            await VerifyUser(user, password, false);
+        await _databaseAccessRepository.ClearTracking();
 
         return new BaseResult { Success = true };
     }
 
-    public async Task<bool> VerifyUser(User user, string password)
+    public async Task<bool> VerifyUser(User user, string password, bool resetPassword = true)
     {
         var mailingResult = await _mailingService.SendUserRegisteredMessageAsync(user, password);
         if (!mailingResult) return false;
         var code = await _identityManager.GenerateEmailConfirmationTokenAsync(user.Identity);
         await _identityManager.ConfirmEmailAsync(user.Identity, code);
-        var token = await _identityManager.GeneratePasswordResetTokenAsync(user.Identity);
-        await _identityManager.ResetPasswordAsync(user.Identity, token, password);
+        if (resetPassword)
+        {
+            var token = await _identityManager.GeneratePasswordResetTokenAsync(user.Identity);
+            await _identityManager.ResetPasswordAsync(user.Identity, token, password);
+        }
+
         return true;
     }
 

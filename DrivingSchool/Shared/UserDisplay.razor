@@ -184,7 +184,7 @@ else
         {
             Surname = _userModel.Surname, Name = _userModel.Name,
             Patronymic = _userModel.Patronymic, BirthDate = _userModel.BirthDate!.Value,
-            Id = Id == 0 ? _user.Id : Id, Identity = _user.Identity
+            Id = Id == 0 ? _user.Id : Id, Identity = _user.Identity, Role = _user.Role
         };
         _user.Identity.Email = _userModel.Email;
 

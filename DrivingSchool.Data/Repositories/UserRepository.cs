@@ -1,6 +1,11 @@
-﻿using DrivingSchool.Domain.Exceptions;
+﻿using System.Linq.Expressions;
+using DrivingSchool.Data.Extensions;
+using DrivingSchool.Data.Models;
+using DrivingSchool.Domain.Enums;
+using DrivingSchool.Domain.Exceptions;
 using DrivingSchool.Domain.Models;
 using DrivingSchool.Domain.Repositories;
+using DrivingSchool.Domain.Results;
 using Microsoft.EntityFrameworkCore;
 
 namespace DrivingSchool.Data.Repositories;
@@ -52,5 +57,42 @@ public class UserRepository : BaseRepository, IUserRepository
         user.Identity = identity;
 
         return EntityConverter.ConvertUser(user);
+    }
+
+    public async Task<ListDataResult<User>> ListUsers(int itemCount, int pageNumber, string searchText,
+        string field = UserSortingField.Id, bool desc = false)
+    {
+        var property = GetOrderProperty(field);
+        var filtered = Context.Users
+            .Where(x => string.Join(" ", x.Name, x.Surname, x.Patronymic).ToLower().Contains(searchText.ToLower()));
+        var users = await filtered
+            .OrderBy(property, desc)
+            .Skip(pageNumber * itemCount)
+            .Take(itemCount)
+            .ToListAsync();
+        var identityIds = users.Select(x => x.IdentityId).ToList();
+        var identities = Context.UserIdentities.Where(x => identityIds.Contains(x.Id)).ToList();
+        foreach (var user in users)
+        {
+            user.Identity = identities.Single(x => user.IdentityId == x.Id);
+        }
+
+        return new ListDataResult<User>
+        {
+            Items = users.Select(EntityConverter.ConvertUser),
+            TotalItemsCount = filtered.Count()
+        };
+    }
+
+    private Expression<Func<UserDb, object>> GetOrderProperty(string field)
+    {
+        return field switch
+        {
+            UserSortingField.Id => x => x.Id,
+            UserSortingField.Name => x => x.Name,
+            UserSortingField.Surname => x => x.Surname,
+            UserSortingField.Patronymic => x => x.Patronymic,
+            _ => throw new ArgumentOutOfRangeException(nameof(field), field, null)
+        };
     }
 }
