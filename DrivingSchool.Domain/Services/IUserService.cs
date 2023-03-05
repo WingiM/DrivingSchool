@@ -6,7 +6,7 @@ namespace DrivingSchool.Domain.Services;
 public interface IUserService
 {
     public Task CreateUserAsync(User user);
-    public Task<BaseResult> UpdateUserAsync(User user);
+    public Task<BaseResult> UpdateUserAsync(User user, bool emailUpdated);
     public Task ChangeUserEmail(User user, string newEmail);
     public Task<bool> IsUserExistsByPhoneNumberAsync(string phoneNumber);
     public Task<User> GetUserByLoginAsync(string login);

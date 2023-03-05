@@ -6,14 +6,18 @@ using DrivingSchool.Domain.Exceptions;
 using DrivingSchool.Domain.Models;
 using DrivingSchool.Domain.Repositories;
 using DrivingSchool.Domain.Results;
+using DrivingSchool.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace DrivingSchool.Data.Repositories;
 
 public class UserRepository : BaseRepository, IUserRepository
 {
-    public UserRepository(ApplicationContext context) : base(context)
+    private readonly IIdentityCachingService _identityCachingService;
+
+    public UserRepository(ApplicationContext context, IIdentityCachingService identityCachingService) : base(context)
     {
+        _identityCachingService = identityCachingService;
     }
 
     public async Task CreateUserAsync(User user)
@@ -33,13 +37,12 @@ public class UserRepository : BaseRepository, IUserRepository
 
     public async Task<bool> IsUserExistsByPhoneNumberAsync(string phoneNumber)
     {
-        return await Context.UserIdentities.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber) is not null;
+        return await _identityCachingService.GetByPhone(phoneNumber) is not null;
     }
 
     public async Task<User> GetUserByLoginAsync(string login)
     {
-        var identity = await Context.UserIdentities.SingleOrDefaultAsync(x => x.UserName == login) ??
-                       throw new NotFoundException();
+        var identity = (await _identityCachingService.GetByEmail(login))!;
         var user = await Context.Users
             .Include(x => x.Passport)
             .SingleAsync(x => x.IdentityId == identity.Id);
@@ -53,8 +56,8 @@ public class UserRepository : BaseRepository, IUserRepository
         var user = await Context.Users
             .Include(x => x.Passport)
             .SingleOrDefaultAsync(x => x.Id == id) ?? throw new NotFoundException();
-        var identity = await Context.UserIdentities.SingleAsync(x => x.Id == user.IdentityId);
-        user.Identity = identity;
+        var identity = await _identityCachingService.GetIdentity(user.IdentityId);
+        user.Identity = identity!;
 
         return EntityConverter.ConvertUser(user);
     }
@@ -71,7 +74,7 @@ public class UserRepository : BaseRepository, IUserRepository
             .Take(itemCount)
             .ToListAsync();
         var identityIds = users.Select(x => x.IdentityId).ToList();
-        var identities = Context.UserIdentities.Where(x => identityIds.Contains(x.Id)).ToList();
+        var identities = (await _identityCachingService.GetMultiple(identityIds)).ToList();
         foreach (var user in users)
         {
             user.Identity = identities.Single(x => user.IdentityId == x.Id);

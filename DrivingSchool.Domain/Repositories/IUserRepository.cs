@@ -1,4 +1,5 @@
 ﻿using DrivingSchool.Domain.Enums;
+using Microsoft.AspNetCore.Identity;
 
 namespace DrivingSchool.Domain.Repositories;
 

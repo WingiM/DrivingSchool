@@ -5,6 +5,7 @@
 @using DrivingSchool.Middleware
 @inject SignInManager<IdentityUser<int>> SignInManager
 @inject UserManager<IdentityUser<int>> UserManager
+@inject IIdentityCachingService IdentityCachingService
 @inject NavigationManager NavigationManager
 
 <MudCard>
@@ -44,8 +45,8 @@
             return;
         }
 
-        var user = await UserManager.FindByEmailAsync(_model.Email);
-        if (user == null)
+        var user = await IdentityCachingService.GetByEmail(_model.Email);
+        if (user is null)
         {
             Snackbar.Add("Пользователя с такими данными не существует", Severity.Error);
             return;

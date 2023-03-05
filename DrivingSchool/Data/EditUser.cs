@@ -7,5 +7,6 @@ public class EditUser
     public string Patronymic { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public bool EmailUpdated { get; set; }
     public DateTime? BirthDate { get; set; }
 }

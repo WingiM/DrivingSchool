@@ -21,10 +21,9 @@ public class UserService : IUserService
         await _userRepository.CreateUserAsync(user);
     }
 
-    public async Task<BaseResult> UpdateUserAsync(User user)
+    public async Task<BaseResult> UpdateUserAsync(User user, bool emailUpdated)
     {
-        var existingUser = await _userRepository.GetUserByIdAsync(user.Id);
-        if (existingUser.Identity.Email != user.Identity.Email)
+        if (emailUpdated)
         {
             await ChangeUserEmail(user, user.Identity.Email!);
         }

@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEncryptionService, EncryptionService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IPassportService, PassportService>();
+        services.AddScoped<IIdentityCachingService, IdentityCachingService>();
         services.AddTransient<IMailingService, MailingService>();
 
         services.AddFluentValidationAutoValidation().AddValidatorsFromAssembly(typeof(PassportValidator).Assembly);
