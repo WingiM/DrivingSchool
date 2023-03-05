@@ -1,45 +1,44 @@
-﻿using DrivingSchool.Domain.Repositories;
+﻿using DrivingSchool.Domain.Constants;
+using DrivingSchool.Domain.Repositories;
 using Microsoft.AspNetCore.Identity;
 
 namespace DrivingSchool.Domain.Services.Impl;
 
-public static class IdentityCache
-{
-    public static readonly Dictionary<int, IdentityUser<int>> Cache = new();
-}
 public class IdentityCachingService : IIdentityCachingService
 {
-    private readonly IIdentityCachingRepository _userRepository;
+    private readonly IdentityCache _cache;
+    private readonly IIdentityCachingRepository _identityCachingRepository;
 
-    public IdentityCachingService(IIdentityCachingRepository userRepository)
+    public IdentityCachingService(IIdentityCachingRepository identityCachingRepository, IdentityCache cache)
     {
-        _userRepository = userRepository;
+        _identityCachingRepository = identityCachingRepository;
+        _cache = cache;
     }
 
     public Task AddIdentity(IdentityUser<int> identityUser)
     {
-        IdentityCache.Cache.Add(identityUser.Id, identityUser);
+        _cache.Cache.Add(identityUser.Id, identityUser);
         return Task.CompletedTask;
     }
 
     public Task<IdentityUser<int>?> GetIdentity(int id)
     {
-        var res = IdentityCache.Cache.TryGetValue(id, out var identityUser);
+        var res = _cache.Cache.TryGetValue(id, out var identityUser);
         if (res) return Task.FromResult(identityUser);
-        identityUser = _userRepository.FindIdentityById(id);
+        identityUser = _identityCachingRepository.FindIdentityById(id);
         if (identityUser is not null)
-            IdentityCache.Cache.Add(id, identityUser);
+            _cache.Cache.Add(id, identityUser);
         return Task.FromResult(identityUser);
     }
 
     public Task<IdentityUser<int>?> GetByEmail(string email)
     {
-        IdentityUser<int>? identityUser = IdentityCache.Cache.Values.FirstOrDefault(x => x.Email == email);
+        IdentityUser<int>? identityUser = _cache.Cache.Values.FirstOrDefault(x => x.Email == email);
         if (identityUser is null)
         {
-            identityUser = _userRepository.FindIdentityByEmail(email);
+            identityUser = _identityCachingRepository.FindIdentityByEmail(email);
             if (identityUser is not null)
-                IdentityCache.Cache.Add(identityUser.Id, identityUser);
+                _cache.Cache.Add(identityUser.Id, identityUser);
         }
 
         return Task.FromResult(identityUser);
@@ -47,12 +46,12 @@ public class IdentityCachingService : IIdentityCachingService
 
     public Task<IdentityUser<int>?> GetByPhone(string phone)
     {
-        IdentityUser<int>? identityUser = IdentityCache.Cache.Values.FirstOrDefault(x => x.Email == phone);
+        IdentityUser<int>? identityUser = _cache.Cache.Values.FirstOrDefault(x => x.Email == phone);
         if (identityUser is null)
         {
-            identityUser = _userRepository.FindIdentityByPhone(phone);
+            identityUser = _identityCachingRepository.FindIdentityByPhone(phone);
             if (identityUser is not null)
-                IdentityCache.Cache.Add(identityUser.Id, identityUser);
+                _cache.Cache.Add(identityUser.Id, identityUser);
         }
 
         return Task.FromResult(identityUser);

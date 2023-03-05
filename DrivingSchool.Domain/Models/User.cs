@@ -13,14 +13,5 @@ public class User
     public required Roles Role { get; set; }
 
     public IdentityUser<int> Identity { get; set; } = null!;
-    public IdentityInfo IdentityInfo { get; set; } = null!;
     public Passport? Passport { get; init; }
-}
-
-public class IdentityInfo
-{
-    public int Id { get; set; }
-    public string Email { get; set; }
-    public string PhoneNumber { get; set; }
-    public string EmailVerified { get; set; }
 }

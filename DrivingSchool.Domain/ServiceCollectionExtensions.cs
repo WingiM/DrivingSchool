@@ -1,4 +1,5 @@
-﻿using DrivingSchool.Domain.Services;
+﻿using DrivingSchool.Domain.Constants;
+using DrivingSchool.Domain.Services;
 using DrivingSchool.Domain.Services.Impl;
 using DrivingSchool.Domain.Validation;
 using FluentValidation.AspNetCore;
@@ -23,6 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IPassportService, PassportService>();
         services.AddScoped<IIdentityCachingService, IdentityCachingService>();
+        services.AddSingleton<IdentityCache>();
         services.AddTransient<IMailingService, MailingService>();
 
         services.AddFluentValidationAutoValidation().AddValidatorsFromAssembly(typeof(PassportValidator).Assembly);
