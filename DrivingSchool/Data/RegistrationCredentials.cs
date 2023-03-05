@@ -11,4 +11,5 @@ public class RegistrationCredentials
     public string Email { get; set; } = string.Empty;
     public DateTime? BirthDate { get; set; }
     public Roles Role { get; set; }
+    public bool SendVerificationEmail { get; set; }
 }

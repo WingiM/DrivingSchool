@@ -11,7 +11,12 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPassportRepository, PassportRepository>();
-        services.AddDbContext<ApplicationContext>(options => { options.UseNpgsql(connectionString); });
+        services.AddScoped<IDatabaseAccessRepository, DatabaseAccessRepository>();
+        services.AddScoped<IIdentityCachingRepository, IdentityCachingRepository>();
+        services.AddDbContext<ApplicationContext>(options => { options.UseNpgsql(connectionString);
+            options.EnableSensitiveDataLogging();
+            options.EnableDetailedErrors();
+        });
         services.AddDatabaseDeveloperPageExceptionFilter();
         return services;
     }

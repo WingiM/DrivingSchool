@@ -1,0 +1,119 @@
+﻿@page "/management"
+@using IAuthorizationService = DrivingSchool.Domain.Services.IAuthorizationService
+@using DrivingSchool.Domain.Enums
+@using DrivingSchool.Domain.Extensions
+@using DrivingSchool.Domain.Results
+@using Microsoft.AspNetCore.Identity
+@inject IUserService UserService
+@inject IAuthorizationService AuthorizationService
+@inject IEncryptionService EncryptionService
+@inject UserManager<IdentityUser<int>> UserManager
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "Администратор")]
+
+<PageTitle>Управление пользователями</PageTitle>
+
+<MudTable T="User" ServerData="GetData" Dense="true" Hover="true" Bordered="true" Striped="true" @ref="_table" OnRowClick="RowClickEvent">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Пользователи системы</MudText>
+        <MudSpacer/>
+        <MudTextField T="string" Placeholder="Поиск по инициалам" Adornment="Adornment.Start" ValueChanged="@(OnSearch)"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@UserSortingField.Surname" T="User">Фамилия</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@UserSortingField.Name" T="User">Имя</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortLabel="@UserSortingField.Patronymic" T="User">Отчество</MudTableSortLabel>
+        </MudTh>
+        <MudTh>Номер телефона</MudTh>
+        <MudTh>Электронная почта</MudTh>
+        <MudTh>Роль</MudTh>
+        <MudTh>Верифицирован</MudTh>
+        <MudTh>Повторно отправить пароль</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Фамилия">@context.Surname</MudTd>
+        <MudTd DataLabel="Имя">@context.Name</MudTd>
+        <MudTd DataLabel="Отчество">@context.Patronymic</MudTd>
+        <MudTd DataLabel="Номер телефона">@context.Identity.PhoneNumber</MudTd>
+        <MudTd DataLabel="Электронная почта">@context.Identity.Email</MudTd>
+        <MudTd DataLabel="Роль">@context.Role.GetDisplayName()</MudTd>
+        <MudTd DataLabel="Верифицирован">
+            @if (context.Identity.EmailConfirmed)
+            {
+                <MudText Color="Color.Success">Да</MudText>
+            }
+            else
+            {
+                <MudText Color="Color.Error">Нет</MudText>
+            }
+        </MudTd>
+        <MudTd DataLabel="Повторно отправить пароль">
+            <MudButton OnClick="@(() => SendVerification(context))">Отправить</MudButton>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager/>
+    </PagerContent>
+</MudTable>
+
+
+@code {
+
+    [Inject]
+    ISnackbar Snackbar { get; set; } = null!;
+
+    private string _search = string.Empty;
+    private MudTable<User> _table = null!;
+
+    private async Task<TableData<User>> GetData(TableState state)
+    {
+        ListDataResult<User> data;
+        if (state.SortLabel is null)
+            data = await UserService.ListUsers(state.PageSize, state.Page, _search);
+        else
+            data = await UserService.ListUsers(state.PageSize, state.Page, _search, state.SortLabel, state.SortDirection == SortDirection.Descending);
+
+        return new TableData<User>() { TotalItems = data.TotalItemsCount, Items = data.Items };
+    }
+
+    private async Task<string> GetUserRole(IdentityUser<int> user)
+    {
+        return (await UserManager.GetRolesAsync(user)).Single();
+    }
+
+    private void RowClickEvent(TableRowClickEventArgs<User> tableRowClickEventArgs)
+    {
+        NavigationManager.NavigateTo($"/user/{tableRowClickEventArgs.Item.Id}");
+    }
+
+    private void OnSearch(string text)
+    {
+        _search = text;
+        _table.ReloadServerData();
+    }
+
+    private async Task SendVerification(User user)
+    {
+        var res = await AuthorizationService.VerifyUser(user, EncryptionService.GeneratePasswordForUser());
+        if (res)
+        {
+            Snackbar.Add("Письмо отправлено успешно", Severity.Success);
+            return;
+        }
+
+        Snackbar.Add("Ошибка при отправке письма. Свяжитесь с администратором", Severity.Error);
+    }
+
+}

@@ -1,5 +1,4 @@
-﻿using DrivingSchool.Domain.ErrorMessages;
-using DrivingSchool.Domain.Repositories;
+﻿using DrivingSchool.Domain.Repositories;
 
 namespace DrivingSchool.Domain.Services.Impl;
 

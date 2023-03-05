@@ -8,6 +8,7 @@
 @inject IAuthorizationService AuthorizationService;
 @attribute [Authorize(Roles = "Администратор")]
 
+<PageTitle>Регистрация пользователей</PageTitle>
 <MudCard>
     <MudCardHeader>
         <CardHeaderContent>
@@ -29,6 +30,7 @@
                     <MudSelectItem Value="role"/>
                 }
             </MudSelect>
+            <MudCheckBox @bind-Checked="@_model.SendVerificationEmail" Color="Color.Primary" Label="Отправить письмо с паролем" LabelPosition="LabelPosition.End"/>
         </MudCardContent>
         <MudCardActions>
             <MudButton Disabled="@_loading" Variant="Variant.Filled" Color="Color.Primary" OnClick="async () => await Register()">Регистрация</MudButton>
@@ -62,8 +64,8 @@
             return;
         }
 
-        var user = new User { Surname = _model.Surname, Name = _model.Name, Patronymic = _model.Patronymic, BirthDate = _model.BirthDate!.Value };
-        var res = await AuthorizationService.RegisterAsync(user, _model.PhoneNumber, _model.Email, _model.Role);
+        var user = new User { Surname = _model.Surname, Name = _model.Name, Patronymic = _model.Patronymic, BirthDate = _model.BirthDate!.Value, Role = _model.Role };
+        var res = await AuthorizationService.RegisterAsync(user, _model.PhoneNumber, _model.Email, _model.SendVerificationEmail);
         _loading = false;
         if (res.Success)
         {

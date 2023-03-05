@@ -18,7 +18,6 @@ builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>
         .WriteTo.Console()
 );
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddData(builder.Configuration.GetConnectionString("DefaultConnection")!);
 builder.Services.AddDomain(builder.Configuration);
 builder.Services.AddDefaultIdentity<IdentityUser<int>>(options =>

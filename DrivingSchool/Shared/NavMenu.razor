@@ -1,11 +1,13 @@
 ﻿<MudNavMenu Style="padding-top: 0;" Color="Color.Primary">
-    <MudText Typo="Typo.h6" Class="px-4"><MudImage Src="drivingSchool.png" Width="40" Height="40" Style="position: relative;top: 10px"/>втошкола</MudText>
+    <MudLink Href="/" Style="color:black; text-decoration: none; cursor: default">
+        <MudText Typo="Typo.h6" Class="px-4" Style="color: black">
+            <MudImage Src="drivingSchool.png" Width="40" Height="40" Style="position: relative;top: 10px; cursor: pointer"/>втошкола
+        </MudText>
+    </MudLink>
     <MudDivider Class="my-2"/>
-    <MudNavLink Href="/" Match="NavLinkMatch.All">Home</MudNavLink>
-    <MudNavLink Href="/counter">Counter</MudNavLink>
-    <MudNavLink Href="/fetchdata">Data</MudNavLink>
     <AuthorizeView Roles="Администратор">
         <MudNavLink Href="/registration">Регистрация пользователей</MudNavLink>
+        <MudNavLink Href="/management">Управление пользователями</MudNavLink>
     </AuthorizeView>
 </MudNavMenu>
 
