@@ -17,7 +17,7 @@
         <MudForm Model="@_userModel" @ref="@_userEditForm" Validation="@(_userValidator.ValidateValue)" ValidationDelay="0">
             <MudCardHeader>
                 <CardHeaderAvatar>
-                    <MudAvatar Color="Color.Primary">
+                    <MudAvatar Color="Color.Primary" Size="Size.Large">
                         @(_userClaims.FirstOrDefault(x => x.Type == UserDefaultClaims.AvatarLetters)?.Value ?? "D")
                     </MudAvatar>
                 </CardHeaderAvatar>
@@ -158,7 +158,7 @@ else
             _user = await UserService.GetUserByLoginAsync(Login);
         else
             _user = await UserService.GetUserByIdAsync(Id);
-        _userClaims = await UserService.GetUserClaimsByIdAsync(_user.Id);
+        _userClaims = await UserService.GetUserClaimsByIdAsync(_user.Identity.Id);
 
         _userModel = new EditUser
         {
