@@ -13,7 +13,7 @@ public static class EntityConverter
             : new Passport
             {
                 Id = passportDb.Id, Number = passportDb.Number, Series = passportDb.Series,
-                IssuedBy = passportDb.IssuedBy, IssueDate = passportDb.IssueDate.ToUniversalTime(), 
+                IssuedBy = passportDb.IssuedBy, IssueDate = passportDb.IssueDate.ToUniversalTime(),
                 IssuerCode = passportDb.IssuerCode,
                 PlaceOfBirth = passportDb.PlaceOfBirth, UserId = passportDb.UserId
             };
@@ -26,7 +26,7 @@ public static class EntityConverter
             : new PassportDb
             {
                 Id = passport.Id, Number = passport.Number, Series = passport.Series,
-                IssuedBy = passport.IssuedBy, IssueDate = passport.IssueDate.ToUniversalTime(), 
+                IssuedBy = passport.IssuedBy, IssueDate = passport.IssueDate.ToUniversalTime(),
                 IssuerCode = passport.IssuerCode,
                 PlaceOfBirth = passport.PlaceOfBirth, UserId = passport.UserId
             };
@@ -55,6 +55,37 @@ public static class EntityConverter
             Identity = user.Identity,
             IdentityId = user.Identity.Id,
             RoleId = (int)user.Role
+        };
+    }
+
+    public static ExamTicket ConvertExamTicket(ExamTicketDb ticketDb)
+    {
+        return new ExamTicket
+        {
+            Id = ticketDb.Id, Number = ticketDb.Number,
+            Questions = ticketDb.Questions.Select(x => ConvertExamTicketQuestion(x)).ToArray()
+        };
+    }
+    
+    public static ExamTicketQuestion ConvertExamTicketQuestion(ExamTicketQuestionDb ticketQuestionDb)
+    {
+        return new ExamTicketQuestion
+        {
+            Id = ticketQuestionDb.Id, ImageSource = ticketQuestionDb.ImageSource, Question = ticketQuestionDb.Question,
+            Answers = ticketQuestionDb.Answers.Select(x => ConvertExamTicketQuestionAnswer(x)).ToArray(),
+            Comment = ticketQuestionDb.Comment
+        };
+    }
+
+    public static ExamTicketQuestionAnswer ConvertExamTicketQuestionAnswer(ExamTicketQuestionAnswerDb questionAnswerDb)
+    {
+        return new ExamTicketQuestionAnswer
+        {
+            NumberInTicket = questionAnswerDb.NumberInTicket,
+            AnswerText = questionAnswerDb.AnswerText,
+            Id = questionAnswerDb.Id,
+            IsCorrect = questionAnswerDb.IsCorrect,
+            TicketId = questionAnswerDb.QuestionId,
         };
     }
 }

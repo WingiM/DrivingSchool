@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace DrivingSchool.Data.Repositories;
+﻿namespace DrivingSchool.Data.Repositories;
 
 public abstract class BaseRepository
 {
@@ -9,6 +7,5 @@ public abstract class BaseRepository
     protected BaseRepository(ApplicationContext context)
     {
         Context = context;
-        Context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 }

@@ -1,0 +1,68 @@
+﻿@using System.ComponentModel.DataAnnotations
+@inject IExamTicketService ExamTicketService
+
+@if (_ticketLoaded)
+{
+    <MudCard>
+        <MudCardMedia Image="@_currentQuestion.ImageSource" Height="400"/>
+        <MudCardContent>
+            <MudText Typo="Typo.h5">@_currentQuestion.Question</MudText>
+            <MudStack Spacing="3" AlignItems="AlignItems.Start">
+                @foreach (var answer in _currentQuestion.Answers.OrderBy(x => x.NumberInTicket))
+                {
+                    <MudButton Style="@($"color: black; background: {GetButtonBgColor(answer)}; width: 80%; justify-content: left;")" OnClick="() => CheckAnswer(answer)">
+                        <MudText>@($"{answer.NumberInTicket}. {answer.AnswerText}")</MudText>
+                    </MudButton>
+                }
+            </MudStack>
+            @if (_tryGuessed)
+            {
+                <MudText>Правильный ответ: @_currentQuestion.Answers.Single(x => x.IsCorrect).NumberInTicket</MudText>
+                <MudText>@_currentQuestion.Comment</MudText>
+            }
+        </MudCardContent>
+    </MudCard>
+}
+else
+{
+    <div style="transform: translateY(25%); text-align: center">
+        <MudProgressCircular Style="width: 40%; height: 40%;" Color="Color.Primary" Indeterminate="true"/>
+    </div>
+}
+
+@code {
+
+    [Required]
+    [Parameter]
+    public int TicketId { get; set; }
+
+    private ExamTicket _ticket = null!;
+    private ExamTicketQuestion _currentQuestion = null!;
+    private int _currentQuestionId;
+    private bool _tryGuessed;
+    private bool _ticketLoaded;
+    private int _selectedAnswer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _ticket = await ExamTicketService.GetTicketByNumberAsync(TicketId);
+        _currentQuestion = _ticket.Questions[_currentQuestionId];
+        _ticketLoaded = true;
+    }
+
+    private string GetButtonBgColor(ExamTicketQuestionAnswer questionAnswer)
+    {
+        if (!_tryGuessed) return Colors.Grey.Lighten3;
+        if (questionAnswer.IsCorrect)
+            return Colors.Green.Lighten1;
+        return questionAnswer.Id == _selectedAnswer ? Colors.Red.Lighten1 : Colors.Grey.Lighten3;
+    }
+
+    private void CheckAnswer(ExamTicketQuestionAnswer questionAnswer)
+    {
+        if (_tryGuessed) return;
+        _tryGuessed = true;
+        _selectedAnswer = questionAnswer.Id;
+    }
+
+}

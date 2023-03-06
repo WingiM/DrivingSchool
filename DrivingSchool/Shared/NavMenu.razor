@@ -8,6 +8,10 @@
     <AuthorizeView Roles="Администратор">
         <MudNavLink Href="/registration">Регистрация пользователей</MudNavLink>
         <MudNavLink Href="/management">Управление пользователями</MudNavLink>
+        <MudNavLink Href="/test">Пройти тест</MudNavLink>
+    </AuthorizeView>
+    <AuthorizeView Roles="Студент">
+        <MudNavLink Href="/test">Пройти тест</MudNavLink>
     </AuthorizeView>
 </MudNavMenu>
 
