@@ -17,28 +17,28 @@ public class IdentityCachingService : IIdentityCachingService
 
     public Task AddIdentity(IdentityUser<int> identityUser)
     {
-        _cache.Cache.Add(identityUser.Id, identityUser);
+        _cache.TryAdd(identityUser.Id, identityUser);
         return Task.CompletedTask;
     }
 
     public Task<IdentityUser<int>?> GetIdentity(int id)
     {
-        var res = _cache.Cache.TryGetValue(id, out var identityUser);
+        var res = _cache.TryGetValue(id, out var identityUser);
         if (res) return Task.FromResult(identityUser);
         identityUser = _identityCachingRepository.FindIdentityById(id);
         if (identityUser is not null)
-            _cache.Cache.Add(id, identityUser);
+            _cache.TryAdd(id, identityUser);
         return Task.FromResult(identityUser);
     }
 
     public Task<IdentityUser<int>?> GetByEmail(string email)
     {
-        IdentityUser<int>? identityUser = _cache.Cache.Values.FirstOrDefault(x => x.Email == email);
+        var identityUser = _cache.TryGetValueByEmail(email);
         if (identityUser is null)
         {
             identityUser = _identityCachingRepository.FindIdentityByEmail(email);
             if (identityUser is not null)
-                _cache.Cache.Add(identityUser.Id, identityUser);
+                _cache.TryAdd(identityUser.Id, identityUser);
         }
 
         return Task.FromResult(identityUser);
@@ -46,12 +46,12 @@ public class IdentityCachingService : IIdentityCachingService
 
     public Task<IdentityUser<int>?> GetByPhone(string phone)
     {
-        IdentityUser<int>? identityUser = _cache.Cache.Values.FirstOrDefault(x => x.Email == phone);
+        IdentityUser<int>? identityUser = _cache.TryGetValueByPhone(phone);
         if (identityUser is null)
         {
             identityUser = _identityCachingRepository.FindIdentityByPhone(phone);
             if (identityUser is not null)
-                _cache.Cache.Add(identityUser.Id, identityUser);
+                _cache.TryAdd(identityUser.Id, identityUser);
         }
 
         return Task.FromResult(identityUser);

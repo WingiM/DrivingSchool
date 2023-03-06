@@ -7,7 +7,6 @@
 @inject IUserService UserService
 @inject IAuthorizationService AuthorizationService
 @inject IEncryptionService EncryptionService
-@inject UserManager<IdentityUser<int>> UserManager
 @inject NavigationManager NavigationManager
 @attribute [Authorize(Roles = "Администратор")]
 
@@ -64,7 +63,10 @@
         <MudText>Loading...</MudText>
     </LoadingContent>
     <PagerContent>
-        <MudTablePager/>
+        <div class="d-flex flex-column align-center">
+            <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Class="pa-4"/>
+            <MudTablePager HidePagination="true" InfoFormat="{first_item}-{last_item} из {all_items}" RowsPerPageString="Отображать строк:"/>
+        </div>
     </PagerContent>
 </MudTable>
 
@@ -88,11 +90,6 @@
         return new TableData<User>() { TotalItems = data.TotalItemsCount, Items = data.Items };
     }
 
-    private async Task<string> GetUserRole(IdentityUser<int> user)
-    {
-        return (await UserManager.GetRolesAsync(user)).Single();
-    }
-
     private void RowClickEvent(TableRowClickEventArgs<User> tableRowClickEventArgs)
     {
         NavigationManager.NavigateTo($"/user/{tableRowClickEventArgs.Item.Id}");
@@ -102,6 +99,11 @@
     {
         _search = text;
         _table.ReloadServerData();
+    }
+
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
     }
 
     private async Task SendVerification(User user)
