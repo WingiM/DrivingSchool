@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DrivingSchool.Data.Repositories;
 
-public class ExamTicketRepository : BaseRepository, IExamTicketRepository
+public class ExamRepository : BaseRepository, IExamRepository
 {
-    public ExamTicketRepository(ApplicationContext context) : base(context)
+    public ExamRepository(ApplicationContext context) : base(context)
     {
     }
 
@@ -26,5 +26,13 @@ public class ExamTicketRepository : BaseRepository, IExamTicketRepository
             .Select(x => x.Number)
             .ToArrayAsync();
         return new ListDataResult<int> { Items = res, TotalItemsCount = Context.ExamTickets.Count() };
+    }
+
+    public async Task SaveExamResult(ExamHistory result)
+    {
+        var res = EntityConverter.ConvertExamHistory(result);
+        Context.Add(res);
+        await Context.SaveChangesAsync();
+        Context.ChangeTracker.Clear();
     }
 }

@@ -1,7 +1,7 @@
 ﻿@page "/test"
 @using ExamTicket = DrivingSchool.Domain.Models.ExamTicketQuestion
 @* @attribute [Authorize(Roles = "Студент")] *@
-@inject IExamTicketService ExamTicketService
+@inject IExamService ExamService
 
 @if (_ticketsLoaded)
 {
@@ -27,7 +27,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _tickets = (await ExamTicketService.GetTicketNumbersAsync()).Items.ToArray();
+        _tickets = (await ExamService.GetTicketNumbersAsync()).Items.ToArray();
         _ticketsLoaded = true;
     }
 }

@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPassportRepository, PassportRepository>();
         services.AddScoped<IDatabaseAccessRepository, DatabaseAccessRepository>();
-        services.AddScoped<IExamTicketRepository, ExamTicketRepository>();
+        services.AddScoped<IExamRepository, ExamRepository>();
         services.AddScoped<IIdentityCachingRepository, IdentityCachingRepository>();
         services.AddDbContext<ApplicationContext>(options =>
         {

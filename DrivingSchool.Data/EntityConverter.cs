@@ -88,4 +88,24 @@ public static class EntityConverter
             QuestionId = questionAnswerDb.QuestionId,
         };
     }
+
+    public static ExamHistory ConvertExamHistory(ExamHistoryDb historyDb)
+    {
+        return new ExamHistory
+        {
+            Id = historyDb.Id, TicketId = historyDb.TicketId, UserId = historyDb.UserId,
+            CorrectAnswers = historyDb.CorrectAnswers, WrongAnswers = historyDb.WrongAnswers,
+            TotalTime = historyDb.TotalTime, TicketNumber = historyDb.Ticket.Number
+        };
+    }
+
+    public static ExamHistoryDb ConvertExamHistory(ExamHistory history)
+    {
+        return new ExamHistoryDb
+        {
+            Id = history.Id, TicketId = history.TicketId, UserId = history.UserId,
+            CorrectAnswers = history.CorrectAnswers, WrongAnswers = history.WrongAnswers,
+            TotalTime = history.TotalTime
+        };
+    }
 }
