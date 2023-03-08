@@ -5,7 +5,7 @@ namespace DrivingSchool.Domain.Models;
 
 public class User
 {
-    public int Id { get; init; }
+    public int Id { get; set; }
     public required string Surname { get; init; }
     public required string Name { get; init; }
     public required string Patronymic { get; init; }

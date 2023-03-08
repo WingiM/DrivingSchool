@@ -23,6 +23,16 @@ public class ExamService : IExamService
 
     public async Task SaveExamResultAsync(ExamHistory result)
     {
-        await _repository.SaveExamResult(result);
+        await _repository.SaveExamResultAsync(result);
+    }
+
+    public async Task<ListDataResult<ExamHistory>> ListExamHistoryForAllUsersAsync(int itemCount, int pageNumber)
+    {
+        return await _repository.ListExamHistoryForAllUsersAsync(itemCount, pageNumber);
+    }
+
+    public async Task<ListDataResult<ExamHistory>> ListExamHistoryForUserAsync(int userId, int itemCount, int pageNumber)
+    {
+        return await _repository.ListExamHistoryForUserAsync(userId, itemCount, pageNumber);
     }
 }

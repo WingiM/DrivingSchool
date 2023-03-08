@@ -11,7 +11,6 @@ public class AuthorizationService : IAuthorizationService
 {
     private readonly ILogger<AuthorizationService> _logger;
     private readonly IMailingService _mailingService;
-    private readonly IDatabaseAccessRepository _databaseAccessRepository;
     private readonly IIdentityCachingService _identityCachingService;
     private readonly UserManager<IdentityUser<int>> _identityManager;
     private readonly IUserService _userService;
@@ -19,14 +18,12 @@ public class AuthorizationService : IAuthorizationService
 
     public AuthorizationService(UserManager<IdentityUser<int>> identityManager, IUserService userService,
         IEncryptionService encryptionService, IMailingService mailingService,
-        IDatabaseAccessRepository databaseAccessRepository, ILogger<AuthorizationService> logger,
-        IIdentityCachingService identityCachingService)
+        ILogger<AuthorizationService> logger, IIdentityCachingService identityCachingService)
     {
         _identityManager = identityManager;
         _userService = userService;
         _encryptionService = encryptionService;
         _mailingService = mailingService;
-        _databaseAccessRepository = databaseAccessRepository;
         _logger = logger;
         _identityCachingService = identityCachingService;
     }
@@ -34,7 +31,7 @@ public class AuthorizationService : IAuthorizationService
     public async Task<BaseResult> RegisterAsync(User user, string phoneNumber, string email,
         bool sendVerificationEmail = false)
     {
-        if (await _identityCachingService.GetByEmail(email) is not null)
+        if (await _identityCachingService.GetByEmailAsync(email) is not null)
         {
             return new BaseResult { Message = ResultMessages.UserWithThisEmailAlreadyExists };
         }
@@ -47,7 +44,7 @@ public class AuthorizationService : IAuthorizationService
 
         var password = _encryptionService.GeneratePasswordForUser();
         var result = await _identityManager.CreateAsync(identityUser, password);
-        await _identityCachingService.AddIdentity(identityUser);
+        await _identityCachingService.AddIdentityAsync(identityUser);
         user.Identity = identityUser;
         if (!result.Succeeded)
         {
@@ -57,16 +54,16 @@ public class AuthorizationService : IAuthorizationService
 
         await _identityManager.AddToRoleAsync(identityUser, user.Role.GetDisplayName()!);
 
-        await _userService.CreateUserAsync(user);
+        var res = await _userService.CreateUserAsync(user);
+        user.Id = res.CreatedEntityId;
         await AddDefaultClaimsToUserAsync(user);
         if (sendVerificationEmail)
-            await VerifyUser(user, password);
-        await _databaseAccessRepository.ClearTracking();
+            await VerifyUserAsync(user, password);
 
         return new BaseResult { Success = true };
     }
 
-    public async Task<bool> VerifyUser(User user, string password)
+    public async Task<bool> VerifyUserAsync(User user, string password)
     {
         var mailingResult = await _mailingService.SendUserRegisteredMessageAsync(user, password);
         if (!mailingResult) return false;

@@ -2,6 +2,6 @@
 
 public static class UserDefaultClaims
 {
-    public static readonly string AvatarLetters = "avatarLetters";
-    public static readonly string Id = "id";
+    public const string AvatarLetters = "avatarLetters";
+    public const string Id = "id";
 }

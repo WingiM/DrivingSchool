@@ -13,7 +13,7 @@ public static class EntityConverter
             : new Passport
             {
                 Id = passportDb.Id, Number = passportDb.Number, Series = passportDb.Series,
-                IssuedBy = passportDb.IssuedBy, IssueDate = passportDb.IssueDate.ToUniversalTime(),
+                IssuedBy = passportDb.IssuedBy, IssueDate = passportDb.IssueDate.ToLocalTime(),
                 IssuerCode = passportDb.IssuerCode,
                 PlaceOfBirth = passportDb.PlaceOfBirth, UserId = passportDb.UserId
             };
@@ -36,7 +36,7 @@ public static class EntityConverter
     {
         return new User
         {
-            Id = userDb.Id, BirthDate = userDb.BirthDate.ToUniversalTime(), Surname = userDb.Surname,
+            Id = userDb.Id, BirthDate = userDb.BirthDate.ToLocalTime(), Surname = userDb.Surname,
             Name = userDb.Name, Patronymic = userDb.Patronymic, Passport = ConvertPassport(userDb.Passport),
             Identity = userDb.Identity, Role = (Roles)userDb.RoleId
         };
@@ -95,7 +95,13 @@ public static class EntityConverter
         {
             Id = historyDb.Id, TicketId = historyDb.TicketId, UserId = historyDb.UserId,
             CorrectAnswers = historyDb.CorrectAnswers, WrongAnswers = historyDb.WrongAnswers,
-            TotalTime = historyDb.TotalTime, TicketNumber = historyDb.Ticket.Number
+            TotalTime = historyDb.TotalTime, TicketNumber = historyDb.Ticket.Number,
+            Date = historyDb.Date.ToLocalTime(), User = new UserInitials()
+            {
+                Name = historyDb.User!.Name,
+                Surname = historyDb.User.Surname,
+                Patronymic = historyDb.User.Patronymic,
+            }
         };
     }
 
@@ -105,7 +111,7 @@ public static class EntityConverter
         {
             Id = history.Id, TicketId = history.TicketId, UserId = history.UserId,
             CorrectAnswers = history.CorrectAnswers, WrongAnswers = history.WrongAnswers,
-            TotalTime = history.TotalTime
+            TotalTime = history.TotalTime, Date = history.Date.ToUniversalTime()
         };
     }
 }

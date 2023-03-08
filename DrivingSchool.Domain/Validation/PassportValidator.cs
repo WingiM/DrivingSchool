@@ -20,7 +20,7 @@ public class PassportValidator : AbstractValidator<Passport>
 
         RuleFor(x => new { x.Series, x.Number, x.UserId })
             .MustAsync(async (value, _) =>
-                !await passportRepository.SeriesAndPasswordAlreadyExist(value.Series, value.Number, value.UserId))
+                !await passportRepository.SeriesAndPasswordAlreadyExistAsync(value.Series, value.Number, value.UserId))
             .WithMessage(PassportErrorMessages.PassportAlreadyExists);
     }
 }

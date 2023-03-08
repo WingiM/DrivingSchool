@@ -20,10 +20,13 @@ public class UserRepository : BaseRepository, IUserRepository
         _identityCachingService = identityCachingService;
     }
 
-    public async Task CreateUserAsync(User user)
+    public async Task<DatabaseEntityCreationResult> CreateUserAsync(User user)
     {
-        await Context.Users.AddAsync(EntityConverter.ConvertUser(user));
+        var entity = EntityConverter.ConvertUser(user);
+        await Context.Users.AddAsync(entity);
         await Context.SaveChangesAsync();
+        Context.Entry(entity).State = EntityState.Detached;
+        return new DatabaseEntityCreationResult { Success = true, CreatedEntityId = entity.Id };
     }
 
     public async Task<int> UpdateUserAsync(User user)
@@ -37,12 +40,12 @@ public class UserRepository : BaseRepository, IUserRepository
 
     public async Task<bool> IsUserExistsByPhoneNumberAsync(string phoneNumber)
     {
-        return await _identityCachingService.GetByPhone(phoneNumber) is not null;
+        return await _identityCachingService.GetByPhoneAsync(phoneNumber) is not null;
     }
 
     public async Task<User> GetUserByLoginAsync(string login)
     {
-        var identity = (await _identityCachingService.GetByEmail(login))!;
+        var identity = (await _identityCachingService.GetByEmailAsync(login))!;
         var user = await Context.Users
             .Include(x => x.Passport)
             .SingleAsync(x => x.IdentityId == identity.Id);
@@ -56,13 +59,13 @@ public class UserRepository : BaseRepository, IUserRepository
         var user = await Context.Users
             .Include(x => x.Passport)
             .SingleOrDefaultAsync(x => x.Id == id) ?? throw new NotFoundException();
-        var identity = await _identityCachingService.GetIdentity(user.IdentityId);
+        var identity = await _identityCachingService.GetIdentityAsync(user.IdentityId);
         user.Identity = identity!;
 
         return EntityConverter.ConvertUser(user);
     }
 
-    public async Task<ListDataResult<User>> ListUsers(int itemCount, int pageNumber, string searchText,
+    public async Task<ListDataResult<User>> ListUsersAsync(int itemCount, int pageNumber, string searchText,
         string field = UserSortingField.Id, bool desc = false)
     {
         var property = GetOrderProperty(field);
@@ -74,7 +77,7 @@ public class UserRepository : BaseRepository, IUserRepository
             .Take(itemCount)
             .ToListAsync();
         var identityIds = users.Select(x => x.IdentityId).ToList();
-        var identities = (await _identityCachingService.GetMultiple(identityIds)).ToList();
+        var identities = (await _identityCachingService.GetMultipleAsync(identityIds)).ToList();
         foreach (var user in users)
         {
             user.Identity = identities.Single(x => user.IdentityId == x.Id);

@@ -15,6 +15,7 @@ public class ExamHistoryEntityConfiguration : IEntityTypeConfiguration<ExamHisto
         builder.Property(x => x.CorrectAnswers).HasColumnName("correctly_answered_count");
         builder.Property(x => x.WrongAnswers).HasColumnName("wrong_answered_count");
         builder.Property(x => x.TotalTime).HasColumnName("total_time");
+        builder.Property(x => x.Date).HasColumnName("date");
 
         builder.Property(x => x.UserId).HasColumnName("user_id");
         builder.HasOne(x => x.User);

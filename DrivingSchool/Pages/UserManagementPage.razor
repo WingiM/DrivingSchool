@@ -83,9 +83,9 @@
     {
         ListDataResult<User> data;
         if (state.SortLabel is null)
-            data = await UserService.ListUsers(state.PageSize, state.Page, _search);
+            data = await UserService.ListUsersAsync(state.PageSize, state.Page, _search);
         else
-            data = await UserService.ListUsers(state.PageSize, state.Page, _search, state.SortLabel, state.SortDirection == SortDirection.Descending);
+            data = await UserService.ListUsersAsync(state.PageSize, state.Page, _search, state.SortLabel, state.SortDirection == SortDirection.Descending);
 
         return new TableData<User>() { TotalItems = data.TotalItemsCount, Items = data.Items };
     }
@@ -108,7 +108,7 @@
 
     private async Task SendVerification(User user)
     {
-        var res = await AuthorizationService.VerifyUser(user, EncryptionService.GeneratePasswordForUser());
+        var res = await AuthorizationService.VerifyUserAsync(user, EncryptionService.GeneratePasswordForUser());
         if (res)
         {
             Snackbar.Add("Письмо отправлено успешно", Severity.Success);

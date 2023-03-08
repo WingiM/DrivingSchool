@@ -5,20 +5,27 @@
         </MudText>
     </MudLink>
     <MudDivider Class="my-2"/>
-    <MudNavLink Href="/cabinet" Icon="@Icons.Material.Filled.Person">Мой кабинет</MudNavLink>
+    <AuthorizeView>
+        <Authorized>
+            <MudNavLink Href="/cabinet" Icon="@Icons.Material.Filled.Person">Мой кабинет</MudNavLink>
+        </Authorized>
+    </AuthorizeView>
     <AuthorizeView Roles="Администратор">
         <MudNavLink Href="/registration" Icon="@Icons.Material.Filled.HowToReg">Регистрация пользователей</MudNavLink>
         <MudNavLink Href="/management" Icon="@Icons.Material.Filled.Group">Управление пользователями</MudNavLink>
         <MudNavGroup Title="Тесты" Icon="@Icons.Material.Filled.Work" Expanded="true">
             <MudNavLink Href="/test" Icon="@Icons.Material.Filled.MobileFriendly">Пройти тест</MudNavLink>
-            <MudNavLink Href="/test-history" Icon="@Icons.Material.Filled.History">История прохождения тестов</MudNavLink>
+            <MudNavLink Href="/history" Icon="@Icons.Material.Filled.History">История прохождения тестов</MudNavLink>
         </MudNavGroup>
     </AuthorizeView>
     <AuthorizeView Roles="Студент">
         <MudNavGroup Title="Тесты" Icon="@Icons.Material.Filled.Work" Expanded="true">
             <MudNavLink Href="/test" Icon="@Icons.Material.Filled.MobileFriendly">Пройти тест</MudNavLink>
-            <MudNavLink Href="/test-history" Icon="@Icons.Material.Filled.History">История прохождения тестов</MudNavLink>
+            <MudNavLink Href="/history" Icon="@Icons.Material.Filled.History">История прохождения тестов</MudNavLink>
         </MudNavGroup>
+    </AuthorizeView>
+    <AuthorizeView Roles="Учитель">
+        <MudNavLink Href="/history" Icon="@Icons.Material.Filled.History">История прохождения тестов</MudNavLink>
     </AuthorizeView>
 </MudNavMenu>
 
