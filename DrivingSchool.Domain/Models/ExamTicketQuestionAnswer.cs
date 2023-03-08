@@ -6,5 +6,5 @@ public class ExamTicketQuestionAnswer
     public required int NumberInTicket { get; init; }
     public required string AnswerText { get; init; }
     public bool IsCorrect { get; init; }
-    public int TicketId { get; init; }
+    public int QuestionId { get; init; }
 }

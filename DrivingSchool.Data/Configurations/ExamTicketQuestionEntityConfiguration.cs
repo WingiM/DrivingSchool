@@ -15,6 +15,7 @@ public class ExamTicketQuestionEntityConfiguration : IEntityTypeConfiguration<Ex
         builder.Property(x => x.Question).HasColumnName("question");
         builder.Property(x => x.ImageSource).HasColumnName("image_source");
         builder.Property(x => x.Comment).HasColumnName("comment");
+        builder.Property(x => x.NumberInTicket).HasColumnName("number_in_ticket");
         builder.Property(x => x.TicketId).HasColumnName("ticket_id");
 
         builder

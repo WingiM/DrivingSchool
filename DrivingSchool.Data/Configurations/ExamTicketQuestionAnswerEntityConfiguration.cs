@@ -12,7 +12,7 @@ public class ExamTicketQuestionAnswerEntityConfiguration : IEntityTypeConfigurat
         builder.HasKey(x => x.Id).HasName("exam_ticket_answer_pkey");
 
         builder.Property(x => x.Id).HasColumnName("id");
-        builder.Property(x => x.NumberInTicket).HasColumnName("number_in_ticket");
+        builder.Property(x => x.NumberInQuestion).HasColumnName("number_in_question");
         builder.Property(x => x.AnswerText).HasColumnName("answer_text");
         builder.Property(x => x.IsCorrect).HasColumnName("is_correct");
         builder.Property(x => x.QuestionId).HasColumnName("question_id");

@@ -73,7 +73,7 @@ public static class EntityConverter
         {
             Id = ticketQuestionDb.Id, ImageSource = ticketQuestionDb.ImageSource, Question = ticketQuestionDb.Question,
             Answers = ticketQuestionDb.Answers.Select(x => ConvertExamTicketQuestionAnswer(x)).ToArray(),
-            Comment = ticketQuestionDb.Comment
+            Comment = ticketQuestionDb.Comment, NumberInTicket = ticketQuestionDb.NumberInTicket
         };
     }
 
@@ -81,11 +81,11 @@ public static class EntityConverter
     {
         return new ExamTicketQuestionAnswer
         {
-            NumberInTicket = questionAnswerDb.NumberInTicket,
+            NumberInTicket = questionAnswerDb.NumberInQuestion,
             AnswerText = questionAnswerDb.AnswerText,
             Id = questionAnswerDb.Id,
             IsCorrect = questionAnswerDb.IsCorrect,
-            TicketId = questionAnswerDb.QuestionId,
+            QuestionId = questionAnswerDb.QuestionId,
         };
     }
 }
