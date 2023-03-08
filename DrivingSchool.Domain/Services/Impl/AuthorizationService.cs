@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using DrivingSchool.Domain.Constants;
 using DrivingSchool.Domain.Extensions;
-using DrivingSchool.Domain.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 

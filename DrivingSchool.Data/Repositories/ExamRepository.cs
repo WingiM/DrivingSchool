@@ -1,5 +1,4 @@
 ﻿using DrivingSchool.Data.Extensions;
-using DrivingSchool.Data.Models;
 using DrivingSchool.Domain.Models;
 using DrivingSchool.Domain.Repositories;
 using DrivingSchool.Domain.Results;
