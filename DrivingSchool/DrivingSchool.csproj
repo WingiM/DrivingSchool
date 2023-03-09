@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\DrivingSchool.Data\DrivingSchool.Data.csproj" />
+      <ProjectReference Include="..\DrivingSchool.GridFS\DrivingSchool.GridFS.csproj" />
     </ItemGroup>
 
     <ItemGroup>

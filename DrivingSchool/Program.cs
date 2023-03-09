@@ -1,6 +1,7 @@
 using DrivingSchool;
 using DrivingSchool.Data;
 using DrivingSchool.Domain;
+using DrivingSchool.GridFS;
 using DrivingSchool.Middleware;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +21,7 @@ builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>
 builder.Services.AddServerSideBlazor();
 builder.Services.AddData(builder.Configuration.GetConnectionString("DefaultConnection")!);
 builder.Services.AddDomain(builder.Configuration);
+builder.Services.AddFileSystem(builder.Configuration);
 builder.Services.AddDefaultIdentity<IdentityUser<int>>(options =>
     {
         options.Password.RequireDigit = false;
