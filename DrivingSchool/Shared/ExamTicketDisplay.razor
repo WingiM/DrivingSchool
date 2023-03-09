@@ -29,9 +29,9 @@
     <MudCard>
         <MudImage id="ticket-image" Style="display: block; margin: auto" Alt=""/>
         <MudCardContent>
-            <MudText Typo="Typo.h5">@_currentQuestion.Question</MudText>
+            <MudText Typo="Typo.h5">@_currentQuestion!.Question</MudText>
             <MudStack Spacing="3" AlignItems="AlignItems.Start">
-                @foreach (var answer in _currentQuestion.Answers.OrderBy(x => x.NumberInTicket))
+                @foreach (var answer in _currentQuestion!.Answers.OrderBy(x => x.NumberInTicket))
                 {
                     <MudButton Style="@($"color: black; background: {GetAnswerButtonBackgroundColor(answer)}; width: 80%; justify-content: left;")" OnClick="() => CheckAnswer(answer)" Disabled="_ticketDisabled">
                         <MudText>@($"{answer.NumberInTicket}. {answer.AnswerText}")</MudText>

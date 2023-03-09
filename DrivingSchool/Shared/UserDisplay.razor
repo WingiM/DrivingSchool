@@ -188,6 +188,13 @@ else
     private async Task SaveUserChanges()
     {
         _formLoading = true;
+        await _userEditForm.Validate();
+        if (!_userEditForm.IsValid)
+        {
+            Snackbar.Add("Не все данные заполнены верно!");
+            _formLoading = false;
+            return;
+        }
         var user = new User
         {
             Surname = _userModel.Surname, Name = _userModel.Name,
@@ -224,6 +231,14 @@ else
 
     private async Task SavePassportChanges()
     {
+        _formLoading = true;
+        await _passportEditForm.Validate();
+        if (!_passportEditForm.IsValid)
+        {
+            Snackbar.Add("Не все данные заполнены верно!");
+            _formLoading = false;
+            return;
+        }
         _formLoading = true;
         var passport = new Passport
         {
