@@ -2,8 +2,11 @@
 @using System.Diagnostics
 @using System.Security.Claims
 @using DrivingSchool.Domain.Constants
+@using DrivingSchool.Domain.FileSystem
 @using Timer = System.Timers.Timer;
 @inject IExamService ExamService
+@inject IImageLoadingService ImageLoadingService
+@inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 @if (_ticketLoaded)
@@ -24,7 +27,7 @@
         }
     </MudStack>
     <MudCard>
-        <MudCardMedia Image="@_currentQuestion.ImageSource" Height="300"/>
+        <MudImage id="ticket-image" Style="display: block; margin: auto" Alt=""/>
         <MudCardContent>
             <MudText Typo="Typo.h5">@_currentQuestion.Question</MudText>
             <MudStack Spacing="3" AlignItems="AlignItems.Start">
@@ -37,8 +40,8 @@
             </MudStack>
             @if (TryGuessed)
             {
-                <MudText>Правильный ответ: @_currentQuestion.Answers.Single(x => x.IsCorrect).NumberInTicket</MudText>
-                <MudText>@_currentQuestion.Comment</MudText>
+                <MudText>Правильный ответ: @_currentQuestion!.Answers.Single(x => x.IsCorrect).NumberInTicket</MudText>
+                <MudText>@_currentQuestion!.Comment</MudText>
             }
         </MudCardContent>
     </MudCard>
@@ -81,7 +84,7 @@ else
     private bool _ticketLoaded;
 
     private ExamTicket _ticket = null!;
-    private ExamTicketQuestion _currentQuestion = null!;
+    private ExamTicketQuestion? _currentQuestion;
     private int _currentQuestionNumber;
     private int _selectedAnswer;
     private Dictionary<int, QuestionStatus> _questionResults = null!;
@@ -91,6 +94,7 @@ else
     private TimeSpan _counter = DefaultTicketTime;
     private int _userId;
     private bool _ticketDisabled;
+    private bool _isImageLoaded;
 
     protected override async Task OnInitializedAsync()
     {
@@ -98,6 +102,19 @@ else
         if (!int.TryParse(user.Claims.First(x => x.Type == UserDefaultClaims.Id).Value, out _userId))
             throw new UnreachableException();
         await UpdateTicket();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_isImageLoaded || _currentQuestion is null) return;
+        var stream = await ImageLoadingService.GetImageReadStreamAsync(_currentQuestion.ImageSource);
+        var dotnetImageStream = new DotNetStreamReference(stream);
+        var res = await JsRuntime.InvokeAsync<bool>("getById", "ticket-image");
+        if (res)
+        {
+            await JsRuntime.InvokeVoidAsync("setImage", "ticket-image", dotnetImageStream);
+            _isImageLoaded = true;
+        }
     }
 
     protected override async Task OnParametersSetAsync()
@@ -143,6 +160,7 @@ else
             await InvokeAsync(StateHasChanged);
         };
         _timer.Start();
+        _isImageLoaded = false;
         _ticketLoaded = true;
     }
 
@@ -172,10 +190,13 @@ else
         }
     }
 
-    private void ChangeQuestion(int questionKey)
+    private async Task ChangeQuestion(int questionKey)
     {
         _currentQuestionNumber = questionKey;
         _currentQuestion = _ticket.Questions.Single(x => x.NumberInTicket == _currentQuestionNumber);
+        var dotnetImageStream = new DotNetStreamReference(Stream.Null);
+        await JsRuntime.InvokeVoidAsync("setImage", "ticket-image", dotnetImageStream);
+        _isImageLoaded = false;
     }
 
     private string GetQuestionButtonBackgroundColor(KeyValuePair<int, QuestionStatus> question)

@@ -31,5 +31,22 @@
 
 <script src="_framework/blazor.server.js"></script>
 <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+<script>
+  window.setImage = async (imageElementId, imageStream) => {
+    const arrayBuffer = await imageStream.arrayBuffer();
+    const blob = new Blob([arrayBuffer]);
+    const url = URL.createObjectURL(blob);
+    const image = document.getElementById(imageElementId);
+    console.log(image)
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+    }
+    image.src = url;
+  }
+  
+  window.getById = (imageId) => {
+      return document.getElementById(imageId) !== null;
+  }
+</script>
 </body>
 </html>

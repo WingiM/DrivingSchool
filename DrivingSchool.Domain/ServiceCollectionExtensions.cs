@@ -14,8 +14,10 @@ public static class ServiceCollectionExtensions
     {
         var userSecrets = new UserSecrets();
         var mailSettings = new MailSettings();
+
         configuration.Bind(nameof(userSecrets), userSecrets);
         configuration.Bind(nameof(mailSettings), mailSettings);
+
         services.AddSingleton(userSecrets);
         services.AddSingleton(mailSettings);
 
@@ -25,6 +27,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IPassportService, PassportService>();
         services.AddScoped<IIdentityCachingService, IdentityCachingService>();
+        services.AddScoped<IImageLoadingService, ImageLoadingService>();
         services.AddSingleton<IdentityCache>();
         services.AddTransient<IMailingService, MailingService>();
 
