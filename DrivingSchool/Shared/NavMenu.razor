@@ -13,10 +13,6 @@
     <AuthorizeView Roles="Администратор">
         <MudNavLink Href="/registration" Icon="@Icons.Material.Filled.HowToReg">Регистрация пользователей</MudNavLink>
         <MudNavLink Href="/management" Icon="@Icons.Material.Filled.Group">Управление пользователями</MudNavLink>
-        <MudNavGroup Title="Тесты" Icon="@Icons.Material.Filled.Work" Expanded="true">
-            <MudNavLink Href="/test" Icon="@Icons.Material.Filled.MobileFriendly">Пройти тест</MudNavLink>
-            <MudNavLink Href="/history" Icon="@Icons.Material.Filled.History">История прохождения тестов</MudNavLink>
-        </MudNavGroup>
     </AuthorizeView>
     <AuthorizeView Roles="Студент">
         <MudNavGroup Title="Тесты" Icon="@Icons.Material.Filled.Work" Expanded="true">
