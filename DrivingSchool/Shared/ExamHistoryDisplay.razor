@@ -5,10 +5,9 @@
 @using System.Security.Claims
 @using DrivingSchool.Domain.Constants
 @inject IExamService ExamService
-<h3>ExamHistoryDisplay</h3>
 <MudTable T="ExamHistory" ServerData="GetData" Dense="true" Hover="true" Bordered="true" Striped="true" @ref="_table">
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Пользователи системы</MudText>
+        <MudText Typo="Typo.h6">Результаты тестирований</MudText>
     </ToolBarContent>
     <HeaderContent>
         <AuthorizeView Roles="Учитель">
