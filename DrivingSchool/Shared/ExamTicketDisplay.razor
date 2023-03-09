@@ -1,0 +1,201 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using System.Diagnostics
+@using System.Security.Claims
+@using DrivingSchool.Domain.Constants
+@using Timer = System.Timers.Timer;
+@inject IExamService ExamService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@if (_ticketLoaded)
+{
+    @if (_ticketDisabled)
+    {
+        <MudText>Прохождение билета окончено. Ваши результаты были сохранены</MudText>
+    }
+    <MudProgressLinear Style="margin-bottom: 20px; height: 24px;" Color="Color.Primary" Rounded="true" Value="_counter.TotalSeconds / DefaultTicketTime.TotalSeconds * 100">
+        <MudText Style="color: white">
+            <b>@_counter</b>
+        </MudText>
+    </MudProgressLinear>
+    <MudStack Row="true">
+        @foreach (var question in _questionResults)
+        {
+            <MudButton Style="@($"background: {GetQuestionButtonBackgroundColor(question)};")" Variant="Variant.Filled" OnClick="() => ChangeQuestion(question.Key)">@question.Key</MudButton>
+        }
+    </MudStack>
+    <MudCard>
+        <MudCardMedia Image="@_currentQuestion.ImageSource" Height="300"/>
+        <MudCardContent>
+            <MudText Typo="Typo.h5">@_currentQuestion.Question</MudText>
+            <MudStack Spacing="3" AlignItems="AlignItems.Start">
+                @foreach (var answer in _currentQuestion.Answers.OrderBy(x => x.NumberInTicket))
+                {
+                    <MudButton Style="@($"color: black; background: {GetAnswerButtonBackgroundColor(answer)}; width: 80%; justify-content: left;")" OnClick="() => CheckAnswer(answer)" Disabled="_ticketDisabled">
+                        <MudText>@($"{answer.NumberInTicket}. {answer.AnswerText}")</MudText>
+                    </MudButton>
+                }
+            </MudStack>
+            @if (TryGuessed)
+            {
+                <MudText>Правильный ответ: @_currentQuestion.Answers.Single(x => x.IsCorrect).NumberInTicket</MudText>
+                <MudText>@_currentQuestion.Comment</MudText>
+            }
+        </MudCardContent>
+    </MudCard>
+}
+else
+{
+    <div style="transform: translateY(25%); text-align: center">
+        <MudProgressCircular Style="width: 30%; height: 30%;" Color="Color.Primary" Indeterminate="true"/>
+    </div>
+}
+
+@code {
+
+    enum QuestionStatus
+    {
+        Passed,
+        Failed,
+        Default
+    }
+
+    [Required]
+    [Parameter]
+    public int TicketId { get; set; }
+
+    private static readonly Dictionary<bool, string> SuccessButtonColorsBySelection = new()
+    {
+        { false, Colors.Green.Lighten2 }, { true, Colors.Green.Lighten1 }
+    };
+
+    private static readonly Dictionary<bool, string> FailureButtonColorsBySelection = new()
+    {
+        { false, Colors.Red.Lighten2 }, { true, Colors.Red.Lighten1 }
+    };
+
+    private static readonly Dictionary<bool, string> DefaultButtonColorsBySelection = new()
+    {
+        { false, Colors.Grey.Lighten2 }, { true, Colors.Grey.Lighten1 }
+    };
+
+    private bool _ticketLoaded;
+
+    private ExamTicket _ticket = null!;
+    private ExamTicketQuestion _currentQuestion = null!;
+    private int _currentQuestionNumber;
+    private int _selectedAnswer;
+    private Dictionary<int, QuestionStatus> _questionResults = null!;
+    private bool TryGuessed => _questionResults[_currentQuestionNumber] != QuestionStatus.Default;
+    private Timer? _timer;
+    private static readonly TimeSpan DefaultTicketTime = TimeSpan.FromMinutes(20);
+    private TimeSpan _counter = DefaultTicketTime;
+    private int _userId;
+    private bool _ticketDisabled;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        if (!int.TryParse(user.Claims.First(x => x.Type == UserDefaultClaims.Id).Value, out _userId))
+            throw new UnreachableException();
+        await UpdateTicket();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await UpdateTicket();
+    }
+
+    private async Task UpdateTicket()
+    {
+        if (_timer is not null)
+        {
+            _timer.Stop();
+            _timer.Dispose();
+        }
+        _counter = DefaultTicketTime;
+        _ticketLoaded = false;
+        _ticketDisabled = false;
+        _currentQuestionNumber = 1;
+
+        _ticket = await ExamService.GetTicketByNumberAsync(TicketId);
+        _questionResults = new Dictionary<int, QuestionStatus>();
+        foreach (var question in _ticket.Questions
+            .OrderBy(x => x.NumberInTicket)
+            .Select(x => x.NumberInTicket))
+        {
+            _questionResults.Add(question, QuestionStatus.Default);
+        }
+
+        _currentQuestion = _ticket.Questions.Single(x => x.NumberInTicket == _currentQuestionNumber);
+        _timer = new Timer(TimeSpan.FromSeconds(1));
+        _timer.Elapsed += async (_, _) =>
+        {
+            if (_counter.TotalSeconds > 0)
+            {
+                _counter -= TimeSpan.FromSeconds(1);
+            }
+            else
+            {
+                _ticketDisabled = true;
+                await SaveExamResults();
+                _timer.Stop();
+            }
+            await InvokeAsync(StateHasChanged);
+        };
+        _timer.Start();
+        _ticketLoaded = true;
+    }
+
+    private async Task SaveExamResults()
+    {
+        var examResult = new ExamHistory
+        {
+            CorrectAnswers = _questionResults.Count(x => x.Value == QuestionStatus.Passed),
+            WrongAnswers = _questionResults.Count(x => x.Value == QuestionStatus.Failed),
+            TotalTime = DefaultTicketTime - _counter, TicketId = _ticket.Id, UserId = _userId, Date = DateTime.Now
+        };
+        await ExamService.SaveExamResultAsync(examResult);
+    }
+
+
+    private async Task CheckAnswer(ExamTicketQuestionAnswer questionAnswer)
+    {
+        if (TryGuessed) return;
+        _selectedAnswer = questionAnswer.Id;
+        _questionResults[_currentQuestionNumber] = questionAnswer.IsCorrect ? QuestionStatus.Passed : QuestionStatus.Failed;
+
+        if (_questionResults.All(x => x.Value != QuestionStatus.Default))
+        {
+            _ticketDisabled = true;
+            _timer?.Stop();
+            await SaveExamResults();
+        }
+    }
+
+    private void ChangeQuestion(int questionKey)
+    {
+        _currentQuestionNumber = questionKey;
+        _currentQuestion = _ticket.Questions.Single(x => x.NumberInTicket == _currentQuestionNumber);
+    }
+
+    private string GetQuestionButtonBackgroundColor(KeyValuePair<int, QuestionStatus> question)
+    {
+        return question.Value switch 
+        {
+            QuestionStatus.Passed => SuccessButtonColorsBySelection[question.Key == _currentQuestionNumber],
+            QuestionStatus.Failed => FailureButtonColorsBySelection[question.Key == _currentQuestionNumber],
+            QuestionStatus.Default => DefaultButtonColorsBySelection[question.Key == _currentQuestionNumber],
+            _ => throw new ArgumentOutOfRangeException()
+            };
+    }
+
+
+    private string GetAnswerButtonBackgroundColor(ExamTicketQuestionAnswer questionAnswer)
+    {
+        if (!TryGuessed) return Colors.Grey.Lighten3;
+        if (questionAnswer.IsCorrect)
+            return Colors.Green.Lighten1;
+        return questionAnswer.Id == _selectedAnswer ? Colors.Red.Lighten1 : Colors.Grey.Lighten3;
+    }
+
+}

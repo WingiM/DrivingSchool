@@ -4,7 +4,7 @@ namespace DrivingSchool.Domain.Repositories;
 
 public interface IIdentityCachingRepository
 {
-    public IdentityUser<int>? FindIdentityById(int id);
-    public IdentityUser<int>? FindIdentityByEmail(string email);
-    public IdentityUser<int>? FindIdentityByPhone(string phone);
+    public IdentityUser<int>? FindIdentityByIdAsync(int id);
+    public IdentityUser<int>? FindIdentityByEmailAsync(string email);
+    public IdentityUser<int>? FindIdentityByPhoneAsync(string phone);
 }

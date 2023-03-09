@@ -1,0 +1,33 @@
+﻿@page "/test"
+@using ExamTicket = DrivingSchool.Domain.Models.ExamTicketQuestion
+@* @attribute [Authorize(Roles = "Студент")] *@
+@inject IExamService ExamService
+
+@if (_ticketsLoaded)
+{
+    <MudSelect T="int" @bind-Value="_currentTicket" Label="Номер билета" Style="margin: 20px 0" >
+        @foreach (var number in _tickets)
+        {
+            <MudSelectItem Value="number"></MudSelectItem>
+        }
+    </MudSelect>
+    <ExamTicketDisplay TicketId="@_currentTicket"/>
+}
+else
+{
+    <div style="transform: translateY(25%); text-align: center">
+        <MudProgressCircular Style="width: 40%; height: 40%;" Color="Color.Primary" Indeterminate="true"/>
+    </div>
+}
+
+@code {
+    private bool _ticketsLoaded;
+    private int _currentTicket = 1;
+    private int[] _tickets = Array.Empty<int>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _tickets = (await ExamService.GetTicketNumbersAsync()).Items.ToArray();
+        _ticketsLoaded = true;
+    }
+}

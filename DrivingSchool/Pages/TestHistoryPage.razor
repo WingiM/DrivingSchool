@@ -1,0 +1,32 @@
+﻿@page "/history"
+@using System.Security.Claims
+@using DrivingSchool.Domain.Enums
+@using DrivingSchool.Domain.Extensions
+@using System.Diagnostics
+@using DrivingSchool.Domain.Constants
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>История прохождения тестов</PageTitle>
+@if (_isTeacher)
+{
+    <ExamHistoryDisplay IsForTeacher="true"/>
+}
+else
+{
+    <ExamHistoryDisplay IsForTeacher="false" UserId="_userId"/>
+}
+
+@code {
+    private bool _isTeacher;
+    private int _userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        var userRole = user.Claims.First(x => x.Type == ClaimTypes.Role);
+        _isTeacher = userRole.Value == Roles.Teacher.GetDisplayName();
+        if (!int.TryParse(user.Claims.First(x => x.Type == UserDefaultClaims.Id).Value, out _userId))
+            throw new UnreachableException();
+    }
+
+}

@@ -45,7 +45,7 @@
             return;
         }
 
-        var user = await IdentityCachingService.GetByEmail(_model.Email);
+        var user = await IdentityCachingService.GetByEmailAsync(_model.Email);
         if (user is null)
         {
             Snackbar.Add("Пользователя с такими данными не существует", Severity.Error);

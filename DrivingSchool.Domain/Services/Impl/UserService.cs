@@ -16,16 +16,16 @@ public class UserService : IUserService
         _userManager = userManager;
     }
 
-    public async Task CreateUserAsync(User user)
+    public async Task<DatabaseEntityCreationResult> CreateUserAsync(User user)
     {
-        await _userRepository.CreateUserAsync(user);
+        return await _userRepository.CreateUserAsync(user);
     }
 
     public async Task<BaseResult> UpdateUserAsync(User user, bool emailUpdated)
     {
         if (emailUpdated)
         {
-            await ChangeUserEmail(user, user.Identity.Email!);
+            await ChangeUserEmailAsync(user, user.Identity.Email!);
         }
 
         var res = await _userRepository.UpdateUserAsync(user);
@@ -33,7 +33,7 @@ public class UserService : IUserService
         return new DatabaseEntityCreationResult { Success = true, CreatedEntityId = res };
     }
 
-    public async Task ChangeUserEmail(User user, string newEmail)
+    public async Task ChangeUserEmailAsync(User user, string newEmail)
     {
         var identity = user.Identity;
         await _userManager.SetUserNameAsync(identity, newEmail);
@@ -60,9 +60,9 @@ public class UserService : IUserService
         return await _userManager.GetClaimsAsync(new IdentityUser<int> { Id = id });
     }
 
-    public async Task<ListDataResult<User>> ListUsers(int itemCount, int pageNumber, string searchText,
+    public async Task<ListDataResult<User>> ListUsersAsync(int itemCount, int pageNumber, string searchText,
         string field = UserSortingField.Id, bool desc = false)
     {
-        return await _userRepository.ListUsers(itemCount, pageNumber, searchText, field, desc);
+        return await _userRepository.ListUsersAsync(itemCount, pageNumber, searchText, field, desc);
     }
 }

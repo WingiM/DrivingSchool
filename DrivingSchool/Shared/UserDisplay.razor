@@ -54,8 +54,8 @@
                         </MudStack>
                     </Authorized>
                 </AuthorizeView>
-                <MudTextField @bind-Value="_userModel.PhoneNumber" InputType="InputType.Telephone"
-                              Label="Номер телефона" ReadOnly="true"/>
+                <MudTextField @bind-Value="_userModel.PhoneNumber" InputType="InputType.Telephone" 
+                              Mask="@(new PatternMask("+0 (000) 000 00-00"))" Label="Номер телефона" ReadOnly="true"/>
             </MudCardContent>
             <MudCardActions>
                 @if (!ReadOnly)
@@ -73,49 +73,52 @@
         </MudForm>
     </MudCard>
     <MudExpansionPanels MultiExpansion="true">
-        <MudExpansionPanel Text="Паспортные данные">
-            <MudCard>
-                <MudForm Model="@_passportModel" @ref="@_passportEditForm"
-                         Validation="@(_passportValidator.ValidateValue)" ValidationDelay="0">
-                    <MudCardContent>
-                        <MudStack Row="true">
-                            <MudTextField @bind-Value="_passportModel.Series" For="() => _passportModel.Series"
-                                          ReadOnly="ReadOnly" Label="Серия" Immediate="false"
-                                          Mask="@(new PatternMask("00 00") { CleanDelimiters = true })"/>
-                            <MudTextField @bind-Value="_passportModel.Number" For="() => _passportModel.Number"
-                                          ReadOnly="ReadOnly" Label="Номер" Immediate="false"
-                                          Mask="@(new PatternMask("000 000") { CleanDelimiters = true })"/>
-                        </MudStack>
-                        <MudStack Row="true">
-                            <MudTextField @bind-Value="_passportModel.IssuerCode" For="() => _passportModel.IssuerCode"
-                                          ReadOnly="ReadOnly" Label="Код подразделения" Immediate="false"
-                                          Mask="@(new PatternMask("000-000") { CleanDelimiters = true })"/>
-                            <MudDatePicker @bind-Date="_passportModel.IssueDate" OpenTo="OpenTo.Year"
-                                           For="() => _passportModel.IssueDate" Label="Дата выдачи"
-                                           ReadOnly="ReadOnly"/>
-                        </MudStack>
-                        <MudTextField @bind-Value="_passportModel.IssuedBy" For="() => _passportModel.IssuedBy"
-                                      ReadOnly="ReadOnly" Label="Кем выдано" Immediate="false"
-                                      Placeholder="Точно по паспорту" Variant="Variant.Text"/>
-                        <MudTextField @bind-Value="_passportModel.PlaceOfBirth" For="() => _passportModel.PlaceOfBirth"
-                                      ReadOnly="ReadOnly" Label="Место рождения" Immediate="false" Variant="Variant.Text"/>
-                    </MudCardContent>
-                    <MudCardActions>
-                        @if (!ReadOnly)
-                        {
-                            <MudButton Disabled="@_formLoading" Variant="Variant.Filled" Color="Color.Primary"
-                                       OnClick="async () => await SavePassportChanges()">
-                                Сохранить изменения
-                            </MudButton>
-                            @if (_formLoading)
+        @if (CanViewPassport)
+        {
+            <MudExpansionPanel Text="Паспортные данные">
+                <MudCard>
+                    <MudForm Model="@_passportModel" @ref="@_passportEditForm"
+                             Validation="@(_passportValidator.ValidateValue)" ValidationDelay="0">
+                        <MudCardContent>
+                            <MudStack Row="true">
+                                <MudTextField @bind-Value="_passportModel.Series" For="() => _passportModel.Series"
+                                              ReadOnly="ReadOnly" Label="Серия" Immediate="false"
+                                              Mask="@(new PatternMask("00 00") { CleanDelimiters = true })"/>
+                                <MudTextField @bind-Value="_passportModel.Number" For="() => _passportModel.Number"
+                                              ReadOnly="ReadOnly" Label="Номер" Immediate="false"
+                                              Mask="@(new PatternMask("000 000") { CleanDelimiters = true })"/>
+                            </MudStack>
+                            <MudStack Row="true">
+                                <MudTextField @bind-Value="_passportModel.IssuerCode" For="() => _passportModel.IssuerCode"
+                                              ReadOnly="ReadOnly" Label="Код подразделения" Immediate="false"
+                                              Mask="@(new PatternMask("000-000") { CleanDelimiters = true })"/>
+                                <MudDatePicker @bind-Date="_passportModel.IssueDate" OpenTo="OpenTo.Year"
+                                               For="() => _passportModel.IssueDate" Label="Дата выдачи"
+                                               ReadOnly="ReadOnly"/>
+                            </MudStack>
+                            <MudTextField @bind-Value="_passportModel.IssuedBy" For="() => _passportModel.IssuedBy"
+                                          ReadOnly="ReadOnly" Label="Кем выдано" Immediate="false"
+                                          Placeholder="Точно по паспорту" Variant="Variant.Text"/>
+                            <MudTextField @bind-Value="_passportModel.PlaceOfBirth" For="() => _passportModel.PlaceOfBirth"
+                                          ReadOnly="ReadOnly" Label="Место рождения" Immediate="false" Variant="Variant.Text"/>
+                        </MudCardContent>
+                        <MudCardActions>
+                            @if (!ReadOnly)
                             {
-                                <MudProgressCircular Style="margin-left: 10px;" Color="Color.Primary" Indeterminate="true"/>
+                                <MudButton Disabled="@_formLoading" Variant="Variant.Filled" Color="Color.Primary"
+                                           OnClick="async () => await SavePassportChanges()">
+                                    Сохранить изменения
+                                </MudButton>
+                                @if (_formLoading)
+                                {
+                                    <MudProgressCircular Style="margin-left: 10px;" Color="Color.Primary" Indeterminate="true"/>
+                                }
                             }
-                        }
-                    </MudCardActions>
-                </MudForm>
-            </MudCard>
-        </MudExpansionPanel>
+                        </MudCardActions>
+                    </MudForm>
+                </MudCard>
+            </MudExpansionPanel>
+        }
     </MudExpansionPanels>
 }
 else
@@ -135,6 +138,9 @@ else
 
     [Parameter]
     public string? Login { get; set; }
+
+    [Parameter]
+    public bool CanViewPassport { get; set; } = true;
 
     [Inject]
     ISnackbar Snackbar { get; set; } = null!;
@@ -204,7 +210,7 @@ else
         Snackbar.Add("Успешно сохранено", Severity.Success);
         if (_userModel.EmailUpdated && await CheckSelf())
         {
-            await AuthorizationService.VerifyUser(user, EncryptionService.GeneratePasswordForUser());
+            await AuthorizationService.VerifyUserAsync(user, EncryptionService.GeneratePasswordForUser());
             NavigationManager.NavigateTo("/logout", true);
         }
     }
@@ -212,7 +218,7 @@ else
     private async Task<bool> CheckSelf()
     {
         var identity = (await AuthenticationState.GetAuthenticationStateAsync()).User;
-        return Id.ToString() == identity.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value
+        return Id.ToString() == identity.Claims.First(x => x.Type == UserDefaultClaims.Id).Value
                || Login == identity.Claims.First(x => x.Type == ClaimTypes.Name).Value;
     }
 
@@ -239,7 +245,7 @@ else
 
     private async Task SendVerification()
     {
-        var res = await AuthorizationService.VerifyUser(_user, EncryptionService.GeneratePasswordForUser());
+        var res = await AuthorizationService.VerifyUserAsync(_user, EncryptionService.GeneratePasswordForUser());
         if (res)
         {
             Snackbar.Add("Письмо отправлено успешно", Severity.Success);
@@ -248,4 +254,6 @@ else
 
         Snackbar.Add("Ошибка при отправке письма. Свяжитесь с администратором", Severity.Error);
     }
+
 }
+

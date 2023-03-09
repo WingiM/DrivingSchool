@@ -19,7 +19,7 @@ public class PassportRepository : BaseRepository, IPassportRepository
         return entity.Id;
     }
 
-    public async Task<bool> SeriesAndPasswordAlreadyExist(string series, string number, int userId)
+    public async Task<bool> SeriesAndPasswordAlreadyExistAsync(string series, string number, int userId)
     {
         var passport = await Context.Passports.SingleOrDefaultAsync(x => x.UserId != userId && x.Series == series && x.Number == number);
         return passport is not null;

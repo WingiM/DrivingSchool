@@ -1,9 +1,23 @@
 ﻿@page "/user/{Id:int}"
-@attribute [Authorize(Roles = "Администратор")]
+@using System.Security.Claims
+@using DrivingSchool.Domain.Enums
+@using DrivingSchool.Domain.Extensions
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize(Roles = "Администратор,Учитель")]
 
 <PageTitle>Редактирование пользователя</PageTitle>
-<UserDisplay Id="Id"/>
+<UserDisplay Id="Id" ReadOnly="_readonly" CanViewPassport="!_readonly"/>
 @code {
     [Parameter]
     public int Id { get; set; }
+
+    private bool _readonly;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        var userRole = user.Claims.First(x => x.Type == ClaimTypes.Role);
+        _readonly = userRole.Value != Roles.Administrator.GetDisplayName();
+    }
+
 }

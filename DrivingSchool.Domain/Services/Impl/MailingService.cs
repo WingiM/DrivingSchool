@@ -19,7 +19,7 @@ public class MailingService : IMailingService
 
     public async Task<bool> SendUserRegisteredMessageAsync(User user, string password)
     {
-        return await FormAndSendMessage(new MailingMessage
+        return await FormAndSendMessageAsync(new MailingMessage
         {
             ToEmail = user.Identity.Email!,
             Subject = MailingSubjects.UserRegisteredSubject,
@@ -28,7 +28,7 @@ public class MailingService : IMailingService
         });
     }
 
-    public async Task<bool> FormAndSendMessage(MailingMessage mailingMessage)
+    public async Task<bool> FormAndSendMessageAsync(MailingMessage mailingMessage)
     {
         try
         {

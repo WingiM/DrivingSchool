@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(mailSettings);
 
         services.AddScoped<IAuthorizationService, AuthorizationService>();
+        services.AddScoped<IExamService, ExamService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IPassportService, PassportService>();

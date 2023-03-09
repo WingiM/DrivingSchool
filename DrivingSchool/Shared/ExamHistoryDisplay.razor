@@ -1,0 +1,78 @@
+﻿@using Microsoft.AspNetCore.Components
+@using DrivingSchool.Domain.Enums
+@using DrivingSchool.Domain.Extensions
+@using DrivingSchool.Domain.Results
+@using System.Security.Claims
+@using DrivingSchool.Domain.Constants
+@inject IExamService ExamService
+<MudTable T="ExamHistory" ServerData="GetData" Dense="true" Hover="true" Bordered="true" Striped="true" @ref="_table">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Результаты тестирований</MudText>
+    </ToolBarContent>
+    <HeaderContent>
+        <AuthorizeView Roles="Учитель">
+            <Authorized>
+                <MudTh>Студент</MudTh>
+            </Authorized>
+        </AuthorizeView>
+        <MudTh>Дата прохождения</MudTh>
+        <MudTh>Номер билета</MudTh>
+        <MudTh>Затраченно времени</MudTh>
+        <MudTh>Правильных ответов</MudTh>
+        <MudTh>Неправильных ответов</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <AuthorizeView Roles="Учитель">
+            <Authorized Context="_">
+                <MudLink Href="@($"/user/{context.UserId}")">
+                    @(string.Join(" ", context.User?.Surname, context.User?.Name, context.User?.Patronymic))
+                </MudLink>
+            </Authorized>
+        </AuthorizeView>
+        <MudTd>@context.Date</MudTd>
+        <MudTd>@context.TicketNumber</MudTd>
+        <MudTd>@context.TotalTime</MudTd>
+        <MudTd>@context.CorrectAnswers</MudTd>
+        <MudTd>@context.WrongAnswers</MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <div class="d-flex flex-column align-center">
+            <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Class="pa-4"/>
+            <MudTablePager HidePagination="true" InfoFormat="{first_item}-{last_item} из {all_items}" RowsPerPageString="Отображать строк:"/>
+        </div>
+    </PagerContent>
+</MudTable>
+
+@code {
+
+    [Parameter]
+    public bool IsForTeacher { get; set; }
+
+    [Parameter]
+    public int UserId { get; set; }
+
+    private MudTable<ExamHistory> _table = null!;
+
+    private async Task<TableData<ExamHistory>> GetData(TableState state)
+    {
+        ListDataResult<ExamHistory> data;
+        if (IsForTeacher)
+            data = await ExamService.ListExamHistoryForAllUsersAsync(state.PageSize, state.Page);
+        else
+            data = await ExamService.ListExamHistoryForUserAsync(UserId, state.PageSize, state.Page);
+
+        return new TableData<ExamHistory> { Items = data.Items, TotalItems = data.TotalItemsCount };
+    }
+
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
+    }
+
+}

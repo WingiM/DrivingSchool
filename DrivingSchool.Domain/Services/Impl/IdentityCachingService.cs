@@ -15,28 +15,28 @@ public class IdentityCachingService : IIdentityCachingService
         _cache = cache;
     }
 
-    public Task AddIdentity(IdentityUser<int> identityUser)
+    public Task AddIdentityAsync(IdentityUser<int> identityUser)
     {
         _cache.TryAdd(identityUser.Id, identityUser);
         return Task.CompletedTask;
     }
 
-    public Task<IdentityUser<int>?> GetIdentity(int id)
+    public Task<IdentityUser<int>?> GetIdentityAsync(int id)
     {
         var res = _cache.TryGetValue(id, out var identityUser);
         if (res) return Task.FromResult(identityUser);
-        identityUser = _identityCachingRepository.FindIdentityById(id);
+        identityUser = _identityCachingRepository.FindIdentityByIdAsync(id);
         if (identityUser is not null)
             _cache.TryAdd(id, identityUser);
         return Task.FromResult(identityUser);
     }
 
-    public Task<IdentityUser<int>?> GetByEmail(string email)
+    public Task<IdentityUser<int>?> GetByEmailAsync(string email)
     {
         var identityUser = _cache.TryGetValueByEmail(email);
         if (identityUser is null)
         {
-            identityUser = _identityCachingRepository.FindIdentityByEmail(email);
+            identityUser = _identityCachingRepository.FindIdentityByEmailAsync(email);
             if (identityUser is not null)
                 _cache.TryAdd(identityUser.Id, identityUser);
         }
@@ -44,12 +44,12 @@ public class IdentityCachingService : IIdentityCachingService
         return Task.FromResult(identityUser);
     }
 
-    public Task<IdentityUser<int>?> GetByPhone(string phone)
+    public Task<IdentityUser<int>?> GetByPhoneAsync(string phone)
     {
         IdentityUser<int>? identityUser = _cache.TryGetValueByPhone(phone);
         if (identityUser is null)
         {
-            identityUser = _identityCachingRepository.FindIdentityByPhone(phone);
+            identityUser = _identityCachingRepository.FindIdentityByPhoneAsync(phone);
             if (identityUser is not null)
                 _cache.TryAdd(identityUser.Id, identityUser);
         }
@@ -57,12 +57,12 @@ public class IdentityCachingService : IIdentityCachingService
         return Task.FromResult(identityUser);
     }
 
-    public async Task<IEnumerable<IdentityUser<int>>> GetMultiple(IEnumerable<int> ids)
+    public async Task<IEnumerable<IdentityUser<int>>> GetMultipleAsync(IEnumerable<int> ids)
     {
         var list = new List<IdentityUser<int>>();
         foreach (var id in ids)
         {
-            list.Add((await GetIdentity(id))!);
+            list.Add((await GetIdentityAsync(id))!);
         }
 
         return list;

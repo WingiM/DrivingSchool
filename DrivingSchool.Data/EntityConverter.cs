@@ -13,7 +13,7 @@ public static class EntityConverter
             : new Passport
             {
                 Id = passportDb.Id, Number = passportDb.Number, Series = passportDb.Series,
-                IssuedBy = passportDb.IssuedBy, IssueDate = passportDb.IssueDate.ToUniversalTime(), 
+                IssuedBy = passportDb.IssuedBy, IssueDate = passportDb.IssueDate.ToLocalTime(),
                 IssuerCode = passportDb.IssuerCode,
                 PlaceOfBirth = passportDb.PlaceOfBirth, UserId = passportDb.UserId
             };
@@ -26,7 +26,7 @@ public static class EntityConverter
             : new PassportDb
             {
                 Id = passport.Id, Number = passport.Number, Series = passport.Series,
-                IssuedBy = passport.IssuedBy, IssueDate = passport.IssueDate.ToUniversalTime(), 
+                IssuedBy = passport.IssuedBy, IssueDate = passport.IssueDate.ToUniversalTime(),
                 IssuerCode = passport.IssuerCode,
                 PlaceOfBirth = passport.PlaceOfBirth, UserId = passport.UserId
             };
@@ -36,7 +36,7 @@ public static class EntityConverter
     {
         return new User
         {
-            Id = userDb.Id, BirthDate = userDb.BirthDate.ToUniversalTime(), Surname = userDb.Surname,
+            Id = userDb.Id, BirthDate = userDb.BirthDate.ToLocalTime(), Surname = userDb.Surname,
             Name = userDb.Name, Patronymic = userDb.Patronymic, Passport = ConvertPassport(userDb.Passport),
             Identity = userDb.Identity, Role = (Roles)userDb.RoleId
         };
@@ -55,6 +55,63 @@ public static class EntityConverter
             Identity = user.Identity,
             IdentityId = user.Identity.Id,
             RoleId = (int)user.Role
+        };
+    }
+
+    public static ExamTicket ConvertExamTicket(ExamTicketDb ticketDb)
+    {
+        return new ExamTicket
+        {
+            Id = ticketDb.Id, Number = ticketDb.Number,
+            Questions = ticketDb.Questions.Select(x => ConvertExamTicketQuestion(x)).ToArray()
+        };
+    }
+    
+    public static ExamTicketQuestion ConvertExamTicketQuestion(ExamTicketQuestionDb ticketQuestionDb)
+    {
+        return new ExamTicketQuestion
+        {
+            Id = ticketQuestionDb.Id, ImageSource = ticketQuestionDb.ImageSource, Question = ticketQuestionDb.Question,
+            Answers = ticketQuestionDb.Answers.Select(x => ConvertExamTicketQuestionAnswer(x)).ToArray(),
+            Comment = ticketQuestionDb.Comment, NumberInTicket = ticketQuestionDb.NumberInTicket
+        };
+    }
+
+    public static ExamTicketQuestionAnswer ConvertExamTicketQuestionAnswer(ExamTicketQuestionAnswerDb questionAnswerDb)
+    {
+        return new ExamTicketQuestionAnswer
+        {
+            NumberInTicket = questionAnswerDb.NumberInQuestion,
+            AnswerText = questionAnswerDb.AnswerText,
+            Id = questionAnswerDb.Id,
+            IsCorrect = questionAnswerDb.IsCorrect,
+            QuestionId = questionAnswerDb.QuestionId,
+        };
+    }
+
+    public static ExamHistory ConvertExamHistory(ExamHistoryDb historyDb)
+    {
+        return new ExamHistory
+        {
+            Id = historyDb.Id, TicketId = historyDb.TicketId, UserId = historyDb.UserId,
+            CorrectAnswers = historyDb.CorrectAnswers, WrongAnswers = historyDb.WrongAnswers,
+            TotalTime = historyDb.TotalTime, TicketNumber = historyDb.Ticket.Number,
+            Date = historyDb.Date.ToLocalTime(), User = new UserInitials()
+            {
+                Name = historyDb.User!.Name,
+                Surname = historyDb.User.Surname,
+                Patronymic = historyDb.User.Patronymic,
+            }
+        };
+    }
+
+    public static ExamHistoryDb ConvertExamHistory(ExamHistory history)
+    {
+        return new ExamHistoryDb
+        {
+            Id = history.Id, TicketId = history.TicketId, UserId = history.UserId,
+            CorrectAnswers = history.CorrectAnswers, WrongAnswers = history.WrongAnswers,
+            TotalTime = history.TotalTime, Date = history.Date.ToUniversalTime()
         };
     }
 }
