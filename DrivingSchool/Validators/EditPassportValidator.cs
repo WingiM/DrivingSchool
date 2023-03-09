@@ -1,4 +1,5 @@
 ﻿using DrivingSchool.Data;
+using DrivingSchool.Validators.ValidationMessages;
 using FluentValidation;
 
 namespace DrivingSchool.Validators;
@@ -8,19 +9,27 @@ public class EditPassportValidator : AbstractValidator<EditPassport>
     public EditPassportValidator()
     {
         RuleFor(x => x.Series)
-            .Length(4);
+            .Length(4)
+            .WithMessage(PassportValidatorMessages.WrongSeries);
         RuleFor(x => x.Number)
-            .Length(6);
+            .Length(6)
+            .WithMessage(PassportValidatorMessages.WrongNumber);
         RuleFor(x => x.IssueDate)
-            .NotEmpty();
+            .NotEmpty()
+            .WithMessage(PassportValidatorMessages.EmptyIssueDate);
         RuleFor(x => x.IssuerCode)
-            .Length(6);
+            .Length(6)
+            .WithMessage(PassportValidatorMessages.WrongIssuerCode);
         RuleFor(x => x.IssuedBy)
             .NotEmpty()
-            .MaximumLength(150);
+            .WithMessage(PassportValidatorMessages.EmptyIssuedBy)
+            .MaximumLength(150)
+            .WithMessage(PassportValidatorMessages.OverflowedIssuedBy);
         RuleFor(x => x.PlaceOfBirth)
             .NotEmpty()
-            .MaximumLength(200);
+            .WithMessage(PassportValidatorMessages.EmptyPlaceOfBirth)
+            .MaximumLength(200)
+            .WithMessage(PassportValidatorMessages.OverflowedPlaceOfBirth);
     }
 
     public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
