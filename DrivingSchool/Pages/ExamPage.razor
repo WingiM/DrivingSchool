@@ -1,12 +1,12 @@
 ﻿@page "/test"
 @using ExamTicket = DrivingSchool.Domain.Models.ExamTicketQuestion
-@* @attribute [Authorize(Roles = "Студент")] *@
+@attribute [Authorize(Roles = "Студент")]
 @inject IExamService ExamService
 
 @if (_ticketsLoaded)
 {
     <MudSelect T="int" @bind-Value="_currentTicket" Label="Номер билета" Style="margin: 20px 0" >
-        @foreach (var number in _tickets)
+        @foreach (var number in _tickets.OrderBy(x => x))
         {
             <MudSelectItem Value="number"></MudSelectItem>
         }

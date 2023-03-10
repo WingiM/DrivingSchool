@@ -1,7 +1,9 @@
+using System.Text;
 using DrivingSchool;
 using DrivingSchool.Data;
 using DrivingSchool.Domain;
 using DrivingSchool.GridFS;
+using DrivingSchool.HostedServices;
 using DrivingSchool.Middleware;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -35,6 +37,9 @@ builder.Services.AddDefaultIdentity<IdentityUser<int>>(options =>
 builder.Services.AddMudServices();
 builder.Services
     .AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddHostedService<AddTicketsToDatabaseHostedService>();
+builder.Services.AddHostedService<UploadImagesHostedService>();
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 var app = builder.Build();
 app.UseSerilogRequestLogging();
 app.UseMiddleware<ExceptionMiddleware>();

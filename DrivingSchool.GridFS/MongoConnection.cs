@@ -9,7 +9,9 @@ public class MongoConnection
 
     public MongoConnection(string connectionString, string databaseName)
     {
-        Client = new MongoClient(connectionString);
+        var s = MongoClientSettings.FromConnectionString(connectionString);
+        s.ServerSelectionTimeout = TimeSpan.FromSeconds(5);
+        Client = new MongoClient(s);
         Database = Client.GetDatabase(databaseName);
     }
 }
