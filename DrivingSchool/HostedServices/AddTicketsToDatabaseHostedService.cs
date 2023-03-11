@@ -45,7 +45,7 @@ public class AddTicketsToDatabaseHostedService : IHostedService
             return;
         }
 
-        _logger.LogInformation("Images are already loaded. Skipping image initialization");
+        _logger.LogInformation("Tickets are already loaded. Skipping ticket initialization");
     }
 
     private async Task LoadTicketsToDatabase(IDbConnection connection)

@@ -10,4 +10,5 @@ public static class RegisterValidatorMessages
     public const string NameNotEmpty = "Имя обязательно для ввода";
     public const string OnlyCyrillicSymbols = "Для ввода разрешены только символы кириллицы";
     public const string BirthDateNotNull = "Дата рождения не может быть пустой";
+    public const string PhoneIsTooSmall = "Номер должен содержать 11 символов";
 }
