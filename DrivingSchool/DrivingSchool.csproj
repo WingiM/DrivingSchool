@@ -14,6 +14,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Include="Startups\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+    
+    <ItemGroup>
       <ProjectReference Include="..\DrivingSchool.Data\DrivingSchool.Data.csproj" />
       <ProjectReference Include="..\DrivingSchool.GridFS\DrivingSchool.GridFS.csproj" />
     </ItemGroup>
