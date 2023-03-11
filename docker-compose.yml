@@ -24,10 +24,10 @@ services:
       - ~/volumes/postgres:/var/lib/postgresql/data
       - ./drivingschool.sql:/docker-entrypoint-initdb.d/drivingschool.sql
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -d ${POSTGRES_DATABASE_NAME} -U postgres" ]
-      interval: 5s
+      test: [ "CMD-SHELL", "pg_isready -d ${POSTGRES_DATABASE_NAME} -U ${POSTGRES_USER}" ]
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   app:
     container_name: app
