@@ -13,6 +13,7 @@ services:
     container_name: storage
     image: postgres:14.3
     restart: always
+    command: ["postgres", "-c", "log_statement=mod"]
     ports:
       - "${POSTGRES_OUTER_PORT}:${POSTGRES_INNER_PORT}"
     environment:
@@ -34,6 +35,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    restart: on-failure
     depends_on:
       storage:
         condition: service_healthy
