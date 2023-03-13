@@ -2,6 +2,6 @@
 
 public interface ILessonRepository
 {
-    public Task<DatabaseEntityCreationResult> AddLesson(StudentLesson lesson);
-    public Task<BaseResult> CheckLessonOverlapping(StudentLesson lesson);
+    public Task<DatabaseEntityCreationResult> AddLessonAsync(StudentLesson lesson);
+    public Task<BaseResult> CheckLessonOverlappingAsync(StudentLesson lesson);
 }

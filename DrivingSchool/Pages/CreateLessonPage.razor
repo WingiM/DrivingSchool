@@ -1,0 +1,93 @@
+﻿@page "/lessons"
+@using DrivingSchool.Data
+@using DrivingSchool.Domain.Constants
+@using DrivingSchool.Validators
+@inject ILessonService LessonService
+@inject AuthenticationStateProvider AuthenticationStateProvider 
+@inject IUserService UserService
+@attribute [Authorize(Roles = "Учитель")]
+
+@if (_usersInitialized)
+{
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h4">Создание занятия</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudForm Model="@_model" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
+            <MudCardContent>
+                <MudSelect @bind-Value="_model.StudentId" For="() => _model.StudentId" Label="Студент" AnchorOrigin="Origin.BottomCenter" Clearable>
+                    @foreach (var user in _users)
+                    {
+                        <MudSelectItem Value="(int?)user.Id">
+                            @(string.Join(" ", user.Surname, user.Name, user.Patronymic))
+                        </MudSelectItem>
+                    }
+                </MudSelect>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Disabled="@_loading" Variant="Variant.Filled" Color="Color.Primary" OnClick="async () => await AddLesson()">Создать занятие</MudButton>
+                @if (_loading)
+                {
+                    <MudProgressCircular Style="margin-left: 10px;" Color="Color.Primary" Indeterminate="true"/>
+                }
+            </MudCardActions>
+        </MudForm>
+    </MudCard>
+}
+
+
+@code {
+
+    [Inject]
+    ISnackbar Snackbar { get; set; } = null!;
+
+    private readonly CreateLesson _model = new();
+    private readonly CreateLessonValidator _validator = new();
+    private MudForm _form = null!;
+
+    private int _userId;
+    private UserInitials[] _users = null!;
+
+    private bool _usersInitialized;
+    private bool _loading;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        int.TryParse(user.Claims.First(x => x.Type == UserDefaultClaims.Id).Value, out _userId);
+        _users = (await UserService.ListStudentsAsync()).Items.ToArray();
+        _usersInitialized = true;
+    }
+
+    private async Task AddLesson()
+    {
+        _loading = true;
+        await _form.Validate();
+        if (!_form.IsValid)
+        {
+            Snackbar.Add("Не все данные заполнены верно!");
+            _loading = false;
+            return;
+        }
+
+        var lesson = new StudentLesson
+        {
+            StudentId = _model.StudentId!.Value, Date = _model.Date, Duration = _model.Duration,
+            TimeStart = _model.TimeStart, TeacherId = _userId
+        };
+
+        var res = await LessonService.AddLessonAsync(lesson);
+        _loading = false;
+        if (!res.Success)
+        {
+            Snackbar.Add($"Ошибка при добавлении занятия: {res.Message}", Severity.Error);
+            return;
+        }
+
+        Snackbar.Add($"Успешно создано новое занятие", Severity.Success);
+    }
+
+}

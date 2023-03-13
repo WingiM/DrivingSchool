@@ -11,7 +11,7 @@ public class LessonRepository : BaseRepository, ILessonRepository
     {
     }
 
-    public async Task<DatabaseEntityCreationResult> AddLesson(StudentLesson lesson)
+    public async Task<DatabaseEntityCreationResult> AddLessonAsync(StudentLesson lesson)
     {
         var lessonDb = EntityConverter.ConvertStudentLesson(lesson);
         Context.Lessons.Add(lessonDb);
@@ -21,9 +21,11 @@ public class LessonRepository : BaseRepository, ILessonRepository
         return new DatabaseEntityCreationResult { Success = true, CreatedEntityId = entityId };
     }
 
-    public Task<BaseResult> CheckLessonOverlapping(StudentLesson lesson)
+    public Task<BaseResult> CheckLessonOverlappingAsync(StudentLesson lesson)
     {
-        var lessons = Context.Lessons.Where(x => x.TeacherId == lesson.TeacherId && x.Date == lesson.Date)
+        var lessons = Context.Lessons
+            .Where(x => x.TeacherId == lesson.TeacherId && x.Date == lesson.Date)
+            .AsEnumerable()
             .Select(x => EntityConverter.ConvertStudentLesson(x));
 
         var overlaps = lessons.Any(x => x.Overlaps(lesson));

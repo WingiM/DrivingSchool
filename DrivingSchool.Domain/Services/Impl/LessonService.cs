@@ -11,17 +11,17 @@ public class LessonService : ILessonService
         _repository = repository;
     }
 
-    public async Task<DatabaseEntityCreationResult> AddLesson(StudentLesson lesson)
+    public async Task<DatabaseEntityCreationResult> AddLessonAsync(StudentLesson lesson)
     {
-        var overlapping = await CheckLessonOverlapping(lesson);
-        if (overlapping.Success)
+        var overlapping = await CheckLessonOverlappingAsync(lesson);
+        if (!overlapping.Success)
             return new DatabaseEntityCreationResult { Success = false, Message = overlapping.Message };
 
-        return await _repository.AddLesson(lesson);
+        return await _repository.AddLessonAsync(lesson);
     }
 
-    public async Task<BaseResult> CheckLessonOverlapping(StudentLesson lesson)
+    public async Task<BaseResult> CheckLessonOverlappingAsync(StudentLesson lesson)
     {
-        return await _repository.CheckLessonOverlapping(lesson);
+        return await _repository.CheckLessonOverlappingAsync(lesson);
     }
 }
