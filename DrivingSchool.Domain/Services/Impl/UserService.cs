@@ -65,4 +65,14 @@ public class UserService : IUserService
     {
         return await _userRepository.ListUsersAsync(itemCount, pageNumber, searchText, field, desc);
     }
+
+    public async Task<ListDataResult<UserInitials>> ListStudentsAsync()
+    {
+        return await _userRepository.ListStudentsAsync();
+    }
+
+    public async Task<ListDataResult<UserInitials>> ListTeachersAsync()
+    {
+        return await _userRepository.ListTeachersAsync();
+    }
 }

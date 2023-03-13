@@ -10,4 +10,6 @@ public interface IUserRepository
     public Task<User> GetUserByLoginAsync(string login);
     public Task<User> GetUserByIdAsync(int id);
     public Task<ListDataResult<User>> ListUsersAsync(int itemCount, int pageNumber, string searchText, string field = UserSortingField.Id, bool desc = false);
+    public Task<ListDataResult<UserInitials>> ListStudentsAsync();
+    public Task<ListDataResult<UserInitials>> ListTeachersAsync();
 }

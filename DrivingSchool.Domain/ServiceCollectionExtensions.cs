@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPassportService, PassportService>();
         services.AddScoped<IIdentityCachingService, IdentityCachingService>();
         services.AddScoped<IImageLoadingService, ImageLoadingService>();
+        services.AddScoped<ILessonService, LessonService>();
         services.AddSingleton<IdentityCache>();
         services.AddTransient<IMailingService, MailingService>();
 

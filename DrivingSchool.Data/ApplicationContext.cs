@@ -15,6 +15,7 @@ public class ApplicationContext : DbContext
     public DbSet<UserDb> Users { get; set; } = null!;
     public DbSet<PassportDb> Passports { get; set; } = null!;
     public DbSet<ExamTicketDb> ExamTickets { get; set; } = null!;
+    public DbSet<StudentLessonDb> Lessons { get; set; } = null!;
     public DbSet<ExamHistoryDb> ExamHistories { get; set; } = null!;
     public DbSet<IdentityRole<int>> Roles { get; set; } = null!;
     public DbSet<IdentityUserRole<int>> UserRoles { get; set; } = null!;

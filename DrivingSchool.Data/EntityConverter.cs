@@ -6,6 +6,32 @@ namespace DrivingSchool.Data;
 
 public static class EntityConverter
 {
+    public static StudentLesson ConvertStudentLesson(StudentLessonDb lessonDb)
+    {
+        return new StudentLesson
+        {
+            Id = lessonDb.Id, Duration = TimeSpan.FromMinutes(lessonDb.DurationInMinutes),
+            Date = lessonDb.Date.ToLocalTime(), StudentId = lessonDb.StudentId, TeacherId = lessonDb.TeacherId,
+            TimeStart = lessonDb.TimeStart
+        };
+    }
+
+    public static StudentLessonDb ConvertStudentLesson(StudentLesson lesson)
+    {
+        return new StudentLessonDb
+        {
+            Id = lesson.Id, DurationInMinutes = (int)lesson.Duration.TotalMinutes,
+            Date = lesson.Date.ToLocalTime(), StudentId = lesson.StudentId, TeacherId = lesson.TeacherId,
+            TimeStart = lesson.TimeStart
+        };
+    }
+
+    public static UserInitials GetUserInitials(UserDb user)
+    {
+        return new UserInitials
+            { Id = user.Id, Name = user.Name, Patronymic = user.Patronymic, Surname = user.Surname };
+    }
+
     public static Passport? ConvertPassport(PassportDb? passportDb)
     {
         return passportDb is null
@@ -66,7 +92,7 @@ public static class EntityConverter
             Questions = ticketDb.Questions.Select(x => ConvertExamTicketQuestion(x)).ToArray()
         };
     }
-    
+
     public static ExamTicketQuestion ConvertExamTicketQuestion(ExamTicketQuestionDb ticketQuestionDb)
     {
         return new ExamTicketQuestion
