@@ -1,7 +1,7 @@
 ﻿<MudNavMenu Style="padding-top: 0;" Color="Color.Primary">
     <MudLink Href="/" Style="color:black; text-decoration: none; cursor: default">
         <MudText Typo="Typo.h6" Class="px-4" Style="color: black">
-            <MudImage Src="drivingSchool.png" Width="40" Height="40" Style="position: relative;top: 10px; cursor: pointer"/>втошкола
+            <MudImage Src="drivingschool.png" Width="40" Height="40" Style="position: relative;top: 10px; cursor: pointer"/>втошкола
         </MudText>
     </MudLink>
     <MudDivider Class="my-2"/>
@@ -13,10 +13,6 @@
     <AuthorizeView Roles="Администратор">
         <MudNavLink Href="/registration" Icon="@Icons.Material.Filled.HowToReg">Регистрация пользователей</MudNavLink>
         <MudNavLink Href="/management" Icon="@Icons.Material.Filled.Group">Управление пользователями</MudNavLink>
-        <MudNavGroup Title="Тесты" Icon="@Icons.Material.Filled.Work" Expanded="true">
-            <MudNavLink Href="/test" Icon="@Icons.Material.Filled.MobileFriendly">Пройти тест</MudNavLink>
-            <MudNavLink Href="/history" Icon="@Icons.Material.Filled.History">История прохождения тестов</MudNavLink>
-        </MudNavGroup>
     </AuthorizeView>
     <AuthorizeView Roles="Студент">
         <MudNavGroup Title="Тесты" Icon="@Icons.Material.Filled.Work" Expanded="true">

@@ -8,6 +8,7 @@
 @inject IImageLoadingService ImageLoadingService
 @inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILogger<ExamTicketDisplay> Logger
 
 @if (_ticketLoaded)
 {
@@ -20,27 +21,38 @@
             <b>@_counter</b>
         </MudText>
     </MudProgressLinear>
-    <MudStack Row="true">
-        @foreach (var question in _questionResults)
-        {
-            <MudButton Style="@($"background: {GetQuestionButtonBackgroundColor(question)};")" Variant="Variant.Filled" OnClick="() => ChangeQuestion(question.Key)">@question.Key</MudButton>
-        }
-    </MudStack>
+    <div style="display: flex;flex-direction: column;justify-content: center;align-items: center;">
+        <MudStack Row="true">
+            @foreach (var question in _questionResults.Take(_questionResults.Count / 2))
+            {
+                <MudButton Style="@($"background: {GetQuestionButtonBackgroundColor(question)};")" Variant="Variant.Filled" OnClick="() => ChangeQuestion(question.Key)">@question.Key</MudButton>
+            }
+        </MudStack>
+        <div style="margin:5px"></div>
+        <MudStack Row="true">
+            @foreach (var question in _questionResults.Skip(_questionResults.Count / 2).Take(_questionResults.Count / 2))
+            {
+                <MudButton Style="@($"background: {GetQuestionButtonBackgroundColor(question)};")" Variant="Variant.Filled" OnClick="() => ChangeQuestion(question.Key)">@question.Key</MudButton>
+            }
+        </MudStack>
+    </div>
+    <MudDivider Style="margin: 10px"/>
     <MudCard>
-        <MudImage id="ticket-image" Style="display: block; margin: auto" Alt=""/>
+        <MudImage id="ticket-image" Style="display: block; margin: auto;object-fit: contain; max-width: 65%; max-height: 20%" Alt=""/>
         <MudCardContent>
             <MudText Typo="Typo.h5">@_currentQuestion!.Question</MudText>
+            <div style="margin: 10px"></div>
             <MudStack Spacing="3" AlignItems="AlignItems.Start">
-                @foreach (var answer in _currentQuestion!.Answers.OrderBy(x => x.NumberInTicket))
+                @foreach (var answer in _currentQuestion!.Answers.OrderBy(x => x.NumberInQuestion))
                 {
-                    <MudButton Style="@($"color: black; background: {GetAnswerButtonBackgroundColor(answer)}; width: 80%; justify-content: left;")" OnClick="() => CheckAnswer(answer)" Disabled="_ticketDisabled">
-                        <MudText>@($"{answer.NumberInTicket}. {answer.AnswerText}")</MudText>
+                    <MudButton Style="@($"color: black; background: {GetAnswerButtonBackgroundColor(answer)}; width: 80%; justify-content: left;text-align: left;")" OnClick="() => CheckAnswer(answer)" Disabled="_ticketDisabled">
+                        <MudText>@($"{answer.NumberInQuestion + 1}. {answer.AnswerText}")</MudText>
                     </MudButton>
                 }
             </MudStack>
             @if (TryGuessed)
             {
-                <MudText>Правильный ответ: @_currentQuestion!.Answers.Single(x => x.IsCorrect).NumberInTicket</MudText>
+                <MudText>Правильный ответ: @(_currentQuestion!.Answers.Single(x => x.IsCorrect).NumberInQuestion + 1)</MudText>
                 <MudText>@_currentQuestion!.Comment</MudText>
             }
         </MudCardContent>
@@ -106,14 +118,21 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (_isImageLoaded || _currentQuestion is null) return;
-        var stream = await ImageLoadingService.GetImageReadStreamAsync(_currentQuestion.ImageSource);
-        var dotnetImageStream = new DotNetStreamReference(stream);
-        var res = await JsRuntime.InvokeAsync<bool>("getById", "ticket-image");
-        if (res)
+        try
         {
-            await JsRuntime.InvokeVoidAsync("setImage", "ticket-image", dotnetImageStream);
-            _isImageLoaded = true;
+            if (_isImageLoaded || _currentQuestion is null) return;
+            var stream = await ImageLoadingService.GetImageReadStreamAsync(_currentQuestion.ImageSource);
+            var dotnetImageStream = new DotNetStreamReference(stream);
+            var res = await JsRuntime.InvokeAsync<bool>("getById", "ticket-image");
+            if (res)
+            {
+                await JsRuntime.InvokeVoidAsync("setImage", "ticket-image", dotnetImageStream);
+                _isImageLoaded = true;
+            }
+        }
+        catch (Exception)
+        {
+            Logger.LogError("Could not connect to file system");
         }
     }
 

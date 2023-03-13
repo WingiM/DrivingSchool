@@ -81,7 +81,7 @@ public static class EntityConverter
     {
         return new ExamTicketQuestionAnswer
         {
-            NumberInTicket = questionAnswerDb.NumberInQuestion,
+            NumberInQuestion = questionAnswerDb.NumberInQuestion,
             AnswerText = questionAnswerDb.AnswerText,
             Id = questionAnswerDb.Id,
             IsCorrect = questionAnswerDb.IsCorrect,

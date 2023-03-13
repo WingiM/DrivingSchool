@@ -22,7 +22,9 @@ public class RegistrationValidator : AbstractValidator<RegistrationCredentials>
 
         RuleFor(x => x.PhoneNumber)
             .NotEmpty()
-            .WithMessage(RegisterValidatorMessages.PhoneNotEmpty);
+            .WithMessage(RegisterValidatorMessages.PhoneNotEmpty)
+            .Length(11)
+            .WithMessage(RegisterValidatorMessages.PhoneIsTooSmall);
 
         RuleFor(x => x.Surname)
             .NotEmpty()

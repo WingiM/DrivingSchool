@@ -1,6 +1,9 @@
 bin/
 obj/
+.env
+drivingSchool.sql
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
 DrivingSchool/appsettings.Development.json
+DrivingSchool/Startups/
