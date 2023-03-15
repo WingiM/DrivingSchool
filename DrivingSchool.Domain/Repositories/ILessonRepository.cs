@@ -7,4 +7,8 @@ public interface ILessonRepository
     public Task<BaseResult> CheckLessonOverlappingAsync(StudentLesson lesson);
     public Task<ListDataResult<LessonBase>> ListLessonsForTeacherAsync(int teacherId);
     public Task<ListDataResult<StudentLesson>> ListLessonsForStudentAsync(int studentId);
+    public Task<ListDataResult<AvailableLesson>> ListAvailableLessonsAsync(int studentId);
+    public Task<AvailableLesson> GetLessonAsync(int lessonId);
+    public Task SignToLessonAsync(int lessonId, int studentId);
+
 }

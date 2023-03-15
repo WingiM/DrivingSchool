@@ -1,4 +1,5 @@
-﻿using DrivingSchool.Domain.Repositories;
+﻿using DrivingSchool.Domain.ErrorMessages;
+using DrivingSchool.Domain.Repositories;
 
 namespace DrivingSchool.Domain.Services.Impl;
 
@@ -38,5 +39,20 @@ public class LessonService : ILessonService
     public async Task<ListDataResult<StudentLesson>> ListLessonsForStudentAsync(int studentId)
     {
         return await _repository.ListLessonsForStudentAsync(studentId);
+    }
+
+    public async Task<ListDataResult<AvailableLesson>> ListAvailableLessonsForStudent(int studentId)
+    {
+        return await _repository.ListAvailableLessonsAsync(studentId);
+    }
+
+    public async Task<BaseResult> SignToLesson(int lessonId, int studentId)
+    {
+        var lesson = await _repository.GetLessonAsync(lessonId);
+        if (lesson.IsTaken)
+            return new BaseResult { Success = false, Message = LessonErrorMessages.LessonIsAlreadyTaken };
+
+        await _repository.SignToLessonAsync(lessonId, studentId);
+        return new BaseResult { Success = true };
     }
 }

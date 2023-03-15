@@ -1,9 +1,10 @@
-﻿using DrivingSchool.Domain.ErrorMessages;
+﻿using Dapper;
+using DrivingSchool.Data.Models;
+using DrivingSchool.Domain.ErrorMessages;
 using DrivingSchool.Domain.Models;
 using DrivingSchool.Domain.Repositories;
 using DrivingSchool.Domain.Results;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Crypto.Tls;
 
 namespace DrivingSchool.Data.Repositories;
 
@@ -56,7 +57,7 @@ public class LessonRepository : BaseRepository, ILessonRepository
             .Include(x => x.Student)
             .Where(x => x.TeacherId == teacherId)
             .ToArrayAsync();
-        
+
         var availableLessons = await Context.AvailableLessons
             .Include(x => x.Student)
             .Where(x => x.TeacherId == teacherId)
@@ -77,5 +78,41 @@ public class LessonRepository : BaseRepository, ILessonRepository
             .ToArrayAsync();
 
         return new ListDataResult<StudentLesson> { Items = lessons.Select(x => EntityConverter.ConvertLesson(x)) };
+    }
+
+    public async Task<ListDataResult<AvailableLesson>> ListAvailableLessonsAsync(int studentId)
+    {
+        var userSignedDays = await Context.AvailableLessons
+            .Where(x => x.StudentId == studentId)
+            .Select(x => x.Date.ToUniversalTime())
+            .ToArrayAsync();
+
+        var res = await Context.AvailableLessons
+            .Include(x => x.Teacher)
+            .Where(x => !x.IsTaken && !userSignedDays.Contains(x.Date))
+            .Select(x => EntityConverter.ConvertLesson(x))
+            .ToArrayAsync();
+        return new ListDataResult<AvailableLesson> { Items = res, Success = true };
+    }
+
+    public async Task<AvailableLesson> GetLessonAsync(int lessonId)
+    {
+        return EntityConverter.ConvertLesson(await Context.AvailableLessons.SingleAsync(x => x.Id == lessonId));
+    }
+
+    public async Task SignToLessonAsync(int lessonId, int studentId)
+    {
+        var lesson = Context.AvailableLessons.Single(x => x.Id == lessonId);
+        lesson.StudentId = studentId;
+        Context.Update(lesson);
+        var studentLesson = new StudentLessonDb
+        {
+            StudentId = studentId, Date = lesson.Date, TeacherId = lesson.TeacherId, TimeStart = lesson.TimeStart,
+            DurationInMinutes = lesson.DurationInMinutes
+        };
+        Context.Add(studentLesson);
+        await Context.SaveChangesAsync();
+        Context.Entry(lesson).State = EntityState.Detached;
+        Context.Entry(studentLesson).State = EntityState.Detached;
     }
 }

@@ -23,7 +23,7 @@
             <MudDatePicker @bind-Date="_model.BirthDate" OpenTo="OpenTo.Year" MaxDate="DrivingSchoolRestrictions.MaximumBirthDate" For="() => _model.BirthDate" Label="Дата рождения"/>
             <MudTextField @bind-Value="_model.Email" For="() => _model.Email" Immediate="false" Label="Электронная почта"/>
             <MudTextField @bind-Value="_model.PhoneNumber" For="() => _model.PhoneNumber" Immediate="false"
-                          Label="Номер телефона" Mask="@(new PatternMask("+0 (000) 000 00-00"))"/>
+                          Label="Номер телефона" Mask="@(new PatternMask("+0 (000) 000 00-00") { CleanDelimiters = true })"/>
             <MudSelect @bind-Value="_model.Role" ToStringFunc="@_converter" Label="Роль пользователя" AnchorOrigin="Origin.BottomCenter" Clearable>
                 @foreach (Roles role in Enum.GetValues(typeof(Roles)))
                 {

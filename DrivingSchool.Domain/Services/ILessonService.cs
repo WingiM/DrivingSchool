@@ -7,4 +7,6 @@ public interface ILessonService
     public Task<BaseResult> CheckLessonOverlappingAsync(StudentLesson lesson);
     public Task<ListDataResult<LessonBase>> ListLessonsForTeacherAsync(int teacherId);
     public Task<ListDataResult<StudentLesson>> ListLessonsForStudentAsync(int studentId);
+    public Task<ListDataResult<AvailableLesson>> ListAvailableLessonsForStudent(int studentId);
+    public Task<BaseResult> SignToLesson(int lessonId, int studentId);
 }

@@ -10,7 +10,7 @@ public class AvailableLessonDb : BaseEntity
     public TimeSpan TimeStart { get; init; }
     public int DurationInMinutes { get; init; }
     
-    public int? StudentId { get; init; }
+    public int? StudentId { get; set; }
     public UserDb? Student { get; init; }
     
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]

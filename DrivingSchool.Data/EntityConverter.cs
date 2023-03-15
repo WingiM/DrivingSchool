@@ -55,7 +55,14 @@ public static class EntityConverter
         {
             Id = lesson.Id, TeacherId = lesson.TeacherId, TimeStart = lesson.TimeStart,
             Duration = TimeSpan.FromMinutes(lesson.DurationInMinutes), Date = lesson.Date.ToLocalTime(),
-            StudentId = lesson.StudentId, IsTaken = lesson.IsTaken
+            StudentId = lesson.StudentId, IsTaken = lesson.IsTaken, 
+            TeacherInitials = lesson.Teacher is not null
+                ? new UserInitials
+                {
+                    Name = lesson.Teacher.Name, Surname = lesson.Teacher.Surname,
+                    Patronymic = lesson.Teacher.Patronymic,
+                }
+                : null
         };
     }
 
