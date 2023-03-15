@@ -9,8 +9,6 @@ public class CreateLessonValidator : AbstractValidator<CreateLesson>
     public CreateLessonValidator()
     {
         RuleFor(x => x.StudentId)
-            .NotNull()
-            .WithMessage(CreateLessonValidatorMessages.StudentNotDefined)
             .GreaterThan(0)
             .WithMessage(CreateLessonValidatorMessages.StudentNotDefined);
 
@@ -19,13 +17,21 @@ public class CreateLessonValidator : AbstractValidator<CreateLesson>
             .WithMessage(CreateLessonValidatorMessages.TeacherNotDefined);
 
         RuleFor(x => x.Date)
-            .Must(x => x > DateTime.Now)
+            .NotNull()
+            .WithMessage(CreateLessonValidatorMessages.DateNotDefined)
+            .Must(x => x >= DateTime.Now.Date)
             .WithMessage(CreateLessonValidatorMessages.LessonTimePassed);
 
-        RuleFor(x => x.Duration)
-            .LessThanOrEqualTo(TimeSpan.FromHours(3))
+        RuleFor(x => x.TimeStart)
+            .NotNull()
+            .WithMessage(CreateLessonValidatorMessages.WrongDuration);
+        
+        RuleFor(x => x.TimeEnd)
+            .Cascade(CascadeMode.Stop)
+            .NotNull()
             .WithMessage(CreateLessonValidatorMessages.WrongDuration)
-            .GreaterThan(TimeSpan.Zero)
+            .Must((lesson, span) => span!.Value - lesson.TimeStart >= TimeSpan.FromMinutes(45)
+                                    && span.Value - lesson.TimeStart <= TimeSpan.FromHours(3))
             .WithMessage(CreateLessonValidatorMessages.WrongDuration);
     }
 

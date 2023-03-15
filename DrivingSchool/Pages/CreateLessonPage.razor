@@ -1,7 +1,9 @@
-﻿@page "/lessons"
+﻿@page "/create-lessons"
 @using DrivingSchool.Data
 @using DrivingSchool.Domain.Constants
+@using DrivingSchool.Domain.Results
 @using DrivingSchool.Validators
+@using DrivingSchool.Validators.ValidationMessages
 @inject ILessonService LessonService
 @inject AuthenticationStateProvider AuthenticationStateProvider 
 @inject IUserService UserService
@@ -17,7 +19,14 @@
         </MudCardHeader>
         <MudForm Model="@_model" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
             <MudCardContent>
-                <MudSelect @bind-Value="_model.StudentId" For="() => _model.StudentId" Label="Студент" AnchorOrigin="Origin.BottomCenter" Clearable>
+                <MudSwitch @bind-Checked="@IsWithStudent" Label="Занятие с конкретным студентом" Color="Color.Primary"/>
+                <MudDatePicker @bind-Date="_model.Date" Label="Дата проведения занятия" OpenTo="OpenTo.Date"
+                               MinDate="DateTime.Now.Date" For="() => _model.Date"/>
+                <MudTimePicker @bind-Time="_model.TimeStart" Label="Время начала занятия" OpenTo="OpenTo.Hours"
+                               For="() => _model.TimeStart"/>
+                <MudTimePicker @bind-Time="_model.TimeEnd" Label="Время окончания занятия" OpenTo="OpenTo.Hours"
+                               For="() => _model.TimeEnd"/>
+                <MudSelect @bind-Value="_model.StudentId" Disabled="@(!IsWithStudent)" For="() => _model.StudentId" Label="Студент" AnchorOrigin="Origin.BottomCenter" Clearable>
                     @foreach (var user in _users)
                     {
                         <MudSelectItem Value="(int?)user.Id">
@@ -36,6 +45,12 @@
         </MudForm>
     </MudCard>
 }
+else
+{
+    <div style="transform: translateY(25%); text-align: center">
+        <MudProgressCircular Style="width: 40%; height: 40%;" Color="Color.Primary" Indeterminate="true"/>
+    </div>
+}
 
 
 @code {
@@ -52,6 +67,7 @@
 
     private bool _usersInitialized;
     private bool _loading;
+    private bool IsWithStudent { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -73,13 +89,35 @@
             return;
         }
 
-        var lesson = new StudentLesson
+        DatabaseEntityCreationResult res;
+        if (IsWithStudent)
         {
-            StudentId = _model.StudentId!.Value, Date = _model.Date, Duration = _model.Duration,
-            TimeStart = _model.TimeStart, TeacherId = _userId
-        };
+            if (_model.StudentId is null)
+            {
+                _loading = false;
+                Snackbar.Add($"Ошибка при добавлении занятия: {CreateLessonValidatorMessages.StudentNotDefined}", Severity.Error);
+                return;
+            }
 
-        var res = await LessonService.AddLessonAsync(lesson);
+            var lesson = new StudentLesson
+            {
+                StudentId = _model.StudentId!.Value, Date = _model.Date!.Value, Duration = _model.TimeEnd!.Value - _model.TimeStart!.Value,
+                TimeStart = _model.TimeStart!.Value, TeacherId = _userId
+            };
+
+            res = await LessonService.AddLessonAsync(lesson);
+        }
+        else
+        {
+            var lesson = new AvailableLesson
+            {
+                Date = _model.Date!.Value, Duration = _model.TimeEnd!.Value - _model.TimeStart!.Value,
+                TimeStart = _model.TimeStart!.Value, TeacherId = _userId
+            };
+
+            res = await LessonService.AddAvailableLessonAsync(lesson);
+        }
+
         _loading = false;
         if (!res.Success)
         {

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using DrivingSchool;
 using DrivingSchool.Data;
@@ -40,6 +41,10 @@ builder.Services
 builder.Services.AddHostedService<AddTicketsToDatabaseHostedService>();
 builder.Services.AddHostedService<UploadImagesHostedService>();
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+var cultureInfo = new CultureInfo("ru-RU");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 var app = builder.Build();
 app.UseSerilogRequestLogging();
 app.UseMiddleware<ExceptionMiddleware>();

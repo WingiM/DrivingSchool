@@ -86,7 +86,7 @@
         else
             data = await UserService.ListUsersAsync(state.PageSize, state.Page, _search, state.SortLabel, state.SortDirection == SortDirection.Descending);
 
-        return new TableData<User>() { TotalItems = data.TotalItemsCount, Items = data.Items };
+        return new TableData<User> { TotalItems = data.TotalItemsCount, Items = data.Items };
     }
 
     private void RowClickEvent(TableRowClickEventArgs<User> tableRowClickEventArgs)

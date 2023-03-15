@@ -20,8 +20,23 @@ public class LessonService : ILessonService
         return await _repository.AddLessonAsync(lesson);
     }
 
+    public async Task<DatabaseEntityCreationResult> AddAvailableLessonAsync(AvailableLesson lesson)
+    {
+        return await _repository.AddAvailableLessonAsync(lesson);
+    }
+
     public async Task<BaseResult> CheckLessonOverlappingAsync(StudentLesson lesson)
     {
         return await _repository.CheckLessonOverlappingAsync(lesson);
+    }
+
+    public async Task<ListDataResult<LessonBase>> ListLessonsForTeacherAsync(int teacherId)
+    {
+        return await _repository.ListLessonsForTeacherAsync(teacherId);
+    }
+
+    public async Task<ListDataResult<StudentLesson>> ListLessonsForStudentAsync(int studentId)
+    {
+        return await _repository.ListLessonsForStudentAsync(studentId);
     }
 }

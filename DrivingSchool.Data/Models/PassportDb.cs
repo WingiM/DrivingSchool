@@ -1,8 +1,7 @@
 ﻿namespace DrivingSchool.Data.Models;
 
-public class PassportDb
+public class PassportDb : BaseEntity
 {
-    public int Id { get; init; }
     public string Series { get; init; } = null!;
     public string Number { get; init; } = null!;
     public DateTime IssueDate { get; init; }

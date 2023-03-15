@@ -6,23 +6,56 @@ namespace DrivingSchool.Data;
 
 public static class EntityConverter
 {
-    public static StudentLesson ConvertStudentLesson(StudentLessonDb lessonDb)
+    public static StudentLesson ConvertLesson(StudentLessonDb lessonDb, bool useStudentInitials = false)
     {
         return new StudentLesson
         {
             Id = lessonDb.Id, Duration = TimeSpan.FromMinutes(lessonDb.DurationInMinutes),
             Date = lessonDb.Date.ToLocalTime(), StudentId = lessonDb.StudentId, TeacherId = lessonDb.TeacherId,
-            TimeStart = lessonDb.TimeStart
+            TimeStart = lessonDb.TimeStart, StudentInitials = useStudentInitials && lessonDb.Student is not null
+                ? new UserInitials
+                {
+                    Name = lessonDb.Student.Name, Surname = lessonDb.Student.Surname,
+                    Patronymic = lessonDb.Student.Patronymic,
+                }
+                : null,
+            TeacherInitials = !useStudentInitials && lessonDb.Teacher is not null
+                ? new UserInitials
+                {
+                    Name = lessonDb.Teacher.Name, Surname = lessonDb.Teacher.Surname,
+                    Patronymic = lessonDb.Teacher.Patronymic,
+                }
+                : null
         };
     }
 
-    public static StudentLessonDb ConvertStudentLesson(StudentLesson lesson)
+    public static StudentLessonDb ConvertLesson(StudentLesson lesson)
     {
         return new StudentLessonDb
         {
             Id = lesson.Id, DurationInMinutes = (int)lesson.Duration.TotalMinutes,
-            Date = lesson.Date.ToLocalTime(), StudentId = lesson.StudentId, TeacherId = lesson.TeacherId,
+            Date = lesson.Date.ToUniversalTime(), StudentId = lesson.StudentId, TeacherId = lesson.TeacherId,
             TimeStart = lesson.TimeStart
+        };
+    }
+
+    public static AvailableLessonDb ConvertLesson(AvailableLesson lesson)
+    {
+        return new AvailableLessonDb
+        {
+            Id = lesson.Id, TeacherId = lesson.TeacherId, TimeStart = lesson.TimeStart,
+            DurationInMinutes = (int)lesson.Duration.TotalMinutes, Date = lesson.Date.ToUniversalTime(),
+            StudentId = lesson.StudentId
+        };
+    }
+
+    public static AvailableLesson ConvertLesson(AvailableLessonDb lesson)
+    {
+        return new AvailableLesson
+        {
+            Id = lesson.Id, TeacherId = lesson.TeacherId, TimeStart = lesson.TimeStart,
+            Duration = TimeSpan.FromMinutes(lesson.DurationInMinutes), Date = lesson.Date.ToLocalTime(),
+            StudentId = lesson.StudentId, IsTaken = lesson.IsTaken
         };
     }
 
@@ -122,7 +155,7 @@ public static class EntityConverter
             Id = historyDb.Id, TicketId = historyDb.TicketId, UserId = historyDb.UserId,
             CorrectAnswers = historyDb.CorrectAnswers, WrongAnswers = historyDb.WrongAnswers,
             TotalTime = historyDb.TotalTime, TicketNumber = historyDb.Ticket.Number,
-            Date = historyDb.Date.ToLocalTime(), User = new UserInitials()
+            Date = historyDb.Date.ToLocalTime(), User = new UserInitials
             {
                 Name = historyDb.User!.Name,
                 Surname = historyDb.User.Surname,
