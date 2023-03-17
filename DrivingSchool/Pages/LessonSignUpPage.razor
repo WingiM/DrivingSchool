@@ -31,7 +31,7 @@ else
     private DisplayLesson[] _lessons = null!;
 
     [Inject]
-    private ISnackbar Snackbar { get; set; }
+    private ISnackbar Snackbar { get; set; } = null!;
 
     protected override async Task OnInitializedAsync()
     {
