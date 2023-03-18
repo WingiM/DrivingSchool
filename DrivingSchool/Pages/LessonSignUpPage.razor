@@ -53,11 +53,16 @@ else
 
     private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<DisplayLesson> args)
     {
-        args.Attributes["style"] = $"background: {Colors.Red.Darken2}";
+        if (args.Start < DateTime.Now)
+            args.Attributes["style"] = $"background: {Colors.Grey.Darken2}";
+        else
+            args.Attributes["style"] = $"background: {Colors.Red.Darken2}";
     }
 
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<DisplayLesson> args)
     {
+        if (args.Start < DateTime.Now)
+            return;
         var parameters = new DialogParameters() { ["Lesson"] = args.Data };
         var dialog = await DialogService.ShowAsync<LessonSignUpDialog>("Вы уверены?", parameters);
         var result = await dialog.Result;

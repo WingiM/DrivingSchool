@@ -57,6 +57,9 @@ else
 
     private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<DisplayLesson> args)
     {
-        args.Attributes["style"] = $"background: {Colors.Red.Darken2}";
+        if (args.Start < DateTime.Now)
+            args.Attributes["style"] = $"background: {Colors.Grey.Darken2}";
+        else
+            args.Attributes["style"] = $"background: {Colors.Red.Darken2}";
     }
 }

@@ -49,6 +49,8 @@ public class LessonService : ILessonService
     public async Task<BaseResult> SignToLesson(int lessonId, int studentId)
     {
         var lesson = await _repository.GetLessonAsync(lessonId);
+        if (lesson.Date.Add(lesson.TimeStart) < DateTime.Now)
+            return new BaseResult { Success = false, Message = LessonErrorMessages.LessonFromThePast };
         if (lesson.IsTaken)
             return new BaseResult { Success = false, Message = LessonErrorMessages.LessonIsAlreadyTaken };
 
