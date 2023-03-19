@@ -8,6 +8,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider 
 @attribute [Authorize(Roles = "Учитель,Студент")]
 
+<PageTitle>Просмотр занятий</PageTitle>
 @if (_lessonsInitialized)
 {
     <RadzenScheduler Style="height: 90vh;" TItem="DisplayLesson" Data="_lessons" StartProperty="TimeStart" EndProperty="TimeEnd" 

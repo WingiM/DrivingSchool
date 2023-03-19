@@ -9,6 +9,7 @@
 @inject IUserService UserService
 @attribute [Authorize(Roles = "Учитель")]
 
+<PageTitle>Создание занятий</PageTitle>
 @if (_usersInitialized)
 {
     <MudCard>

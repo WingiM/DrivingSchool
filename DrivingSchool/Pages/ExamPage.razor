@@ -3,6 +3,7 @@
 @attribute [Authorize(Roles = "Студент")]
 @inject IExamService ExamService
 
+<PageTitle>Экзамен</PageTitle>
 @if (_ticketsLoaded)
 {
     <MudSelect T="int" @bind-Value="_currentTicket" Label="Номер билета" Style="margin: 20px 0" >

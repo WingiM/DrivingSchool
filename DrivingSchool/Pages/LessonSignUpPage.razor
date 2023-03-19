@@ -6,6 +6,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IDialogService DialogService 
 
+<PageTitle>Запись на занятия</PageTitle>
 @if (_lessonsInitialized)
 {
     <RadzenScheduler @ref="_scheduler" Style="height: 90vh;" TItem="DisplayLesson" Data="_lessons" StartProperty="TimeStart" EndProperty="TimeEnd"
