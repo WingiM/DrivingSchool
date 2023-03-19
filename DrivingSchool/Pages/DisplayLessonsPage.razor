@@ -42,7 +42,7 @@ else
             var res = (await LessonService.ListLessonsForTeacherAsync(_userId)).Items;
             _lessons = res.Select(x => new DisplayLesson
             {
-                TimeStart = x.Date.Add(x.TimeStart), TimeEnd = x.Date.Add(x.TimeStart).Add(x.Duration), 
+                TimeStart = x.LessonStartDateTime, TimeEnd = x.LessonEndDateTime, 
                 Text = x is StudentLesson sl ? sl.StudentInitials!.ToString() : string.Empty
             }).ToArray();
         }
@@ -50,7 +50,7 @@ else
         {
             _lessons = (await LessonService.ListLessonsForStudentAsync(_userId)).Items.Select(x => new DisplayLesson
             {
-                TimeStart = x.Date.Add(x.TimeStart), TimeEnd = x.Date.Add(x.TimeStart).Add(x.Duration), Text = x.TeacherInitials!.ToString()
+                TimeStart = x.LessonStartDateTime, TimeEnd = x.LessonEndDateTime, Text = x.TeacherInitials!.ToString()
             }).ToArray();
         }
         _lessonsInitialized = true;

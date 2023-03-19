@@ -8,11 +8,12 @@ public abstract class LessonBase
     public required TimeSpan TimeStart { get; init; }
     public required TimeSpan Duration { get; init; }
 
+    public DateTime LessonStartDateTime => Date.Add(TimeStart);
+    public DateTime LessonEndDateTime => LessonStartDateTime.Add(Duration);
+    public DateTimeRange DateTimeRange => new() {TimeStart = LessonStartDateTime, TimeEnd = LessonEndDateTime};
+
     public bool Overlaps(LessonBase other)
     {
-        var timeEnd = TimeStart.Add(Duration);
-        var otherTimeEnd = other.TimeStart.Add(other.Duration);
-        return other.TeacherId == TeacherId && other.Date == Date && TimeStart < otherTimeEnd &&
-               other.TimeStart < timeEnd;
+        return other.TeacherId == TeacherId && DateTimeRange.Overlaps(other.DateTimeRange);
     }
 }

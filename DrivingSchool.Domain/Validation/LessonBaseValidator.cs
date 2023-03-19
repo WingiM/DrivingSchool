@@ -11,8 +11,8 @@ public class LessonBaseValidator : AbstractValidator<LessonBase>
             .MustAsync(async (lesson, _) => !await lessonRepository.CheckLessonOverlappingAsync(lesson))
             .WithMessage(LessonErrorMessages.LessonOverlapsAnotherLesson);
         
-        RuleFor(x => new {x.Date, x.TimeStart})
-            .Must(x => x.Date.Add(x.TimeStart) >= DateTime.Now)
+        RuleFor(x => x.LessonStartDateTime)
+            .Must(x => x >= DateTime.Now)
             .WithMessage(LessonErrorMessages.LessonFromThePast);
 
         RuleFor(x => x.Duration)

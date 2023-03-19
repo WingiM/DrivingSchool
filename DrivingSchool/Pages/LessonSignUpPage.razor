@@ -47,7 +47,7 @@ else
         var res = (await LessonService.ListAvailableLessonsForStudent(_userId)).Items;
         _lessons = res.Select(x => new DisplayLesson
         {
-            TimeStart = x.Date.Add(x.TimeStart), TimeEnd = x.Date.Add(x.TimeStart).Add(x.Duration),
+            TimeStart = x.LessonStartDateTime, TimeEnd = x.LessonEndDateTime,
             Text = x.TeacherInitials!.ToString(), Id = x.Id
         }).ToArray();
     }
