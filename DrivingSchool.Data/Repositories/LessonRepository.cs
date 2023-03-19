@@ -34,7 +34,7 @@ public class LessonRepository : BaseRepository, ILessonRepository
         return new DatabaseEntityCreationResult { Success = true, CreatedEntityId = lessonDb.Id };
     }
 
-    public Task<BaseResult> CheckLessonOverlappingAsync(StudentLesson lesson)
+    public Task<bool> CheckLessonOverlappingAsync(LessonBase lesson)
     {
         var lessons = Context.Lessons
             .Where(x => x.TeacherId == lesson.TeacherId && x.Date == lesson.Date.ToUniversalTime())
@@ -46,9 +46,7 @@ public class LessonRepository : BaseRepository, ILessonRepository
             .Select(x => EntityConverter.ConvertLesson(x));
 
         var overlaps = lessons.Any(x => x.Overlaps(lesson)) || availableLessons.Any(x => x.Overlaps(lesson));
-        return Task.FromResult(overlaps
-            ? new BaseResult { Success = false, Message = LessonErrorMessages.LessonOverlapsAnotherLesson }
-            : new BaseResult { Success = true });
+        return Task.FromResult(overlaps);
     }
 
     public async Task<ListDataResult<LessonBase>> ListLessonsForTeacherAsync(int teacherId)
