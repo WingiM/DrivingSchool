@@ -6,6 +6,72 @@ namespace DrivingSchool.Data;
 
 public static class EntityConverter
 {
+    public static StudentLesson ConvertLesson(StudentLessonDb lessonDb, bool useStudentInitials = false)
+    {
+        return new StudentLesson
+        {
+            Id = lessonDb.Id, Duration = TimeSpan.FromMinutes(lessonDb.DurationInMinutes),
+            Date = lessonDb.Date.ToLocalTime(), StudentId = lessonDb.StudentId, TeacherId = lessonDb.TeacherId,
+            TimeStart = lessonDb.TimeStart, StudentInitials = useStudentInitials && lessonDb.Student is not null
+                ? new UserInitials
+                {
+                    Name = lessonDb.Student.Name, Surname = lessonDb.Student.Surname,
+                    Patronymic = lessonDb.Student.Patronymic,
+                }
+                : null,
+            TeacherInitials = !useStudentInitials && lessonDb.Teacher is not null
+                ? new UserInitials
+                {
+                    Name = lessonDb.Teacher.Name, Surname = lessonDb.Teacher.Surname,
+                    Patronymic = lessonDb.Teacher.Patronymic,
+                }
+                : null
+        };
+    }
+
+    public static StudentLessonDb ConvertLesson(StudentLesson lesson)
+    {
+        return new StudentLessonDb
+        {
+            Id = lesson.Id, DurationInMinutes = (int)lesson.Duration.TotalMinutes,
+            Date = lesson.Date.ToUniversalTime(), StudentId = lesson.StudentId, TeacherId = lesson.TeacherId,
+            TimeStart = lesson.TimeStart
+        };
+    }
+
+    public static AvailableLessonDb ConvertLesson(AvailableLesson lesson)
+    {
+        return new AvailableLessonDb
+        {
+            Id = lesson.Id, TeacherId = lesson.TeacherId, TimeStart = lesson.TimeStart,
+            DurationInMinutes = (int)lesson.Duration.TotalMinutes, Date = lesson.Date.ToUniversalTime(),
+            StudentId = lesson.StudentId
+        };
+    }
+
+    public static AvailableLesson ConvertLesson(AvailableLessonDb lesson)
+    {
+        return new AvailableLesson
+        {
+            Id = lesson.Id, TeacherId = lesson.TeacherId, TimeStart = lesson.TimeStart,
+            Duration = TimeSpan.FromMinutes(lesson.DurationInMinutes), Date = lesson.Date.ToLocalTime(),
+            StudentId = lesson.StudentId, IsTaken = lesson.IsTaken, 
+            TeacherInitials = lesson.Teacher is not null
+                ? new UserInitials
+                {
+                    Name = lesson.Teacher.Name, Surname = lesson.Teacher.Surname,
+                    Patronymic = lesson.Teacher.Patronymic,
+                }
+                : null
+        };
+    }
+
+    public static UserInitials GetUserInitials(UserDb user)
+    {
+        return new UserInitials
+            { Id = user.Id, Name = user.Name, Patronymic = user.Patronymic, Surname = user.Surname };
+    }
+
     public static Passport? ConvertPassport(PassportDb? passportDb)
     {
         return passportDb is null
@@ -66,7 +132,7 @@ public static class EntityConverter
             Questions = ticketDb.Questions.Select(x => ConvertExamTicketQuestion(x)).ToArray()
         };
     }
-    
+
     public static ExamTicketQuestion ConvertExamTicketQuestion(ExamTicketQuestionDb ticketQuestionDb)
     {
         return new ExamTicketQuestion
@@ -96,7 +162,7 @@ public static class EntityConverter
             Id = historyDb.Id, TicketId = historyDb.TicketId, UserId = historyDb.UserId,
             CorrectAnswers = historyDb.CorrectAnswers, WrongAnswers = historyDb.WrongAnswers,
             TotalTime = historyDb.TotalTime, TicketNumber = historyDb.Ticket.Number,
-            Date = historyDb.Date.ToLocalTime(), User = new UserInitials()
+            Date = historyDb.Date.ToLocalTime(), User = new UserInitials
             {
                 Name = historyDb.User!.Name,
                 Surname = historyDb.User.Surname,

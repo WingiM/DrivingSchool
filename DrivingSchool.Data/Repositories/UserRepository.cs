@@ -90,6 +90,30 @@ public class UserRepository : BaseRepository, IUserRepository
         };
     }
 
+    public async Task<ListDataResult<UserInitials>> ListStudentsAsync()
+    {
+        var res = Context.Users.Where(x => x.RoleId == (int)Roles.Student);
+        return new ListDataResult<UserInitials>
+        {
+            Success = true,
+            Items = await res 
+                .Select(x => EntityConverter.GetUserInitials(x))
+                .ToArrayAsync()
+        };
+    }
+
+    public async Task<ListDataResult<UserInitials>> ListTeachersAsync()
+    {
+        var res = Context.Users.Where(x => x.RoleId == (int)Roles.Teacher);
+        return new ListDataResult<UserInitials>
+        {
+            Success = true,
+            Items = await res
+                .Select(x => EntityConverter.GetUserInitials(x))
+                .ToArrayAsync()
+        };
+    }
+
     private Expression<Func<UserDb, object>> GetOrderProperty(string field)
     {
         return field switch

@@ -43,17 +43,20 @@ public class AuthorizationService : IAuthorizationService
 
         var password = _encryptionService.GeneratePasswordForUser();
         var result = await _identityManager.CreateAsync(identityUser, password);
-        await _identityCachingService.AddIdentityAsync(identityUser);
-        user.Identity = identityUser;
         if (!result.Succeeded)
         {
             _logger.LogInformation("Registration not completed: {Error}", result);
             return new BaseResult { Message = ResultMessages.InternalRegisterError };
         }
 
+        await _identityCachingService.AddIdentityAsync(identityUser);
+        user.Identity = identityUser;
         await _identityManager.AddToRoleAsync(identityUser, user.Role.GetDisplayName()!);
 
         var res = await _userService.CreateUserAsync(user);
+        if (!res.Success)
+            return new BaseResult { Message = ResultMessages.InternalRegisterError };
+
         user.Id = res.CreatedEntityId;
         await AddDefaultClaimsToUserAsync(user);
         if (sendVerificationEmail)

@@ -10,11 +10,13 @@ public class MailingService : IMailingService
 {
     private readonly MailSettings _mailSettings;
     private readonly ILogger<MailingService> _logger;
+    private readonly ISmtpClient _smtpClient;
 
-    public MailingService(ILogger<MailingService> logger, MailSettings mailSettings)
+    public MailingService(ILogger<MailingService> logger, MailSettings mailSettings, ISmtpClient smtpClient)
     {
         _logger = logger;
         _mailSettings = mailSettings;
+        _smtpClient = smtpClient;
     }
 
     public async Task<bool> SendUserRegisteredMessageAsync(User user, string password)
@@ -58,17 +60,16 @@ public class MailingService : IMailingService
             }
 
             message.Body = builder.ToMessageBody();
-            using var smtp = new SmtpClient();
             if (_mailSettings.Port == 465)
-                await smtp.ConnectAsync(_mailSettings.Host, _mailSettings.Port, true);
+                await _smtpClient.ConnectAsync(_mailSettings.Host, _mailSettings.Port, true);
             else
-                await smtp.ConnectAsync(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
-            await smtp.AuthenticateAsync(_mailSettings.Mail, _mailSettings.Password);
-            await smtp.SendAsync(message);
+                await _smtpClient.ConnectAsync(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
+            await _smtpClient.AuthenticateAsync(_mailSettings.Mail, _mailSettings.Password);
+            await _smtpClient.SendAsync(message);
             _logger.LogInformation(
                 "Отправлено сообщение на почту {Email} с темой {Subject}. Количество вложений: {AttachmentCount}",
                 mailingMessage.ToEmail, mailingMessage.Subject, mailingMessage.Attachments.Length);
-            await smtp.DisconnectAsync(true);
+            await _smtpClient.DisconnectAsync(true);
             return true;
         }
         catch (Exception e)

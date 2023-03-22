@@ -12,10 +12,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPassportRepository, PassportRepository>();
         services.AddScoped<IExamRepository, ExamRepository>();
+        services.AddScoped<ILessonRepository, LessonRepository>();
         services.AddScoped<IIdentityCachingRepository, IdentityCachingRepository>();
         services.AddDbContext<ApplicationContext>(options =>
         {
-            options.UseNpgsql(connectionString);
+            options.UseNpgsql(connectionString,
+                npgsqlOptions => npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
             options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
         services.AddDatabaseDeveloperPageExceptionFilter();

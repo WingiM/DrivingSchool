@@ -3,6 +3,7 @@ using DrivingSchool.Domain.Services;
 using DrivingSchool.Domain.Services.Impl;
 using DrivingSchool.Domain.Validation;
 using FluentValidation.AspNetCore;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +21,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton(userSecrets);
         services.AddSingleton(mailSettings);
+        services.AddSingleton<IdentityCache>();
 
         services.AddScoped<IAuthorizationService, AuthorizationService>();
         services.AddScoped<IExamService, ExamService>();
@@ -28,7 +30,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPassportService, PassportService>();
         services.AddScoped<IIdentityCachingService, IdentityCachingService>();
         services.AddScoped<IImageLoadingService, ImageLoadingService>();
-        services.AddSingleton<IdentityCache>();
+        services.AddScoped<ILessonService, LessonService>();
+
+        services.AddTransient<ISmtpClient, SmtpClient>();
         services.AddTransient<IMailingService, MailingService>();
 
         services.AddFluentValidationAutoValidation().AddValidatorsFromAssembly(typeof(PassportValidator).Assembly);
