@@ -32,9 +32,7 @@ services:
 
   app:
     container_name: app
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+    image: wingim/driving_school:latest
     restart: on-failure
     depends_on:
       storage:
