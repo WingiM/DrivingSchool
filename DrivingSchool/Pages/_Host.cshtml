@@ -39,7 +39,6 @@
     const blob = new Blob([arrayBuffer]);
     const url = URL.createObjectURL(blob);
     const image = document.getElementById(imageElementId);
-    console.log(image)
     image.onload = () => {
       URL.revokeObjectURL(url);
     }
