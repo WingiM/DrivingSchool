@@ -14,7 +14,10 @@
                   @ref="_table" OnRowClick="x => RowClicked(x)">
             <HeaderContent>
                 <MudTh></MudTh>
-                <MudTh>Идентификатор</MudTh>
+                @if (ShowId)
+                {
+                    <MudTh>Идентификатор</MudTh>
+                }
                 @foreach (var field in _entityFields)
                 {
                     <MudTh>@(typeof(TListEntity).GetProperty(field)!.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? field)</MudTh>
@@ -22,7 +25,10 @@
             </HeaderContent>
             <RowTemplate>
                 <MudCheckBox Checked="@(_selectedEntity?.Id == context.Id)" Disabled="true"/>
-                <MudTd>@context.Id</MudTd>
+                @if (ShowId)
+                {
+                    <MudTd>@context.Id</MudTd>
+                }
                 @foreach (var field in _entityFields)
                 {
                     var value = typeof(TListEntity).GetProperty(field)!.GetValue(context);
@@ -57,6 +63,9 @@
 
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public bool ShowId { get; set; }
     
     [Parameter]
     public Predicate<TListEntity>? Filter { get; set; }

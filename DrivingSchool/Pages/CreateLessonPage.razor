@@ -30,7 +30,7 @@
                                For="() => _model.Duration"/>
                 <ListDisplay TListEntity="UserGeneral" TOutValue="int?" @bind-Value="_model.StudentId" ValueCallback="x => x.Id" 
                              DisplayCallback="@(x => string.Join(" ", x.Surname, x.Name, x.Patronymic))" 
-                             Filter="x => x.Role == Roles.Student"/>
+                             Filter="x => x.Role == Roles.Student" Label="Студент" Disabled="@(!IsWithStudent)"/>
             </MudCardContent>
             <MudCardActions>
                 <MudButton Disabled="@_loading" Variant="Variant.Filled" Color="Color.Primary" OnClick="async () => await AddLesson()">Создать занятие</MudButton>
