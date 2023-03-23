@@ -1,0 +1,103 @@
+﻿@using DrivingSchool.Domain.Services.Generic
+@using Microsoft.AspNetCore.Components
+@using System.Reflection
+@using System.ComponentModel
+@typeparam TListEntity where TListEntity : DrivingSchool.Domain.Models.Base.Entity
+@inject IListService<TListEntity> ListService;
+
+<MudDialog>
+    <TitleContent>
+        @MudDialog.Title
+    </TitleContent>
+    <DialogContent>
+        <MudTable T="TListEntity" ServerData="GetData" Dense="true" Hover="true" Bordered="true" Striped="true"
+                  @ref="_table" OnRowClick="x => RowClicked(x)">
+            <HeaderContent>
+                <MudTh></MudTh>
+                <MudTh>Идентификатор</MudTh>
+                @foreach (var field in _entityFields)
+                {
+                    <MudTh>@(typeof(TListEntity).GetProperty(field)!.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? field)</MudTh>
+                }
+            </HeaderContent>
+            <RowTemplate>
+                <MudCheckBox Checked="@(_selectedEntity?.Id == context.Id)" Disabled="true"/>
+                <MudTd>@context.Id</MudTd>
+                @foreach (var field in _entityFields)
+                {
+                    var value = typeof(TListEntity).GetProperty(field)!.GetValue(context);
+                    if (value is DateTime dt)
+                        value = dt.ToString("d");
+                    <MudTd>
+                        @value
+                    </MudTd>
+                }
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText>Не найдено записей</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <MudText>Loading...</MudText>
+            </LoadingContent>
+            <PagerContent>
+                <div class="d-flex flex-column align-center">
+                    <MudPagination SelectedChanged="PageChanged" Count="@((_table.GetFilteredItemsCount() + _table.RowsPerPage - 1) / _table.RowsPerPage)" Class="pa-4"/>
+                    <MudTablePager HidePagination="true" InfoFormat="{first_item}-{last_item} из {all_items}" RowsPerPageString="Отображать строк:"/>
+                </div>
+            </PagerContent>
+        </MudTable>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; } = null!;
+    
+    [Parameter]
+    public Predicate<TListEntity>? Filter { get; set; }
+
+    private MudTable<TListEntity> _table = null!;
+    private TListEntity? _selectedEntity;
+    private IEnumerable<string> _entityFields = null!;
+    private readonly Type[] _availableTypes = {typeof(string), typeof(int), typeof(DateTime), typeof(DateTime?)};
+
+    protected override void OnInitialized()
+    {
+        _entityFields = typeof(TListEntity)
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(x => _availableTypes.Contains(x.PropertyType) && x.Name != "Id")
+            .Select(x => x.Name);
+    }
+
+    private async Task<TableData<TListEntity>> GetData(TableState state)
+    {
+        var data = await ListService.ListAsync(state.PageSize, state.Page, Filter);
+        return new TableData<TListEntity> {TotalItems = data.TotalItemsCount, Items = data.Items};
+    }
+
+    private void PageChanged(int i)
+    {
+        _table.NavigateTo(i - 1);
+    }
+
+    private void RowClicked(TableRowClickEventArgs<TListEntity> tableRowClickEventArgs)
+    {
+        _selectedEntity = tableRowClickEventArgs.Item;
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(_selectedEntity));
+    }
+
+}

@@ -1,6 +1,7 @@
 ﻿@page "/create-lessons"
 @using DrivingSchool.Data
 @using DrivingSchool.Domain.Constants
+@using DrivingSchool.Domain.Enums
 @using DrivingSchool.Domain.Results
 @using DrivingSchool.Validators
 @using DrivingSchool.Validators.ValidationMessages
@@ -27,16 +28,9 @@
                                For="() => _model.TimeStart"/>
                 <MudTimePicker @bind-Time="_model.Duration" Label="Длительность занятия" OpenTo="OpenTo.Hours"
                                For="() => _model.Duration"/>
-                <MudSelect @bind-Value="_model.StudentId" Disabled="@(!IsWithStudent)" For="() => _model.StudentId" Label="Студент" AnchorOrigin="Origin.BottomCenter" Clearable>
-                    @foreach (var user in _users)
-                    {
-                        <MudSelectItem Value="(int?)user.Id">
-                            <MudStack>
-                                @(string.Join(" ", user.Surname, user.Name, user.Patronymic))
-                            </MudStack>
-                        </MudSelectItem>
-                    }
-                </MudSelect>
+                <ListDisplay TListEntity="UserGeneral" TOutValue="int?" @bind-Value="_model.StudentId" ValueCallback="x => x.Id" 
+                             DisplayCallback="@(x => string.Join(" ", x.Surname, x.Name, x.Patronymic))" 
+                             Filter="x => x.Role == Roles.Student"/>
             </MudCardContent>
             <MudCardActions>
                 <MudButton Disabled="@_loading" Variant="Variant.Filled" Color="Color.Primary" OnClick="async () => await AddLesson()">Создать занятие</MudButton>
@@ -66,7 +60,7 @@ else
     private MudForm _form = null!;
 
     private int _userId;
-    private UserInitials[] _users = null!;
+    private UserGeneral[] _users = null!;
 
     private bool _usersInitialized;
     private bool _loading;

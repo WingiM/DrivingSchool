@@ -1,0 +1,47 @@
+﻿@using DrivingSchool.Domain.Services.Generic
+@using System.Linq.Expressions
+@typeparam TListEntity where TListEntity : DrivingSchool.Domain.Models.Base.Entity
+@typeparam TOutValue
+@inject IDialogService DialogService
+@inject ILogger<ListDisplay<TListEntity, TOutValue>> Logger;
+
+<MudStack Row="true">
+    @if (_selectedValue is not null)
+    {
+        <MudText>@(DisplayCallback.Invoke(_selectedValue))</MudText>
+    }
+    <MudButton OnClick="() => OpenDialog()">...</MudButton>
+</MudStack>
+
+@code {
+    [Parameter]
+    public EventCallback<TOutValue> ValueChanged { get; set; }
+
+    [Parameter]
+    public TOutValue Value { get; set; } = default!;
+
+    [Parameter]
+    public Func<TListEntity, TOutValue> ValueCallback { get; set; } = null!;
+
+    [Parameter]
+    public Func<TListEntity, string> DisplayCallback { get; set; } = null!;
+    
+    [Parameter]
+    public Predicate<TListEntity>? Filter { get; set; }
+
+    private TListEntity? _selectedValue;
+
+    private async Task OpenDialog()
+    {
+        var dialogParameters = new DialogParameters {{nameof(Filter), Filter}};
+        var dialog = await DialogService.ShowAsync<ListDisplayDialog<TListEntity>>("Выбор", dialogParameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            _selectedValue = (TListEntity)result.Data;
+            Value = ValueCallback.Invoke(_selectedValue);
+        }
+    }
+
+}
