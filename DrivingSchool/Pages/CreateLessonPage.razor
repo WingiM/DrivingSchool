@@ -25,8 +25,8 @@
                                MinDate="DateTime.Now.Date" For="() => _model.Date"/>
                 <MudTimePicker @bind-Time="_model.TimeStart" Label="Время начала занятия" OpenTo="OpenTo.Hours"
                                For="() => _model.TimeStart"/>
-                <MudTimePicker @bind-Time="_model.TimeEnd" Label="Время окончания занятия" OpenTo="OpenTo.Hours"
-                               For="() => _model.TimeEnd"/>
+                <MudTimePicker @bind-Time="_model.Duration" Label="Длительность занятия" OpenTo="OpenTo.Hours"
+                               For="() => _model.Duration"/>
                 <MudSelect @bind-Value="_model.StudentId" Disabled="@(!IsWithStudent)" For="() => _model.StudentId" Label="Студент" AnchorOrigin="Origin.BottomCenter" Clearable>
                     @foreach (var user in _users)
                     {
@@ -102,7 +102,7 @@ else
 
             var lesson = new StudentLesson
             {
-                StudentId = _model.StudentId!.Value, Date = _model.Date!.Value, Duration = _model.TimeEnd!.Value - _model.TimeStart!.Value,
+                StudentId = _model.StudentId!.Value, Date = _model.Date!.Value, Duration = _model.Duration!.Value,
                 TimeStart = _model.TimeStart!.Value, TeacherId = _userId
             };
 
@@ -112,7 +112,7 @@ else
         {
             var lesson = new AvailableLesson
             {
-                Date = _model.Date!.Value, Duration = _model.TimeEnd!.Value - _model.TimeStart!.Value,
+                Date = _model.Date!.Value, Duration = _model.Duration!.Value,
                 TimeStart = _model.TimeStart!.Value, TeacherId = _userId
             };
 

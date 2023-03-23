@@ -1,4 +1,5 @@
-﻿using DrivingSchool.Domain.ErrorMessages;
+﻿using DrivingSchool.Domain.Constants;
+using DrivingSchool.Domain.ErrorMessages;
 using DrivingSchool.Domain.Repositories;
 
 namespace DrivingSchool.Domain.Validation;
@@ -16,7 +17,7 @@ public class LessonBaseValidator : AbstractValidator<LessonBase>
             .WithMessage(LessonErrorMessages.LessonFromThePast);
 
         RuleFor(x => x.Duration)
-            .InclusiveBetween(TimeSpan.FromMinutes(45), TimeSpan.FromHours(3))
+            .InclusiveBetween(DrivingSchoolRestrictions.MinimumLessonLength, DrivingSchoolRestrictions.MaximumLessonLength)
             .WithMessage(LessonErrorMessages.WrongDuration);
     }
 }

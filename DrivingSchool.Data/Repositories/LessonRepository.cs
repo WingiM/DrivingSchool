@@ -58,7 +58,7 @@ public class LessonRepository : BaseRepository, ILessonRepository
 
         var availableLessons = await Context.AvailableLessons
             .Include(x => x.Student)
-            .Where(x => x.TeacherId == teacherId)
+            .Where(x => x.TeacherId == teacherId && !x.IsTaken)
             .ToArrayAsync();
 
         return new ListDataResult<LessonBase>
