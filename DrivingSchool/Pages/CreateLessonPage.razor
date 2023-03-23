@@ -31,7 +31,9 @@
                     @foreach (var user in _users)
                     {
                         <MudSelectItem Value="(int?)user.Id">
-                            @(string.Join(" ", user.Surname, user.Name, user.Patronymic))
+                            <MudStack>
+                                @(string.Join(" ", user.Surname, user.Name, user.Patronymic))
+                            </MudStack>
                         </MudSelectItem>
                     }
                 </MudSelect>

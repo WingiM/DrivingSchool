@@ -25,7 +25,7 @@ public class CreateLessonValidator : AbstractValidator<CreateLesson>
 
         RuleFor(x => x.TimeStart)
             .NotNull()
-            .WithMessage(CreateLessonValidatorMessages.WrongDuration);
+            .WithMessage(CreateLessonValidatorMessages.LessonTimePassed);
         
         RuleFor(x => x.Duration)
             .Cascade(CascadeMode.Stop)
