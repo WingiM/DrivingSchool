@@ -1,6 +1,4 @@
-﻿using DrivingSchool.Data.Models;
-using DrivingSchool.Domain.Enums;
-using DrivingSchool.Domain.Models;
+﻿using DrivingSchool.Domain.Enums;
 
 namespace DrivingSchool.Data;
 

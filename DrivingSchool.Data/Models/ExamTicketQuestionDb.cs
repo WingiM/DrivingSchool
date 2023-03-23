@@ -1,6 +1,4 @@
-﻿using DrivingSchool.Domain.Models.Base;
-
-namespace DrivingSchool.Data.Models;
+﻿namespace DrivingSchool.Data.Models;
 
 public class ExamTicketQuestionDb : Entity
 {

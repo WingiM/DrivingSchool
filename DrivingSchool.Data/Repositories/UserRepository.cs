@@ -1,13 +1,8 @@
 ﻿using System.Linq.Expressions;
 using DrivingSchool.Data.Extensions;
-using DrivingSchool.Data.Models;
 using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Exceptions;
-using DrivingSchool.Domain.Models;
-using DrivingSchool.Domain.Repositories;
-using DrivingSchool.Domain.Results;
 using DrivingSchool.Domain.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace DrivingSchool.Data.Repositories;
 

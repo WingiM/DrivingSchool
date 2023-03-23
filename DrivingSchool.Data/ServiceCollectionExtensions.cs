@@ -1,6 +1,4 @@
 ﻿using DrivingSchool.Data.Repositories;
-using DrivingSchool.Domain.Repositories;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DrivingSchool.Data;
