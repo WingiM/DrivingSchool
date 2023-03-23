@@ -3,7 +3,7 @@
 public abstract class LessonBase : Entity
 {
     public required int TeacherId { get; init; }
-    public UserInitials? TeacherInitials { get; init; }
+    public UserGeneral? TeacherInitials { get; init; }
     public required DateTime Date { get; init; }
     public required TimeSpan TimeStart { get; init; }
     public required TimeSpan Duration { get; init; }

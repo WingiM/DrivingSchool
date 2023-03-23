@@ -65,7 +65,7 @@ public class UserRepository : BaseRepository, IUserRepository
         return EntityConverter.ConvertUser(user);
     }
 
-    public async Task<ListDataResult<User>> ListUsersAsync(int itemCount, int pageNumber, string searchText,
+    public async Task<ListDataResult<User>> ListUsersAsync(int itemCount, int pageNumber, string searchText = "",
         string field = UserSortingField.Id, bool desc = false)
     {
         var property = GetOrderProperty(field);
@@ -90,10 +90,10 @@ public class UserRepository : BaseRepository, IUserRepository
         };
     }
 
-    public async Task<ListDataResult<UserInitials>> ListStudentsAsync()
+    public async Task<ListDataResult<UserGeneral>> ListStudentsAsync()
     {
         var res = Context.Users.Where(x => x.RoleId == (int)Roles.Student);
-        return new ListDataResult<UserInitials>
+        return new ListDataResult<UserGeneral>
         {
             Success = true,
             Items = await res 
@@ -102,10 +102,10 @@ public class UserRepository : BaseRepository, IUserRepository
         };
     }
 
-    public async Task<ListDataResult<UserInitials>> ListTeachersAsync()
+    public async Task<ListDataResult<UserGeneral>> ListTeachersAsync()
     {
         var res = Context.Users.Where(x => x.RoleId == (int)Roles.Teacher);
-        return new ListDataResult<UserInitials>
+        return new ListDataResult<UserGeneral>
         {
             Success = true,
             Items = await res

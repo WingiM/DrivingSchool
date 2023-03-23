@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Repositories;
+using DrivingSchool.Domain.Services.Generic;
 using Microsoft.AspNetCore.Identity;
 
 namespace DrivingSchool.Domain.Services.Impl;
@@ -60,18 +61,18 @@ public class UserService : IUserService
         return await _userManager.GetClaimsAsync(new IdentityUser<int> { Id = id });
     }
 
-    public async Task<ListDataResult<User>> ListUsersAsync(int itemCount, int pageNumber, string searchText,
+    public async Task<ListDataResult<User>> ListUsersAsync(int itemCount, int pageNumber, string searchText = "",
         string field = UserSortingField.Id, bool desc = false)
     {
         return await _userRepository.ListUsersAsync(itemCount, pageNumber, searchText, field, desc);
     }
 
-    public async Task<ListDataResult<UserInitials>> ListStudentsAsync()
+    public async Task<ListDataResult<UserGeneral>> ListStudentsAsync()
     {
         return await _userRepository.ListStudentsAsync();
     }
 
-    public async Task<ListDataResult<UserInitials>> ListTeachersAsync()
+    public async Task<ListDataResult<UserGeneral>> ListTeachersAsync()
     {
         return await _userRepository.ListTeachersAsync();
     }
