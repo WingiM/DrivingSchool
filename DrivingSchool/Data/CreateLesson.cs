@@ -6,5 +6,5 @@ public class CreateLesson
     public int? StudentId { get; set; }
     public DateTime? Date { get; set; }
     public TimeSpan? TimeStart { get; set; }
-    public TimeSpan? TimeEnd { get; set; }
+    public TimeSpan? Duration { get; set; }
 }

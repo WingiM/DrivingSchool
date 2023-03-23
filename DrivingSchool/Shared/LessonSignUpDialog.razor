@@ -11,9 +11,8 @@
         <MudText>
             Вы будете записаны на занятие
             <MudTextField Value="@Lesson.Text" Label="Учитель" ReadOnly="true"/>
-            <MudTextField Value="@Lesson.TimeStart.Date.ToString("d")" Label="Дата" ReadOnly="true"/>
-            <MudTextField Value="@Lesson.TimeStart.TimeOfDay" Label="Время начала занятия" ReadOnly="true"/>
-            <MudTextField Value="@Lesson.TimeEnd.TimeOfDay" Label="Время окончания занятия" ReadOnly="true"/>
+            <MudTextField Value="@Lesson.TimeStart.ToString("g")" Label="Время начала занятия" ReadOnly="true"/>
+            <MudTextField Value="@Lesson.TimeEnd.ToString("g")" Label="Время окончания занятия" ReadOnly="true"/>
         </MudText>
     </DialogContent>
     <DialogActions>

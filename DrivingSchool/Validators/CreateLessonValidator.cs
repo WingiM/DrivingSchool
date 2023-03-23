@@ -1,4 +1,5 @@
 ﻿using DrivingSchool.Data;
+using DrivingSchool.Domain.Constants;
 using DrivingSchool.Validators.ValidationMessages;
 using FluentValidation;
 
@@ -26,12 +27,12 @@ public class CreateLessonValidator : AbstractValidator<CreateLesson>
             .NotNull()
             .WithMessage(CreateLessonValidatorMessages.WrongDuration);
         
-        RuleFor(x => x.TimeEnd)
+        RuleFor(x => x.Duration)
             .Cascade(CascadeMode.Stop)
             .NotNull()
             .WithMessage(CreateLessonValidatorMessages.WrongDuration)
-            .Must((lesson, span) => span!.Value - lesson.TimeStart >= TimeSpan.FromMinutes(45)
-                                    && span.Value - lesson.TimeStart <= TimeSpan.FromHours(3))
+            .Must(span => span!.Value >= DrivingSchoolRestrictions.MinimumLessonLength
+                                    && span.Value <= DrivingSchoolRestrictions.MaximumLessonLength)
             .WithMessage(CreateLessonValidatorMessages.WrongDuration);
     }
 
