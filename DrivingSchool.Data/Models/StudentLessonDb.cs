@@ -1,6 +1,8 @@
-﻿namespace DrivingSchool.Data.Models;
+﻿using DrivingSchool.Domain.Models.Base;
 
-public class StudentLessonDb : BaseEntity
+namespace DrivingSchool.Data.Models;
+
+public class StudentLessonDb : Entity
 {
     public int StudentId { get; init; }
     public UserDb? Student { get; init; }

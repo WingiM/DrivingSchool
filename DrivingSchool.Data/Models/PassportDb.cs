@@ -1,6 +1,8 @@
-﻿namespace DrivingSchool.Data.Models;
+﻿using DrivingSchool.Domain.Models.Base;
 
-public class PassportDb : BaseEntity
+namespace DrivingSchool.Data.Models;
+
+public class PassportDb : Entity
 {
     public string Series { get; init; } = null!;
     public string Number { get; init; } = null!;

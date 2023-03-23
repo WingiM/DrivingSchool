@@ -1,6 +1,6 @@
 ﻿namespace DrivingSchool.Domain.Models;
 
-public abstract class LessonBase
+public abstract class LessonBase : Entity
 {
     public required int TeacherId { get; init; }
     public UserInitials? TeacherInitials { get; init; }

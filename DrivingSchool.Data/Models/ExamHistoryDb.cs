@@ -1,6 +1,8 @@
-﻿namespace DrivingSchool.Data.Models;
+﻿using DrivingSchool.Domain.Models.Base;
 
-public class ExamHistoryDb : BaseEntity
+namespace DrivingSchool.Data.Models;
+
+public class ExamHistoryDb : Entity
 {
     public int CorrectAnswers { get; init; }
     public int WrongAnswers { get; init; }

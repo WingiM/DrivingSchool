@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using DrivingSchool.Domain.Models.Base;
 
 namespace DrivingSchool.Data.Models;
 
-public class AvailableLessonDb : BaseEntity
+public class AvailableLessonDb : Entity
 {
     public int TeacherId { get; init; }
     public UserDb? Teacher { get; init; }

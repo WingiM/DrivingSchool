@@ -1,6 +1,8 @@
-﻿namespace DrivingSchool.Data.Models;
+﻿using DrivingSchool.Domain.Models.Base;
 
-public class ExamTicketQuestionAnswerDb : BaseEntity
+namespace DrivingSchool.Data.Models;
+
+public class ExamTicketQuestionAnswerDb : Entity
 {
     public int NumberInQuestion { get; init; }
     public string AnswerText { get; init; } = null!;
