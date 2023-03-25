@@ -85,6 +85,29 @@ public class UserRepository : BaseRepository, IUserRepository
         };
     }
 
+    public async Task<ListDataResult<User>> ListStudentsAsync(int itemCount, int pageNumber)
+    {
+        var filtered = Context.Users
+            .Where(x => x.RoleId == (int)Roles.Student);
+        var users = await filtered
+            .OrderBy(x => x.Id)
+            .Skip(pageNumber * itemCount)
+            .Take(itemCount)
+            .ToListAsync();
+        var identityIds = users.Select(x => x.IdentityId).ToList();
+        var identities = (await _identityCachingService.GetMultipleAsync(identityIds)).ToList();
+        foreach (var user in users)
+        {
+            user.Identity = identities.Single(x => user.IdentityId == x.Id);
+        }
+
+        return new ListDataResult<User>
+        {
+            Items = users.Select(EntityConverter.ConvertUser),
+            TotalItemsCount = filtered.Count()
+        };
+    }
+
     public async Task<ListDataResult<UserGeneral>> ListStudentsAsync()
     {
         var res = Context.Users.Where(x => x.RoleId == (int)Roles.Student);

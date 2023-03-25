@@ -15,13 +15,12 @@ public class UserGeneralListService : IListService<UserGeneral>
     public async Task<ListDataResult<UserGeneral>> ListAsync(int itemCount, int pageNumber,
         Predicate<UserGeneral>? filter = null)
     {
-        var res = await _userRepository.ListUsersAsync(itemCount, pageNumber);
+        var res = await _userRepository.ListStudentsAsync(itemCount, pageNumber);
         var filtered = res.Items.Select(x => new UserGeneral
-            {
-                Email = x.Identity.Email!, PhoneNumber = x.Identity.PhoneNumber!, Name = x.Name, Surname = x.Surname,
-                Patronymic = x.Patronymic, Id = x.Id, BirthDate = x.BirthDate, Role = x.Role
-            })
-            .Where(x => filter?.Invoke(x) ?? true).ToArray();
+        {
+            Email = x.Identity.Email!, PhoneNumber = x.Identity.PhoneNumber!, Name = x.Name, Surname = x.Surname,
+            Patronymic = x.Patronymic, Id = x.Id, BirthDate = x.BirthDate, Role = x.Role
+        }).ToArray();
         return new ListDataResult<UserGeneral>
         {
             Items = filtered,
