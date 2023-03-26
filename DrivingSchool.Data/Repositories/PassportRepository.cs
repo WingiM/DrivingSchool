@@ -2,7 +2,7 @@
 
 public class PassportRepository : BaseRepository, IPassportRepository
 {
-    public PassportRepository(ApplicationContext context) : base(context)
+    public PassportRepository(ApplicationContext context, NpgsqlContext connection) : base(context, connection)
     {
     }
 

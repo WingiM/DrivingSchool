@@ -34,7 +34,6 @@
     public Color BackgroundColor { get; set; } = Color.Primary;
 
     private bool _userLoaded;
-    private User _user = null!;
     private string _defaultAvatar = null!;
     private string? _userAvatar;
     private bool _avatarLoaded;
@@ -48,9 +47,8 @@
             Size.Large => 60,
             _ => throw new ArgumentOutOfRangeException()};
         var userId = UserId ?? int.Parse((await AuthenticationState.GetAuthenticationStateAsync()).User.Claims.First(x => x.Type == UserDefaultClaims.Id).Value);
-        _user = await UserService.GetUserByIdAsync(userId);
-        _defaultAvatar = await UserService.GetUserDefaultAvatarAsync(_user.Identity.Id);
-        _userAvatar = await UserService.GetUserAvatarAsync(_user.Id);
+        _defaultAvatar = await UserService.GetUserDefaultAvatarAsync(userId);
+        _userAvatar = await UserService.GetUserAvatarAsync(userId);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

@@ -11,8 +11,8 @@ namespace DrivingSchool.Data.Repositories;
 public class UserRepository : BaseRepository, IUserRepository
 {
     private readonly IIdentityCachingService _identityCachingService;
-
-    public UserRepository(ApplicationContext context, IIdentityCachingService identityCachingService) : base(context)
+    
+    public UserRepository(ApplicationContext context, NpgsqlContext connection, IIdentityCachingService identityCachingService) : base(context, connection)
     {
         _identityCachingService = identityCachingService;
     }
@@ -137,30 +137,26 @@ public class UserRepository : BaseRepository, IUserRepository
     public async Task SetUserAvatarAsync(int userId, string fileName)
     {
         var sql = "UPDATE public.user SET avatar = @fileName WHERE id = @id";
-        var connection = Context.Database.GetDbConnection();
-        await connection.ExecuteAsync(sql, new { id = userId, fileName });
+        await Connection.ExecuteAsync(sql, new { id = userId, fileName });
     }
 
     public async Task<string?> GetUserAvatarAsync(int userId)
     {
         var sql = "SELECT avatar FROM public.user WHERE id = @id";
-        var connection = Context.Database.GetDbConnection();
-        return await connection.QueryFirstOrDefaultAsync<string>(sql, new { id = userId });
+        return await Connection.QueryFirstOrDefaultAsync<string>(sql, new { id = userId });
     }
 
     public async Task<string> GetUserDefaultAvatarAsync(int userId)
     {
-        var sql = "SELECT claim_value FROM blazor_identity.user_claim WHERE user_id = @id AND claim_type = @claimType";
-        var connection = Context.Database.GetDbConnection();
-        return await connection.QuerySingleAsync<string>(sql,
+        var sql = "SELECT claim_value FROM blazor_identity.user_claim WHERE user_id = (SELECT identity_id FROM public.user WHERE id=@id) AND claim_type = @claimType";
+        return await Connection.QuerySingleAsync<string>(sql,
             new { id = userId, claimType = UserDefaultClaims.AvatarLetters });
     }
 
     public async Task DeleteAvatarAsync(int userId)
     {
         var sql = "UPDATE public.user SET avatar = null WHERE id = @id";
-        var connection = Context.Database.GetDbConnection();
-        await connection.ExecuteAsync(sql, new { id = userId });
+        await Connection.ExecuteAsync(sql, new { id = userId });
     }
 
     private Expression<Func<UserDb, object>> GetOrderProperty(string field)

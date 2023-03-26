@@ -2,7 +2,7 @@
 
 public class LessonRepository : BaseRepository, ILessonRepository
 {
-    public LessonRepository(ApplicationContext context) : base(context)
+    public LessonRepository(ApplicationContext context, NpgsqlContext connection) : base(context, connection)
     {
     }
 
