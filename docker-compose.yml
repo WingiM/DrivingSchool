@@ -47,6 +47,7 @@ services:
       ASPNETCORE_URLS: https://+;http://+;
       ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnetapp.pfx
       ASPNETCORE_Kestrel__Certificates__Default__Password: $ASPNETCORE_Password
+      ASPNETCORE_HTTPS_PORT: $APP_HTTPS_PORT
       TZ: Europe/Moscow
     stdin_open: true
     tty: true
