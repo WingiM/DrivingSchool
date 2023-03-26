@@ -11,8 +11,9 @@ namespace DrivingSchool.Data.Repositories;
 public class UserRepository : BaseRepository, IUserRepository
 {
     private readonly IIdentityCachingService _identityCachingService;
-    
-    public UserRepository(ApplicationContext context, NpgsqlContext connection, IIdentityCachingService identityCachingService) : base(context, connection)
+
+    public UserRepository(ApplicationContext context, NpgsqlContext connection,
+        IIdentityCachingService identityCachingService) : base(context, connection)
     {
         _identityCachingService = identityCachingService;
     }
@@ -67,7 +68,8 @@ public class UserRepository : BaseRepository, IUserRepository
     {
         var property = GetOrderProperty(field);
         var filtered = Context.Users
-            .Where(x => string.Join(" ", x.Name, x.Surname, x.Patronymic).ToLower().Contains(searchText.ToLower()));
+            .Where(x => !x.IsDeleted && string.Join(" ", x.Name, x.Surname, x.Patronymic).ToLower()
+                .Contains(searchText.ToLower()));
         var users = await filtered
             .OrderBy(property, desc)
             .Skip(pageNumber * itemCount)
@@ -90,7 +92,7 @@ public class UserRepository : BaseRepository, IUserRepository
     public async Task<ListDataResult<User>> ListStudentsAsync(int itemCount, int pageNumber)
     {
         var filtered = Context.Users
-            .Where(x => x.RoleId == (int)Roles.Student);
+            .Where(x => !x.IsDeleted && x.RoleId == (int)Roles.Student);
         var users = await filtered
             .OrderBy(x => x.Id)
             .Skip(pageNumber * itemCount)
@@ -112,11 +114,11 @@ public class UserRepository : BaseRepository, IUserRepository
 
     public async Task<ListDataResult<UserGeneral>> ListStudentsAsync()
     {
-        var res = Context.Users.Where(x => x.RoleId == (int)Roles.Student);
+        var res = Context.Users.Where(x => !x.IsDeleted && x.RoleId == (int)Roles.Student);
         return new ListDataResult<UserGeneral>
         {
             Success = true,
-            Items = await res 
+            Items = await res
                 .Select(x => EntityConverter.GetUserInitials(x))
                 .ToArrayAsync()
         };
@@ -124,7 +126,7 @@ public class UserRepository : BaseRepository, IUserRepository
 
     public async Task<ListDataResult<UserGeneral>> ListTeachersAsync()
     {
-        var res = Context.Users.Where(x => x.RoleId == (int)Roles.Teacher);
+        var res = Context.Users.Where(x => !x.IsDeleted && x.RoleId == (int)Roles.Teacher);
         return new ListDataResult<UserGeneral>
         {
             Success = true,
@@ -148,7 +150,8 @@ public class UserRepository : BaseRepository, IUserRepository
 
     public async Task<string> GetUserDefaultAvatarAsync(int userId)
     {
-        var sql = "SELECT claim_value FROM blazor_identity.user_claim WHERE user_id = (SELECT identity_id FROM public.user WHERE id=@id) AND claim_type = @claimType";
+        var sql =
+            "SELECT claim_value FROM blazor_identity.user_claim WHERE user_id = (SELECT identity_id FROM public.user WHERE id=@id) AND claim_type = @claimType";
         return await Connection.QuerySingleAsync<string>(sql,
             new { id = userId, claimType = UserDefaultClaims.AvatarLetters });
     }
@@ -161,14 +164,12 @@ public class UserRepository : BaseRepository, IUserRepository
 
     public async Task DeleteUserAsync(int userId)
     {
-        var param = new { id = userId };
-        await Connection.ExecuteAsync("DELETE FROM public.available_lesson WHERE student_id = @id or teacher_id = @id", param);
-        await Connection.ExecuteAsync("DELETE FROM public.student_lesson WHERE student_id = @id or teacher_id = @id", param);
-        await Connection.ExecuteAsync("DELETE FROM public.exam_history WHERE user_id = @id", param);
-        await Connection.ExecuteAsync("DELETE FROM public.passport WHERE user_id = @id", param);
-        await Connection.ExecuteAsync("DELETE FROM blazor_identity.user_claim WHERE user_id = (SELECT identity_id FROM public.user WHERE id = @id)", param);
-        await Connection.ExecuteAsync("DELETE FROM blazor_identity.user_role WHERE user_id = (SELECT identity_id FROM public.user WHERE id = @id)", param);
-        await Connection.ExecuteAsync("DELETE FROM public.user WHERE id = @id", param);
+        await Connection.ExecuteAsync("UPDATE public.user SET is_deleted = true WHERE id = @id", new { id = userId });
+    }
+
+    public async Task<bool> IsUserDeletedAsync(int userId)
+    {
+        return await Connection.QuerySingleAsync<bool>("SELECT is_deleted FROM public.user WHERE id = @id", new {id = userId});
     }
 
     private Expression<Func<UserDb, object>> GetOrderProperty(string field)

@@ -1,5 +1,4 @@
 ﻿using DrivingSchool.Domain.Enums;
-using DrivingSchool.Domain.Extensions;
 using DrivingSchool.Domain.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Claim = System.Security.Claims.Claim;
@@ -100,7 +99,11 @@ public class UserService : IUserService
     public async Task<BaseResult> DeleteUserAsync(User context)
     {
         await _userRepository.DeleteUserAsync(context.Id);
-        var res = await _userManager.DeleteAsync(context.Identity);
-        return !res.Succeeded ? new BaseResult { Success = false } : new BaseResult { Success = true };
+        return new BaseResult { Success = true };
+    }
+
+    public async Task<bool> IsUserDeletedAsync(int userId)
+    {
+        return await _userRepository.IsUserDeletedAsync(userId);
     }
 }

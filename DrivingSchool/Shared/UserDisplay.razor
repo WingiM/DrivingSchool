@@ -24,6 +24,10 @@
                     </MudIconButton>
                 </CardHeaderAvatar>
                 <CardHeaderContent>
+                    @if (_isDeleted)
+                    {
+                        <MudText Typo="Typo.h4" Color="Color.Primary">Пользователь удален</MudText>
+                    }
                     <MudStack Row="true">
                         <MudTextField @bind-Value="_userModel.Surname" ReadOnly="ReadOnly"
                                       For="() => _userModel.Surname" Immediate="false" Label="Фамилия"/>
@@ -160,6 +164,7 @@ else
     private User _user = null!;
     private IEnumerable<Claim> _userClaims = Enumerable.Empty<Claim>();
     private string _avatarId = Guid.NewGuid().ToString("N");
+    private bool _isDeleted;
 
     protected override async Task OnInitializedAsync()
     {
@@ -168,6 +173,9 @@ else
         else
             _user = await UserService.GetUserByIdAsync(Id);
         _userClaims = await UserService.GetUserClaimsByIdAsync(_user.Identity.Id);
+        _isDeleted = await UserService.IsUserDeletedAsync(_user.Id);
+        if (_isDeleted)
+            ReadOnly = true;
 
         _userModel = new EditUser
         {
@@ -287,4 +295,3 @@ else
     }
 
 }
-
