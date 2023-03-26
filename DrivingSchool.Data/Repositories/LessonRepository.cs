@@ -1,10 +1,5 @@
 ﻿using Dapper;
-using DrivingSchool.Data.Models;
 using DrivingSchool.Domain.ErrorMessages;
-using DrivingSchool.Domain.Models;
-using DrivingSchool.Domain.Repositories;
-using DrivingSchool.Domain.Results;
-using Microsoft.EntityFrameworkCore;
 
 namespace DrivingSchool.Data.Repositories;
 

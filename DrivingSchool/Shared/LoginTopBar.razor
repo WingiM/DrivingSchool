@@ -9,7 +9,7 @@
                     @(context.User.Claims.FirstOrDefault(x => x.Type == UserDefaultClaims.AvatarLetters)?.Value ?? "А")
                 </MudAvatar>
             </a>
-            <a class="appbar" @onclick="() => Logout()">Выйти</a>
+            <a style="cursor:pointer;" class="appbar" @onclick="() => Logout()">Выйти</a>
         </div>
     </Authorized>
     <NotAuthorized>

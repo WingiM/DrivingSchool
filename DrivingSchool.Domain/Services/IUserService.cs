@@ -12,7 +12,7 @@ public interface IUserService
     public Task<User> GetUserByLoginAsync(string login);
     public Task<User> GetUserByIdAsync(int id);
     public Task<IEnumerable<Claim>> GetUserClaimsByIdAsync(int id);
-    public Task<ListDataResult<User>> ListUsersAsync(int itemCount, int pageNumber, string searchText, string field = UserSortingField.Id, bool desc = false);
-    public Task<ListDataResult<UserInitials>> ListStudentsAsync();
-    public Task<ListDataResult<UserInitials>> ListTeachersAsync();
+    public Task<ListDataResult<User>> ListUsersAsync(int itemCount, int pageNumber, string searchText = "", string field = UserSortingField.Id, bool desc = false);
+    public Task<ListDataResult<UserGeneral>> ListStudentsAsync();
+    public Task<ListDataResult<UserGeneral>> ListTeachersAsync();
 }

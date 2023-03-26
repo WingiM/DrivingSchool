@@ -1,8 +1,4 @@
 ﻿using DrivingSchool.Data.Extensions;
-using DrivingSchool.Domain.Models;
-using DrivingSchool.Domain.Repositories;
-using DrivingSchool.Domain.Results;
-using Microsoft.EntityFrameworkCore;
 
 namespace DrivingSchool.Data.Repositories;
 

@@ -1,13 +1,8 @@
 ﻿using System.Linq.Expressions;
 using DrivingSchool.Data.Extensions;
-using DrivingSchool.Data.Models;
 using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Exceptions;
-using DrivingSchool.Domain.Models;
-using DrivingSchool.Domain.Repositories;
-using DrivingSchool.Domain.Results;
 using DrivingSchool.Domain.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace DrivingSchool.Data.Repositories;
 
@@ -65,7 +60,7 @@ public class UserRepository : BaseRepository, IUserRepository
         return EntityConverter.ConvertUser(user);
     }
 
-    public async Task<ListDataResult<User>> ListUsersAsync(int itemCount, int pageNumber, string searchText,
+    public async Task<ListDataResult<User>> ListUsersAsync(int itemCount, int pageNumber, string searchText = "",
         string field = UserSortingField.Id, bool desc = false)
     {
         var property = GetOrderProperty(field);
@@ -90,10 +85,33 @@ public class UserRepository : BaseRepository, IUserRepository
         };
     }
 
-    public async Task<ListDataResult<UserInitials>> ListStudentsAsync()
+    public async Task<ListDataResult<User>> ListStudentsAsync(int itemCount, int pageNumber)
+    {
+        var filtered = Context.Users
+            .Where(x => x.RoleId == (int)Roles.Student);
+        var users = await filtered
+            .OrderBy(x => x.Id)
+            .Skip(pageNumber * itemCount)
+            .Take(itemCount)
+            .ToListAsync();
+        var identityIds = users.Select(x => x.IdentityId).ToList();
+        var identities = (await _identityCachingService.GetMultipleAsync(identityIds)).ToList();
+        foreach (var user in users)
+        {
+            user.Identity = identities.Single(x => user.IdentityId == x.Id);
+        }
+
+        return new ListDataResult<User>
+        {
+            Items = users.Select(EntityConverter.ConvertUser),
+            TotalItemsCount = filtered.Count()
+        };
+    }
+
+    public async Task<ListDataResult<UserGeneral>> ListStudentsAsync()
     {
         var res = Context.Users.Where(x => x.RoleId == (int)Roles.Student);
-        return new ListDataResult<UserInitials>
+        return new ListDataResult<UserGeneral>
         {
             Success = true,
             Items = await res 
@@ -102,10 +120,10 @@ public class UserRepository : BaseRepository, IUserRepository
         };
     }
 
-    public async Task<ListDataResult<UserInitials>> ListTeachersAsync()
+    public async Task<ListDataResult<UserGeneral>> ListTeachersAsync()
     {
         var res = Context.Users.Where(x => x.RoleId == (int)Roles.Teacher);
-        return new ListDataResult<UserInitials>
+        return new ListDataResult<UserGeneral>
         {
             Success = true,
             Items = await res

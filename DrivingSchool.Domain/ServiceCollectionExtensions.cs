@@ -1,5 +1,6 @@
 ﻿using DrivingSchool.Domain.Constants;
 using DrivingSchool.Domain.Services;
+using DrivingSchool.Domain.Services.Generic;
 using DrivingSchool.Domain.Services.Impl;
 using DrivingSchool.Domain.Validation;
 using FluentValidation.AspNetCore;
@@ -27,6 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IExamService, ExamService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IListService<UserGeneral>, UserGeneralListService>();
         services.AddScoped<IPassportService, PassportService>();
         services.AddScoped<IIdentityCachingService, IdentityCachingService>();
         services.AddScoped<IImageLoadingService, ImageLoadingService>();

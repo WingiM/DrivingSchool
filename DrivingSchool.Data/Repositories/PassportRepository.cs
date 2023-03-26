@@ -1,8 +1,4 @@
-﻿using DrivingSchool.Domain.Models;
-using DrivingSchool.Domain.Repositories;
-using Microsoft.EntityFrameworkCore;
-
-namespace DrivingSchool.Data.Repositories;
+﻿namespace DrivingSchool.Data.Repositories;
 
 public class PassportRepository : BaseRepository, IPassportRepository
 {

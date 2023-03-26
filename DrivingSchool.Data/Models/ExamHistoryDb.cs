@@ -1,6 +1,6 @@
 ﻿namespace DrivingSchool.Data.Models;
 
-public class ExamHistoryDb : BaseEntity
+public class ExamHistoryDb : Entity
 {
     public int CorrectAnswers { get; init; }
     public int WrongAnswers { get; init; }

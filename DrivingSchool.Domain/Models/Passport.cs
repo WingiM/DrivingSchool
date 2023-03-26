@@ -1,8 +1,7 @@
 ﻿namespace DrivingSchool.Domain.Models;
 
-public class Passport
+public class Passport : Entity
 {
-    public int Id { get; init; }
     public required string Series { get; init; }
     public required string Number { get; init; }
     public required DateTime IssueDate { get; init; }

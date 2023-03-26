@@ -1,6 +1,4 @@
-﻿using DrivingSchool.Data.Models;
-using DrivingSchool.Domain.Enums;
-using DrivingSchool.Domain.Models;
+﻿using DrivingSchool.Domain.Enums;
 
 namespace DrivingSchool.Data;
 
@@ -13,14 +11,14 @@ public static class EntityConverter
             Id = lessonDb.Id, Duration = TimeSpan.FromMinutes(lessonDb.DurationInMinutes),
             Date = lessonDb.Date.ToLocalTime(), StudentId = lessonDb.StudentId, TeacherId = lessonDb.TeacherId,
             TimeStart = lessonDb.TimeStart, StudentInitials = useStudentInitials && lessonDb.Student is not null
-                ? new UserInitials
+                ? new UserGeneral
                 {
                     Name = lessonDb.Student.Name, Surname = lessonDb.Student.Surname,
                     Patronymic = lessonDb.Student.Patronymic,
                 }
                 : null,
             TeacherInitials = !useStudentInitials && lessonDb.Teacher is not null
-                ? new UserInitials
+                ? new UserGeneral
                 {
                     Name = lessonDb.Teacher.Name, Surname = lessonDb.Teacher.Surname,
                     Patronymic = lessonDb.Teacher.Patronymic,
@@ -29,23 +27,23 @@ public static class EntityConverter
         };
     }
 
-    public static StudentLessonDb ConvertLesson(StudentLesson lesson)
+    public static StudentLessonDb ConvertLesson(StudentLesson lessonBase)
     {
         return new StudentLessonDb
         {
-            Id = lesson.Id, DurationInMinutes = (int)lesson.Duration.TotalMinutes,
-            Date = lesson.Date.ToUniversalTime(), StudentId = lesson.StudentId, TeacherId = lesson.TeacherId,
-            TimeStart = lesson.TimeStart
+            Id = lessonBase.Id, DurationInMinutes = (int)lessonBase.Duration.TotalMinutes,
+            Date = lessonBase.Date.ToUniversalTime(), StudentId = lessonBase.StudentId, TeacherId = lessonBase.TeacherId,
+            TimeStart = lessonBase.TimeStart
         };
     }
 
-    public static AvailableLessonDb ConvertLesson(AvailableLesson lesson)
+    public static AvailableLessonDb ConvertLesson(AvailableLesson lessonBase)
     {
         return new AvailableLessonDb
         {
-            Id = lesson.Id, TeacherId = lesson.TeacherId, TimeStart = lesson.TimeStart,
-            DurationInMinutes = (int)lesson.Duration.TotalMinutes, Date = lesson.Date.ToUniversalTime(),
-            StudentId = lesson.StudentId
+            Id = lessonBase.Id, TeacherId = lessonBase.TeacherId, TimeStart = lessonBase.TimeStart,
+            DurationInMinutes = (int)lessonBase.Duration.TotalMinutes, Date = lessonBase.Date.ToUniversalTime(),
+            StudentId = lessonBase.StudentId
         };
     }
 
@@ -57,7 +55,7 @@ public static class EntityConverter
             Duration = TimeSpan.FromMinutes(lesson.DurationInMinutes), Date = lesson.Date.ToLocalTime(),
             StudentId = lesson.StudentId, IsTaken = lesson.IsTaken, 
             TeacherInitials = lesson.Teacher is not null
-                ? new UserInitials
+                ? new UserGeneral
                 {
                     Name = lesson.Teacher.Name, Surname = lesson.Teacher.Surname,
                     Patronymic = lesson.Teacher.Patronymic,
@@ -66,9 +64,9 @@ public static class EntityConverter
         };
     }
 
-    public static UserInitials GetUserInitials(UserDb user)
+    public static UserGeneral GetUserInitials(UserDb user)
     {
-        return new UserInitials
+        return new UserGeneral
             { Id = user.Id, Name = user.Name, Patronymic = user.Patronymic, Surname = user.Surname };
     }
 
@@ -162,7 +160,7 @@ public static class EntityConverter
             Id = historyDb.Id, TicketId = historyDb.TicketId, UserId = historyDb.UserId,
             CorrectAnswers = historyDb.CorrectAnswers, WrongAnswers = historyDb.WrongAnswers,
             TotalTime = historyDb.TotalTime, TicketNumber = historyDb.Ticket.Number,
-            Date = historyDb.Date.ToLocalTime(), User = new UserInitials
+            Date = historyDb.Date.ToLocalTime(), User = new UserGeneral
             {
                 Name = historyDb.User!.Name,
                 Surname = historyDb.User.Surname,

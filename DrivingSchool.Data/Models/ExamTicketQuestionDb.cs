@@ -1,6 +1,6 @@
 ﻿namespace DrivingSchool.Data.Models;
 
-public class ExamTicketQuestionDb : BaseEntity
+public class ExamTicketQuestionDb : Entity
 {
     public string Question { get; init; } = null!;
     public string? ImageSource { get; init; }

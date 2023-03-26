@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace DrivingSchool.Domain.Models;
 
-public class User
+public class User : Entity
 {
-    public int Id { get; set; }
     public required string Surname { get; init; }
     public required string Name { get; init; }
     public required string Patronymic { get; init; }

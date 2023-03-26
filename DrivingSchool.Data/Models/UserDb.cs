@@ -2,7 +2,7 @@
 
 namespace DrivingSchool.Data.Models;
 
-public class UserDb : BaseEntity
+public class UserDb : Entity
 {
     public required string Surname { get; init; }
     public required string Name { get; init; }

@@ -51,7 +51,7 @@
 
     MudForm _form = null!;
     readonly RegistrationValidator _validator = new();
-    readonly RegistrationCredentials _model = new();
+    private RegistrationCredentials _model = new();
 
     private async Task Register()
     {
@@ -69,6 +69,7 @@
         _loading = false;
         if (res.Success)
         {
+            _model = new RegistrationCredentials();
             Snackbar.Add("Пользователь успешно добавлен", Severity.Success);
             return;
         }
