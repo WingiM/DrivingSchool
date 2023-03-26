@@ -30,7 +30,7 @@
         var user = await UserService.GetUserByIdAsync(UserId);
         var extension = Path.GetExtension(args.File.Name);
         var fileName = $"{GenerateFileNameForUser(user)}{extension}";
-        var result = await ImageService.UploadImageAsync(fileName, args.File.OpenReadStream());
+        var result = await ImageService.UploadImageAsync(fileName, args.File.OpenReadStream(maxAllowedSize:5 * 1024 * 1024));
         if (!result.Success)
         {
             Snackbar.Add(result.Message, Severity.Error);
