@@ -7,12 +7,12 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddData(this IServiceCollection services, string connectionString)
     {
+        services.AddTransient<NpgsqlContext>(_ => new NpgsqlContext(connectionString));
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPassportRepository, PassportRepository>();
         services.AddScoped<IExamRepository, ExamRepository>();
         services.AddScoped<ILessonRepository, LessonRepository>();
         services.AddScoped<IIdentityCachingRepository, IdentityCachingRepository>();
-        services.AddTransient<NpgsqlContext>(_ => new NpgsqlContext(connectionString));
         services.AddDbContext<ApplicationContext>(options =>
         {
             options.UseNpgsql(connectionString,

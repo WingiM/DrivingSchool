@@ -24,7 +24,8 @@
             <MudTextField @bind-Value="_model.Email" For="() => _model.Email" Immediate="false" Label="Электронная почта"/>
             <MudTextField @bind-Value="_model.PhoneNumber" For="() => _model.PhoneNumber" Immediate="false"
                           Label="Номер телефона" Mask="@(new PatternMask("+0 (000) 000 00-00") { CleanDelimiters = true })"/>
-            <MudSelect @bind-Value="_model.Role" ToStringFunc="@_converter" Label="Роль пользователя" AnchorOrigin="Origin.BottomCenter" Clearable>
+            <MudSelect @bind-Value="_model.Role" ToStringFunc="@_converter" Label="Роль пользователя" AnchorOrigin="Origin.BottomCenter"
+                       For="() => _model.Role" Clearable>
                 @foreach (Roles role in Enum.GetValues(typeof(Roles)))
                 {
                     <MudSelectItem Value="role"/>
