@@ -38,6 +38,7 @@ builder.Services.AddDefaultIdentity<IdentityUser<int>>(options =>
 builder.Services.AddMudServices();
 builder.Services
     .AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddHostedService<AddInitialUserHostedService>();
 builder.Services.AddHostedService<AddTicketsToDatabaseHostedService>();
 builder.Services.AddHostedService<UploadImagesHostedService>();
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
