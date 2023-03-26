@@ -34,8 +34,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IImageLoadingService, ImageLoadingService>();
         services.AddScoped<ILessonService, LessonService>();
 
-        services.AddTransient<ISmtpClient, SmtpClient>();
-        services.AddTransient<IMailingService, MailingService>();
+        services.AddScoped<ISmtpClient, SmtpClient>();
+        services.AddScoped<IMailingService, MailingService>();
 
         services.AddFluentValidationAutoValidation().AddValidatorsFromAssembly(typeof(PassportValidator).Assembly);
         return services;
