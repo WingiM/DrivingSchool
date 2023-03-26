@@ -1,4 +1,5 @@
 ﻿using DrivingSchool.Domain.Enums;
+using DrivingSchool.Domain.Extensions;
 using DrivingSchool.Domain.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Claim = System.Security.Claims.Claim;
@@ -94,5 +95,12 @@ public class UserService : IUserService
     public async Task DeleteAvatarAsync(int userId)
     {
         await _userRepository.DeleteAvatarAsync(userId);
+    }
+
+    public async Task<BaseResult> DeleteUserAsync(User context)
+    {
+        await _userRepository.DeleteUserAsync(context.Id);
+        var res = await _userManager.DeleteAsync(context.Identity);
+        return !res.Succeeded ? new BaseResult { Success = false } : new BaseResult { Success = true };
     }
 }

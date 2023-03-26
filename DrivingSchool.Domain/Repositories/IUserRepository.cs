@@ -17,4 +17,5 @@ public interface IUserRepository
     public Task<string?> GetUserAvatarAsync(int userId);
     public Task<string> GetUserDefaultAvatarAsync(int userId);
     public Task DeleteAvatarAsync(int userId);
+    public Task DeleteUserAsync(int userId);
 }

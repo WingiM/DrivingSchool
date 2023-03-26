@@ -159,6 +159,18 @@ public class UserRepository : BaseRepository, IUserRepository
         await Connection.ExecuteAsync(sql, new { id = userId });
     }
 
+    public async Task DeleteUserAsync(int userId)
+    {
+        var param = new { id = userId };
+        await Connection.ExecuteAsync("DELETE FROM public.available_lesson WHERE student_id = @id or teacher_id = @id", param);
+        await Connection.ExecuteAsync("DELETE FROM public.student_lesson WHERE student_id = @id or teacher_id = @id", param);
+        await Connection.ExecuteAsync("DELETE FROM public.exam_history WHERE user_id = @id", param);
+        await Connection.ExecuteAsync("DELETE FROM public.passport WHERE user_id = @id", param);
+        await Connection.ExecuteAsync("DELETE FROM blazor_identity.user_claim WHERE user_id = (SELECT identity_id FROM public.user WHERE id = @id)", param);
+        await Connection.ExecuteAsync("DELETE FROM blazor_identity.user_role WHERE user_id = (SELECT identity_id FROM public.user WHERE id = @id)", param);
+        await Connection.ExecuteAsync("DELETE FROM public.user WHERE id = @id", param);
+    }
+
     private Expression<Func<UserDb, object>> GetOrderProperty(string field)
     {
         return field switch

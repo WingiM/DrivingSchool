@@ -19,4 +19,5 @@ public interface IUserService
     public Task<string> GetUserDefaultAvatarAsync(int userId);
     public Task SetUserAvatarAsync(int userId, string fileName);
     public Task DeleteAvatarAsync(int userId);
+    public Task<BaseResult> DeleteUserAsync(User context);
 }
