@@ -64,7 +64,7 @@ else
     {
         if (args.Start < DateTime.Now)
             return;
-        var parameters = new DialogParameters() { ["Lesson"] = args.Data };
+        var parameters = new DialogParameters { ["Lesson"] = args.Data };
         var dialog = await DialogService.ShowAsync<LessonSignUpDialog>("Вы уверены?", parameters);
         var result = await dialog.Result;
 

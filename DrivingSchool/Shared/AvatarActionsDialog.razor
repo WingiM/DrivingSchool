@@ -1,0 +1,53 @@
+﻿@inject IUserService UserService
+@inject IImageLoadingService ImageService
+
+<MudDialog>
+    <DialogContent>
+        <MudStack>
+            <InputFile id="inputFile" OnChange="SetAvatar" hidden/>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" HtmlTag="label" for="inputFile">Установить новый аватар</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => DeleteAvatar()">Удалить аватар</MudButton>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [Inject]
+    private ISnackbar Snackbar { get; set; } = null!;
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public int UserId { get; set; }
+
+    private async Task SetAvatar(InputFileChangeEventArgs args)
+    {
+        var user = await UserService.GetUserByIdAsync(UserId);
+        var extension = Path.GetExtension(args.File.Name);
+        var fileName = $"{GenerateFileNameForUser(user)}{extension}";
+        var result = await ImageService.UploadImageAsync(fileName, args.File.OpenReadStream());
+        if (!result.Success)
+        {
+            Snackbar.Add(result.Message, Severity.Error);
+            return;
+        }
+        await UserService.SetUserAvatarAsync(user.Id, fileName);
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private static string GenerateFileNameForUser(User user) => $"{user.Id}_{user.Identity.Id}";
+
+    private async Task DeleteAvatar()
+    {
+        await UserService.DeleteAvatarAsync(UserId);
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel() => MudDialog.Cancel();
+
+}

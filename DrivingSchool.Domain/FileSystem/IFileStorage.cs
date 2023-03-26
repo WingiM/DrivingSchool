@@ -2,6 +2,6 @@
 
 public interface IFileStorage
 {
-    public Task UploadFileAsync(string filename, Stream file);
+    public Task UploadFileAsync(string filename, Stream file, bool mustBeSingle = false);
     public Task<Stream> GetFileReadStreamAsync(string filename);
 }

@@ -1,7 +1,4 @@
-﻿using Dapper;
-using DrivingSchool.Domain.ErrorMessages;
-
-namespace DrivingSchool.Data.Repositories;
+﻿namespace DrivingSchool.Data.Repositories;
 
 public class LessonRepository : BaseRepository, ILessonRepository
 {

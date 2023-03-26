@@ -15,4 +15,8 @@ public interface IUserService
     public Task<ListDataResult<User>> ListUsersAsync(int itemCount, int pageNumber, string searchText = "", string field = UserSortingField.Id, bool desc = false);
     public Task<ListDataResult<UserGeneral>> ListStudentsAsync();
     public Task<ListDataResult<UserGeneral>> ListTeachersAsync();
+    public Task<string?> GetUserAvatarAsync(int userId);
+    public Task<string> GetUserDefaultAvatarAsync(int userId);
+    public Task SetUserAvatarAsync(int userId, string fileName);
+    public Task DeleteAvatarAsync(int userId);
 }

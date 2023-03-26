@@ -1,5 +1,7 @@
 ﻿using System.Linq.Expressions;
+using Dapper;
 using DrivingSchool.Data.Extensions;
+using DrivingSchool.Domain.Constants;
 using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Exceptions;
 using DrivingSchool.Domain.Services;
@@ -130,6 +132,35 @@ public class UserRepository : BaseRepository, IUserRepository
                 .Select(x => EntityConverter.GetUserInitials(x))
                 .ToArrayAsync()
         };
+    }
+
+    public async Task SetUserAvatarAsync(int userId, string fileName)
+    {
+        var sql = "UPDATE public.user SET avatar = @fileName WHERE id = @id";
+        var connection = Context.Database.GetDbConnection();
+        await connection.ExecuteAsync(sql, new { id = userId, fileName });
+    }
+
+    public async Task<string?> GetUserAvatarAsync(int userId)
+    {
+        var sql = "SELECT avatar FROM public.user WHERE id = @id";
+        var connection = Context.Database.GetDbConnection();
+        return await connection.QueryFirstOrDefaultAsync<string>(sql, new { id = userId });
+    }
+
+    public async Task<string> GetUserDefaultAvatarAsync(int userId)
+    {
+        var sql = "SELECT claim_value FROM blazor_identity.user_claim WHERE user_id = @id AND claim_type = @claimType";
+        var connection = Context.Database.GetDbConnection();
+        return await connection.QuerySingleAsync<string>(sql,
+            new { id = userId, claimType = UserDefaultClaims.AvatarLetters });
+    }
+
+    public async Task DeleteAvatarAsync(int userId)
+    {
+        var sql = "UPDATE public.user SET avatar = null WHERE id = @id";
+        var connection = Context.Database.GetDbConnection();
+        await connection.ExecuteAsync(sql, new { id = userId });
     }
 
     private Expression<Func<UserDb, object>> GetOrderProperty(string field)

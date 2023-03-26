@@ -1,8 +1,7 @@
-﻿using System.Security.Claims;
-using DrivingSchool.Domain.Enums;
+﻿using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Repositories;
-using DrivingSchool.Domain.Services.Generic;
 using Microsoft.AspNetCore.Identity;
+using Claim = System.Security.Claims.Claim;
 
 namespace DrivingSchool.Domain.Services.Impl;
 
@@ -75,5 +74,25 @@ public class UserService : IUserService
     public async Task<ListDataResult<UserGeneral>> ListTeachersAsync()
     {
         return await _userRepository.ListTeachersAsync();
+    }
+
+    public async Task<string?> GetUserAvatarAsync(int userId)
+    {
+        return await _userRepository.GetUserAvatarAsync(userId);
+    }
+
+    public async Task<string> GetUserDefaultAvatarAsync(int userId)
+    {
+        return await _userRepository.GetUserDefaultAvatarAsync(userId);
+    }
+
+    public async Task SetUserAvatarAsync(int userId, string fileName)
+    {
+        await _userRepository.SetUserAvatarAsync(userId, fileName);
+    }
+
+    public async Task DeleteAvatarAsync(int userId)
+    {
+        await _userRepository.DeleteAvatarAsync(userId);
     }
 }

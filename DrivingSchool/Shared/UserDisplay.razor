@@ -10,6 +10,8 @@
 @inject IPassportService PassportService
 @inject IEncryptionService EncryptionService
 @inject IAuthorizationService AuthorizationService
+@inject IDialogService DialogService;
+
 
 @if (_userLoaded)
 {
@@ -17,9 +19,9 @@
         <MudForm Model="@_userModel" @ref="@_userEditForm" Validation="@(_userValidator.ValidateValue)" ValidationDelay="0">
             <MudCardHeader>
                 <CardHeaderAvatar>
-                    <MudAvatar Color="Color.Primary" Size="Size.Large">
-                        @(_userClaims.FirstOrDefault(x => x.Type == UserDefaultClaims.AvatarLetters)?.Value ?? "D")
-                    </MudAvatar>
+                    <MudIconButton OnClick="() => AvatarActions()">
+                        <UserAvatar ImageId="@_avatarId" Size="Size.Large" UserId="@_user.Id"/>
+                    </MudIconButton>
                 </CardHeaderAvatar>
                 <CardHeaderContent>
                     <MudStack Row="true">
@@ -54,7 +56,7 @@
                         </MudStack>
                     </Authorized>
                 </AuthorizeView>
-                <MudTextField @bind-Value="_userModel.PhoneNumber" InputType="InputType.Telephone" 
+                <MudTextField @bind-Value="_userModel.PhoneNumber" InputType="InputType.Telephone"
                               Mask="@(new PatternMask("+0 (000) 000 00-00"))" Label="Номер телефона" ReadOnly="true"/>
             </MudCardContent>
             <MudCardActions>
@@ -157,6 +159,7 @@ else
     private bool _userLoaded;
     private User _user = null!;
     private IEnumerable<Claim> _userClaims = Enumerable.Empty<Claim>();
+    private string _avatarId = Guid.NewGuid().ToString("N");
 
     protected override async Task OnInitializedAsync()
     {
@@ -268,6 +271,19 @@ else
         }
 
         Snackbar.Add("Ошибка при отправке письма. Свяжитесь с администратором", Severity.Error);
+    }
+
+    private async Task AvatarActions()
+    {
+        if (!await CheckSelf())
+            return;
+
+        var res = await DialogService.ShowAsync<AvatarActionsDialog>("Выберите действие", new DialogParameters { { "UserId", _user.Id } });
+        var result = await res.Result;
+        if (!result.Canceled)
+        {
+            NavigationManager.NavigateTo("/Cabinet", true);
+        }
     }
 
 }

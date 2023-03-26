@@ -121,7 +121,7 @@ else
         try
         {
             if (_isImageLoaded || _currentQuestion is null) return;
-            var stream = await ImageLoadingService.GetImageReadStreamAsync(_currentQuestion.ImageSource);
+            var stream = await ImageLoadingService.GetImageForExamQuestion(_currentQuestion.ImageSource);
             var dotnetImageStream = new DotNetStreamReference(stream);
             var res = await JsRuntime.InvokeAsync<bool>("getById", "ticket-image");
             if (res)

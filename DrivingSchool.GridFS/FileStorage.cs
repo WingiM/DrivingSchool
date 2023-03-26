@@ -14,8 +14,10 @@ public class FileStorage : IFileStorage
         _gridFs = new GridFSBucket(connection.Database);
     }
 
-    public async Task UploadFileAsync(string filename, Stream file)
+    public async Task UploadFileAsync(string filename, Stream file, bool mustBeSingle = false)
     {
+        if (mustBeSingle)
+            await DeleteExistingFiles(filename);
         await _gridFs.UploadFromStreamAsync(filename, file);
     }
 
@@ -25,5 +27,18 @@ public class FileStorage : IFileStorage
             await (await _gridFs.FindAsync(new ExpressionFilterDefinition<GridFSFileInfo>(x => x.Filename == filename)))
                 .SingleOrDefaultAsync() ?? throw new NotFoundException();
         return await _gridFs.OpenDownloadStreamAsync(file.Id);
+    }
+    
+    private async Task DeleteExistingFiles(string filename)
+    {
+        var existing = await _gridFs.FindAsync(Builders<GridFSFileInfo>.Filter.Eq(x => x.Filename, filename));
+        while (await existing.MoveNextAsync())
+        {
+            var files = existing.Current;
+            foreach (var existingFile in files)
+            {
+                await _gridFs.DeleteAsync(existingFile.Id);
+            }
+        }
     }
 }

@@ -2,6 +2,6 @@
 
 public interface IImageLoadingService
 {
-    public Task UploadImageAsync(string filename, Stream file);
-    public Task<Stream> GetImageReadStreamAsync(string? filename);
+    public Task<BaseResult> UploadImageAsync(string filename, Stream file);
+    public Task<Stream> GetImageForExamQuestion(string? filename);
 }
