@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Dapper;
 using DrivingSchool.Data.Extensions;
+using DrivingSchool.Data.Queries;
 using DrivingSchool.Domain.Constants;
 using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Exceptions;
@@ -138,43 +139,37 @@ public class UserRepository : BaseRepository, IUserRepository
 
     public async Task SetUserAvatarAsync(int userId, string fileName)
     {
-        var sql = "UPDATE public.user SET avatar = @fileName WHERE id = @id";
-        await Connection.ExecuteAsync(sql, new { id = userId, fileName });
+        await Connection.ExecuteAsync(UserRepositoryQueries.UpdateUserAvatar, new { id = userId, fileName });
     }
 
     public async Task<string?> GetUserAvatarAsync(int userId)
     {
-        var sql = "SELECT avatar FROM public.user WHERE id = @id";
-        return await Connection.QueryFirstOrDefaultAsync<string>(sql, new { id = userId });
+        return await Connection.QueryFirstOrDefaultAsync<string>(UserRepositoryQueries.GetUserAvatar, new { id = userId });
     }
 
     public async Task<string> GetUserDefaultAvatarAsync(int userId)
     {
-        var sql =
-            "SELECT claim_value FROM blazor_identity.user_claim WHERE user_id = (SELECT identity_id FROM public.user WHERE id=@id) AND claim_type = @claimType";
-        return await Connection.QuerySingleAsync<string>(sql,
+        return await Connection.QuerySingleAsync<string>(UserRepositoryQueries.GetUserDefaultAvatar,
             new { id = userId, claimType = UserDefaultClaims.AvatarLetters });
     }
 
     public async Task DeleteAvatarAsync(int userId)
     {
-        var sql = "UPDATE public.user SET avatar = null WHERE id = @id";
-        await Connection.ExecuteAsync(sql, new { id = userId });
+        await Connection.ExecuteAsync(UserRepositoryQueries.DeleteUserAvatar, new { id = userId });
     }
 
     public async Task DeleteUserAsync(int userId)
     {
-        await Connection.ExecuteAsync("UPDATE public.user SET is_deleted = true WHERE id = @id", new { id = userId });
+        await Connection.ExecuteAsync(UserRepositoryQueries.DeleteUser, new { id = userId });
     }
 
     public async Task<bool> IsUserDeletedAsync(int userId)
     {
-        return await Connection.QuerySingleAsync<bool>("SELECT is_deleted FROM public.user WHERE id = @id", new {id = userId});
+        return await Connection.QuerySingleAsync<bool>(UserRepositoryQueries.IsUserDeleted, new {id = userId});
     }
 
-    private Expression<Func<UserDb, object>> GetOrderProperty(string field)
-    {
-        return field switch
+    private static Expression<Func<UserDb, object>> GetOrderProperty(string field) =>
+        field switch
         {
             UserSortingField.Id => x => x.Id,
             UserSortingField.Name => x => x.Name,
@@ -182,5 +177,4 @@ public class UserRepository : BaseRepository, IUserRepository
             UserSortingField.Patronymic => x => x.Patronymic,
             _ => throw new ArgumentOutOfRangeException(nameof(field), field, null)
         };
-    }
 }
