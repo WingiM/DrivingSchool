@@ -1,50 +1,16 @@
-using System.Globalization;
-using System.Text;
-using DrivingSchool;
-using DrivingSchool.Data;
-using DrivingSchool.Domain;
-using DrivingSchool.GridFS;
-using DrivingSchool.HostedServices;
 using DrivingSchool.Middleware;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
-using MudBlazor.Services;
+using DrivingSchool.ServiceInstallation;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorPages();
-builder.Host.UseSerilog((hostingContext, loggerConfiguration) => 
+builder.Host.UseSerilog((hostingContext, loggerConfiguration) =>
     loggerConfiguration
         .ReadFrom
         .Configuration(hostingContext.Configuration)
         .WriteTo.Console()
 );
-builder.Services.AddServerSideBlazor();
-builder.Services.AddData(builder.Configuration.GetConnectionString("DefaultConnection")!);
-builder.Services.AddDomain(builder.Configuration);
-builder.Services.AddFileSystem(builder.Configuration);
-builder.Services.AddDefaultIdentity<IdentityUser<int>>(options =>
-    {
-        options.Password.RequireDigit = false;
-        options.Password.RequiredLength = 5;
-        options.Password.RequireLowercase = false;
-        options.Password.RequireUppercase = false;
-        options.Password.RequireNonAlphanumeric = false;
-    })
-    .AddRoles<IdentityRole<int>>()
-    .AddEntityFrameworkStores<ApplicationContext>();
-builder.Services.AddMudServices();
-builder.Services
-    .AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-builder.Services.AddHostedService<AddInitialUserHostedService>();
-builder.Services.AddHostedService<AddTicketsToDatabaseHostedService>();
-builder.Services.AddHostedService<UploadImagesHostedService>();
-Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-var cultureInfo = new CultureInfo("ru-RU");
-CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
-CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+builder.Services.InstallServices(builder.Configuration, typeof(IServiceInstaller).Assembly);
 
 var app = builder.Build();
 app.UseSerilogRequestLogging();
