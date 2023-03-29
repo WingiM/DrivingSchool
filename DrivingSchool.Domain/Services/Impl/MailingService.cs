@@ -70,7 +70,6 @@ public class MailingService : IMailingService
                 "Отправлено сообщение на почту {Email} с темой {Subject}. Количество вложений: {AttachmentCount}",
                 mailingMessage.ToEmail, mailingMessage.Subject, mailingMessage.Attachments.Length);
             await _smtpClient.DisconnectAsync(true);
-            _logger.LogError("Я отправил");
             return true;
         }
         catch (Exception e)
