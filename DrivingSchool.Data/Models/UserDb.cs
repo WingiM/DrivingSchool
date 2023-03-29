@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+// ReSharper disable CollectionNeverUpdated.Global
 
 namespace DrivingSchool.Data.Models;
 

@@ -5,7 +5,7 @@ namespace DrivingSchool.Domain.Services.Impl;
 
 public class ImageLoadingService : IImageLoadingService
 {
-    private static readonly string[] AcceptedFileExtensions = new[] { ".jpg", ".png", ".jpeg" };
+    private static readonly string[] AcceptedFileExtensions = { ".jpg", ".png", ".jpeg" };
     private const string DefaultDisplayImageName = "default.jpg";
 
     private readonly IFileStorage _fileStorage;

@@ -66,7 +66,7 @@
             var result = await SignInManager.CheckPasswordSignInAsync(user, _model.Password, true);
             if (result.Succeeded)
             {
-                Guid key = Guid.NewGuid();
+                var key = Guid.NewGuid();
                 AuthenticationMiddleware.Logins[key] = _model;
                 NavigationManager.NavigateTo($"/login?key={key}", true);
                 return;

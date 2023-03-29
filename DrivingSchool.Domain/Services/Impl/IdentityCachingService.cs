@@ -46,7 +46,7 @@ public class IdentityCachingService : IIdentityCachingService
 
     public Task<IdentityUser<int>?> GetByPhoneAsync(string phone)
     {
-        IdentityUser<int>? identityUser = _cache.TryGetValueByPhone(phone);
+        var identityUser = _cache.TryGetValueByPhone(phone);
         if (identityUser is null)
         {
             identityUser = _identityCachingRepository.FindIdentityByPhoneAsync(phone);

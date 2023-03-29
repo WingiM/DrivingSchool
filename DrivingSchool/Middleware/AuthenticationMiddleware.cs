@@ -6,7 +6,7 @@ namespace DrivingSchool.Middleware;
 
 public class AuthenticationMiddleware
 {
-    public static IDictionary<Guid, LoginCredentials> Logins { get; private set; }
+    public static IDictionary<Guid, LoginCredentials> Logins { get; }
         = new ConcurrentDictionary<Guid, LoginCredentials>();
 
 

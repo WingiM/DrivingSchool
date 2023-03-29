@@ -2,8 +2,8 @@
 
 public class DateTimeRange
 {
-    public required DateTime TimeStart { get; set; }
-    public required DateTime TimeEnd { get; set; }
+    public required DateTime TimeStart { get; init; }
+    public required DateTime TimeEnd { get; init; }
 
     public bool Overlaps(DateTimeRange other)
     {
