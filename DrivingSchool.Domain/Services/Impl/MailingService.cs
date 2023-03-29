@@ -11,6 +11,7 @@ public class MailingService : IMailingService
     private readonly MailSettings _mailSettings;
     private readonly ILogger<MailingService> _logger;
     private readonly ISmtpClient _smtpClient;
+    private static readonly SemaphoreSlim Semaphore = new(1, 1);
 
     public MailingService(ILogger<MailingService> logger, MailSettings mailSettings, ISmtpClient smtpClient)
     {
@@ -34,6 +35,7 @@ public class MailingService : IMailingService
     {
         try
         {
+            await Semaphore.WaitAsync();
             var message = new MimeMessage();
             message.Sender = MailboxAddress.Parse(_mailSettings.Mail);
             message.From.Add(new MailboxAddress(_mailSettings.DisplayName, _mailSettings.Mail));
@@ -68,13 +70,19 @@ public class MailingService : IMailingService
                 "Отправлено сообщение на почту {Email} с темой {Subject}. Количество вложений: {AttachmentCount}",
                 mailingMessage.ToEmail, mailingMessage.Subject, mailingMessage.Attachments.Length);
             await _smtpClient.DisconnectAsync(true);
+            _logger.LogError("Я отправил");
             return true;
         }
         catch (Exception e)
         {
-            _logger.LogError("При отправке email сообщения на почту {Email} произошла ошибка {Message}",
-                mailingMessage.ToEmail, e.Message);
+            _logger.LogError(@"При отправке email сообщения на почту {Email} произошла ошибка {Message}.
+                                        {Exception}",
+                mailingMessage.ToEmail, e.Message, e.ToString());
             return false;
+        }
+        finally
+        {
+            Semaphore.Release();
         }
     }
 }

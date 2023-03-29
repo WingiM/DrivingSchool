@@ -9,7 +9,7 @@ public static class ServiceCollectionExtensions
     {
         var serviceInstallers = assemblies
             .SelectMany(x => x.DefinedTypes)
-            .Where(x => x.IsAssignableTo(typeof(IServiceInstaller)))
+            .Where(x => x.IsAssignableTo(typeof(IServiceInstaller)) && x.IsClass)
             .Select(Activator.CreateInstance)
             .Cast<IServiceInstaller>();
         foreach (var installer in serviceInstallers)
