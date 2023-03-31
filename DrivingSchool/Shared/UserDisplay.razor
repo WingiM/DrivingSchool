@@ -60,8 +60,7 @@
                         </MudStack>
                     </Authorized>
                 </AuthorizeView>
-                <MudTextField @bind-Value="_userModel.PhoneNumber" InputType="InputType.Telephone"
-                              Mask="@(new PatternMask("+0 (000) 000 00-00"))" Label="Номер телефона" ReadOnly="true"/>
+                <MudTextField @bind-Value="_userModel.PhoneNumber" InputType="InputType.Telephone" Label="Номер телефона" ReadOnly="true"/>
             </MudCardContent>
             <MudCardActions>
                 @if (!ReadOnly)
@@ -88,16 +87,13 @@
                         <MudCardContent>
                             <MudStack Row="true">
                                 <MudTextField @bind-Value="_passportModel.Series" For="() => _passportModel.Series"
-                                              ReadOnly="ReadOnly" Label="Серия" Immediate="false"
-                                              Mask="@(new PatternMask("00 00") { CleanDelimiters = true })"/>
+                                              ReadOnly="ReadOnly" Label="Серия" Immediate="false"/>
                                 <MudTextField @bind-Value="_passportModel.Number" For="() => _passportModel.Number"
-                                              ReadOnly="ReadOnly" Label="Номер" Immediate="false"
-                                              Mask="@(new PatternMask("000 000") { CleanDelimiters = true })"/>
+                                              ReadOnly="ReadOnly" Label="Номер" Immediate="false"/>
                             </MudStack>
                             <MudStack Row="true">
                                 <MudTextField @bind-Value="_passportModel.IssuerCode" For="() => _passportModel.IssuerCode"
-                                              ReadOnly="ReadOnly" Label="Код подразделения" Immediate="false"
-                                              Mask="@(new PatternMask("000-000") { CleanDelimiters = true })"/>
+                                              ReadOnly="ReadOnly" Label="Код подразделения" Immediate="false"/>
                                 <MudDatePicker @bind-Date="_passportModel.IssueDate" OpenTo="OpenTo.Year"
                                                For="() => _passportModel.IssueDate" Label="Дата выдачи"
                                                ReadOnly="ReadOnly"/>

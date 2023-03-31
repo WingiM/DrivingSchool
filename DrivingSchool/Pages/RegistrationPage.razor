@@ -6,6 +6,7 @@
 @using IAuthorizationService = Domain.Services.IAuthorizationService;
 @using DrivingSchool.Domain.Extensions;
 @inject IAuthorizationService AuthorizationService;
+@inject ILogger<RegistrationPage> Logger;
 @attribute [Authorize(Roles = "Администратор")]
 
 <PageTitle>Регистрация пользователей</PageTitle>
@@ -23,7 +24,7 @@
             <MudDatePicker @bind-Date="_model.BirthDate" OpenTo="OpenTo.Year" MaxDate="DrivingSchoolRestrictions.MaximumBirthDate" For="() => _model.BirthDate" Label="Дата рождения"/>
             <MudTextField @bind-Value="_model.Email" For="() => _model.Email" Immediate="false" Label="Электронная почта"/>
             <MudTextField @bind-Value="_model.PhoneNumber" For="() => _model.PhoneNumber" Immediate="false"
-                          Label="Номер телефона" Mask="@(new PatternMask("+0 (000) 000 00-00") { CleanDelimiters = true })"/>
+                          Label="Номер телефона"/>
             <MudSelect @bind-Value="_model.Role" ToStringFunc="@_converter" Label="Роль пользователя" AnchorOrigin="Origin.BottomCenter"
                        For="() => _model.Role" Clearable>
                 @foreach (Roles role in Enum.GetValues(typeof(Roles)))
