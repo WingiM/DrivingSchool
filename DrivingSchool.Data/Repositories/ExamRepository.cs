@@ -4,7 +4,7 @@ namespace DrivingSchool.Data.Repositories;
 
 public class ExamRepository : BaseRepository, IExamRepository
 {
-    public ExamRepository(ApplicationContext context) : base(context)
+    public ExamRepository(ApplicationContext context, NpgsqlContext connection) : base(context, connection)
     {
     }
 

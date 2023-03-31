@@ -6,5 +6,5 @@ public enum Roles
 {
     [Display(Name = "Администратор")] Administrator = 1,
     [Display(Name = "Студент")] Student = 2,
-    [Display(Name = "Учитель")] Teacher = 3,
+    [Display(Name = "Учитель")] Teacher = 3
 }

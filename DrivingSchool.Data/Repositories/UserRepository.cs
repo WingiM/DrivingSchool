@@ -1,5 +1,8 @@
 ﻿using System.Linq.Expressions;
+using Dapper;
 using DrivingSchool.Data.Extensions;
+using DrivingSchool.Data.Queries;
+using DrivingSchool.Domain.Constants;
 using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Exceptions;
 using DrivingSchool.Domain.Services;
@@ -10,7 +13,8 @@ public class UserRepository : BaseRepository, IUserRepository
 {
     private readonly IIdentityCachingService _identityCachingService;
 
-    public UserRepository(ApplicationContext context, IIdentityCachingService identityCachingService) : base(context)
+    public UserRepository(ApplicationContext context, NpgsqlContext connection,
+        IIdentityCachingService identityCachingService) : base(context, connection)
     {
         _identityCachingService = identityCachingService;
     }
@@ -65,7 +69,8 @@ public class UserRepository : BaseRepository, IUserRepository
     {
         var property = GetOrderProperty(field);
         var filtered = Context.Users
-            .Where(x => string.Join(" ", x.Name, x.Surname, x.Patronymic).ToLower().Contains(searchText.ToLower()));
+            .Where(x => !x.IsDeleted && string.Join(" ", x.Name, x.Surname, x.Patronymic).ToLower()
+                .Contains(searchText.ToLower()));
         var users = await filtered
             .OrderBy(property, desc)
             .Skip(pageNumber * itemCount)
@@ -88,7 +93,7 @@ public class UserRepository : BaseRepository, IUserRepository
     public async Task<ListDataResult<User>> ListStudentsAsync(int itemCount, int pageNumber)
     {
         var filtered = Context.Users
-            .Where(x => x.RoleId == (int)Roles.Student);
+            .Where(x => !x.IsDeleted && x.RoleId == (int)Roles.Student);
         var users = await filtered
             .OrderBy(x => x.Id)
             .Skip(pageNumber * itemCount)
@@ -110,19 +115,7 @@ public class UserRepository : BaseRepository, IUserRepository
 
     public async Task<ListDataResult<UserGeneral>> ListStudentsAsync()
     {
-        var res = Context.Users.Where(x => x.RoleId == (int)Roles.Student);
-        return new ListDataResult<UserGeneral>
-        {
-            Success = true,
-            Items = await res 
-                .Select(x => EntityConverter.GetUserInitials(x))
-                .ToArrayAsync()
-        };
-    }
-
-    public async Task<ListDataResult<UserGeneral>> ListTeachersAsync()
-    {
-        var res = Context.Users.Where(x => x.RoleId == (int)Roles.Teacher);
+        var res = Context.Users.Where(x => !x.IsDeleted && x.RoleId == (int)Roles.Student);
         return new ListDataResult<UserGeneral>
         {
             Success = true,
@@ -132,9 +125,51 @@ public class UserRepository : BaseRepository, IUserRepository
         };
     }
 
-    private Expression<Func<UserDb, object>> GetOrderProperty(string field)
+    public async Task<ListDataResult<UserGeneral>> ListTeachersAsync()
     {
-        return field switch
+        var res = Context.Users.Where(x => !x.IsDeleted && x.RoleId == (int)Roles.Teacher);
+        return new ListDataResult<UserGeneral>
+        {
+            Success = true,
+            Items = await res
+                .Select(x => EntityConverter.GetUserInitials(x))
+                .ToArrayAsync()
+        };
+    }
+
+    public async Task SetUserAvatarAsync(int userId, string fileName)
+    {
+        await Connection.ExecuteAsync(UserRepositoryQueries.UpdateUserAvatar, new { id = userId, fileName });
+    }
+
+    public async Task<string?> GetUserAvatarAsync(int userId)
+    {
+        return await Connection.QueryFirstOrDefaultAsync<string>(UserRepositoryQueries.GetUserAvatar, new { id = userId });
+    }
+
+    public async Task<string> GetUserDefaultAvatarAsync(int userId)
+    {
+        return await Connection.QuerySingleAsync<string>(UserRepositoryQueries.GetUserDefaultAvatar,
+            new { id = userId, claimType = UserDefaultClaims.AvatarLetters });
+    }
+
+    public async Task DeleteAvatarAsync(int userId)
+    {
+        await Connection.ExecuteAsync(UserRepositoryQueries.DeleteUserAvatar, new { id = userId });
+    }
+
+    public async Task DeleteUserAsync(int userId)
+    {
+        await Connection.ExecuteAsync(UserRepositoryQueries.DeleteUser, new { id = userId });
+    }
+
+    public async Task<bool> IsUserDeletedAsync(int userId)
+    {
+        return await Connection.QuerySingleAsync<bool>(UserRepositoryQueries.IsUserDeleted, new {id = userId});
+    }
+
+    private static Expression<Func<UserDb, object>> GetOrderProperty(string field) =>
+        field switch
         {
             UserSortingField.Id => x => x.Id,
             UserSortingField.Name => x => x.Name,
@@ -142,5 +177,4 @@ public class UserRepository : BaseRepository, IUserRepository
             UserSortingField.Patronymic => x => x.Patronymic,
             _ => throw new ArgumentOutOfRangeException(nameof(field), field, null)
         };
-    }
 }

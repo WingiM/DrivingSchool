@@ -3,6 +3,7 @@
 @using DrivingSchool.Domain.Enums
 @using DrivingSchool.Domain.Extensions
 @using DrivingSchool.Domain.Results
+@inject IDialogService DialogService
 @inject IUserService UserService
 @inject IAuthorizationService AuthorizationService
 @inject IEncryptionService EncryptionService
@@ -53,6 +54,9 @@
         </MudTd>
         <MudTd DataLabel="Повторно отправить пароль">
             <MudButton OnClick="@(() => SendVerification(context))">Отправить</MudButton>
+        </MudTd>
+        <MudTd>
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteUser(context))"/>
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
@@ -115,6 +119,23 @@
         }
 
         Snackbar.Add("Ошибка при отправке письма. Свяжитесь с администратором", Severity.Error);
+    }
+
+    private async Task DeleteUser(User context)
+    {
+        var dialog = await DialogService.ShowAsync<ConfirmDeleteDialog>("Вы уверены?");
+        if ((await dialog.Result).Canceled)
+            return;
+
+        var res = await UserService.DeleteUserAsync(context);
+        if (!res.Success)
+        {
+            Snackbar.Add("Невозможно удалить пользователя", Severity.Error);
+            return;
+        }
+
+        Snackbar.Add("Пользователь успешно удален", Severity.Success);
+        await _table.ReloadServerData();
     }
 
 }

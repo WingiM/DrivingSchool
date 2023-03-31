@@ -13,4 +13,10 @@ public interface IUserRepository
     public Task<ListDataResult<User>> ListStudentsAsync(int itemCount, int pageNumber);
     public Task<ListDataResult<UserGeneral>> ListStudentsAsync();
     public Task<ListDataResult<UserGeneral>> ListTeachersAsync();
+    public Task SetUserAvatarAsync(int userId, string fileName);
+    public Task<string?> GetUserAvatarAsync(int userId);
+    public Task<string> GetUserDefaultAvatarAsync(int userId);
+    public Task DeleteAvatarAsync(int userId);
+    public Task DeleteUserAsync(int userId);
+    public Task<bool> IsUserDeletedAsync(int userId);
 }

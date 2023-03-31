@@ -6,9 +6,6 @@
 @inject IListService<TListEntity> ListService;
 
 <MudDialog>
-    <TitleContent>
-        @MudDialog.Title
-    </TitleContent>
     <DialogContent>
         <MudTable T="TListEntity" ServerData="GetData" Dense="true" Hover="true" Bordered="true" Striped="true"
                   @ref="_table" OnRowClick="x => RowClicked(x)">

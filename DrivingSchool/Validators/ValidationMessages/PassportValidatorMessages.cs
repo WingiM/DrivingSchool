@@ -1,6 +1,6 @@
 ﻿namespace DrivingSchool.Validators.ValidationMessages;
 
-public class PassportValidatorMessages
+public static class PassportValidatorMessages
 {
     public const string WrongSeries = "Неправильная серия паспорта";
     public const string WrongNumber = "Неправильный номер паспорта";

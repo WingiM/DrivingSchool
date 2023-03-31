@@ -60,11 +60,11 @@ else
             args.Attributes["style"] = $"background: {Colors.Red.Darken2}";
     }
 
-    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<DisplayLesson> args)
+    private async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<DisplayLesson> args)
     {
         if (args.Start < DateTime.Now)
             return;
-        var parameters = new DialogParameters() { ["Lesson"] = args.Data };
+        var parameters = new DialogParameters { ["Lesson"] = args.Data };
         var dialog = await DialogService.ShowAsync<LessonSignUpDialog>("Вы уверены?", parameters);
         var result = await dialog.Result;
 
@@ -74,7 +74,7 @@ else
             if (!res.Success)
                 Snackbar.Add($"Ошибка при записи на занятие: {res.Message}", Severity.Info);
             else
-                Snackbar.Add($"Запись прошла успешно", Severity.Success);
+                Snackbar.Add("Запись прошла успешно", Severity.Success);
             await LoadData();
         }
     }

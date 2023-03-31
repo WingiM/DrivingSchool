@@ -20,7 +20,7 @@ public class IdentityCachingRepository : BaseRepository, IIdentityCachingReposit
         return _set.FirstOrDefault(x => x.PhoneNumber == phone);
     }
 
-    public IdentityCachingRepository(ApplicationContext context) : base(context)
+    public IdentityCachingRepository(ApplicationContext context, NpgsqlContext connection) : base(context, connection)
     {
         _set = Context.Set<IdentityUser<int>>();
     }

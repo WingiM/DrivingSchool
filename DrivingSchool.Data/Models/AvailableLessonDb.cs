@@ -14,5 +14,5 @@ public class AvailableLessonDb : Entity
     public UserDb? Student { get; init; }
     
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public bool IsTaken { get; private set; }
+    public bool IsTaken { get; init; }
 }

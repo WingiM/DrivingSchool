@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+// ReSharper disable CollectionNeverUpdated.Global
 
 namespace DrivingSchool.Data.Models;
 
@@ -9,6 +10,7 @@ public class UserDb : Entity
     public required string Patronymic { get; init; }
     public DateTime BirthDate { get; init; }
     public int RoleId { get; init; }
+    public bool IsDeleted { get; init; }
     
     public required int IdentityId { get; init; }
     public IdentityUser<int> Identity { get; set; } = null!;

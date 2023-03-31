@@ -14,14 +14,14 @@ public static class EntityConverter
                 ? new UserGeneral
                 {
                     Name = lessonDb.Student.Name, Surname = lessonDb.Student.Surname,
-                    Patronymic = lessonDb.Student.Patronymic,
+                    Patronymic = lessonDb.Student.Patronymic
                 }
                 : null,
             TeacherInitials = !useStudentInitials && lessonDb.Teacher is not null
                 ? new UserGeneral
                 {
                     Name = lessonDb.Teacher.Name, Surname = lessonDb.Teacher.Surname,
-                    Patronymic = lessonDb.Teacher.Patronymic,
+                    Patronymic = lessonDb.Teacher.Patronymic
                 }
                 : null
         };
@@ -58,7 +58,7 @@ public static class EntityConverter
                 ? new UserGeneral
                 {
                     Name = lesson.Teacher.Name, Surname = lesson.Teacher.Surname,
-                    Patronymic = lesson.Teacher.Patronymic,
+                    Patronymic = lesson.Teacher.Patronymic
                 }
                 : null
         };
@@ -149,7 +149,7 @@ public static class EntityConverter
             AnswerText = questionAnswerDb.AnswerText,
             Id = questionAnswerDb.Id,
             IsCorrect = questionAnswerDb.IsCorrect,
-            QuestionId = questionAnswerDb.QuestionId,
+            QuestionId = questionAnswerDb.QuestionId
         };
     }
 
@@ -164,7 +164,7 @@ public static class EntityConverter
             {
                 Name = historyDb.User!.Name,
                 Surname = historyDb.User.Surname,
-                Patronymic = historyDb.User.Patronymic,
+                Patronymic = historyDb.User.Patronymic
             }
         };
     }

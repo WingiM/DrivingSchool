@@ -11,6 +11,7 @@ public class MailingService : IMailingService
     private readonly MailSettings _mailSettings;
     private readonly ILogger<MailingService> _logger;
     private readonly ISmtpClient _smtpClient;
+    private static readonly SemaphoreSlim Semaphore = new(1, 1);
 
     public MailingService(ILogger<MailingService> logger, MailSettings mailSettings, ISmtpClient smtpClient)
     {
@@ -34,6 +35,7 @@ public class MailingService : IMailingService
     {
         try
         {
+            await Semaphore.WaitAsync();
             var message = new MimeMessage();
             message.Sender = MailboxAddress.Parse(_mailSettings.Mail);
             message.From.Add(new MailboxAddress(_mailSettings.DisplayName, _mailSettings.Mail));
@@ -46,17 +48,15 @@ public class MailingService : IMailingService
 
             foreach (var file in mailingMessage.Attachments)
             {
-                if (file.Length > 0)
+                if (file.Length <= 0) continue;
+                byte[] fileBytes;
+                using (var ms = new MemoryStream())
                 {
-                    byte[] fileBytes;
-                    using (var ms = new MemoryStream())
-                    {
-                        await file.CopyToAsync(ms);
-                        fileBytes = ms.ToArray();
-                    }
-
-                    builder.Attachments.Add(file.FileName, fileBytes, ContentType.Parse(file.ContentType));
+                    await file.CopyToAsync(ms);
+                    fileBytes = ms.ToArray();
                 }
+
+                builder.Attachments.Add(file.FileName, fileBytes, ContentType.Parse(file.ContentType));
             }
 
             message.Body = builder.ToMessageBody();
@@ -74,9 +74,14 @@ public class MailingService : IMailingService
         }
         catch (Exception e)
         {
-            _logger.LogError("При отправке email сообщения на почту {Email} произошла ошибка {Message}",
-                mailingMessage.ToEmail, e.Message);
+            _logger.LogError(@"При отправке email сообщения на почту {Email} произошла ошибка {Message}.
+                                        {Exception}",
+                mailingMessage.ToEmail, e.Message, e.ToString());
             return false;
+        }
+        finally
+        {
+            Semaphore.Release();
         }
     }
 }

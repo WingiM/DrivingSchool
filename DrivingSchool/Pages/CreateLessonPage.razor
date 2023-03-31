@@ -60,8 +60,6 @@ else
     private MudForm _form = null!;
 
     private int _userId;
-    private UserGeneral[] _users = null!;
-
     private bool _usersInitialized;
     private bool _loading;
     private bool IsWithStudent { get; set; }
@@ -71,7 +69,6 @@ else
     {
         var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
         int.TryParse(user.Claims.First(x => x.Type == UserDefaultClaims.Id).Value, out _userId);
-        _users = (await UserService.ListStudentsAsync()).Items.ToArray();
         _usersInitialized = true;
     }
 
@@ -122,7 +119,7 @@ else
             return;
         }
 
-        Snackbar.Add($"Успешно создано новое занятие", Severity.Success);
+        Snackbar.Add("Успешно создано новое занятие", Severity.Success);
     }
 
 }

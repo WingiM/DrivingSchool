@@ -10,6 +10,8 @@
 @inject IPassportService PassportService
 @inject IEncryptionService EncryptionService
 @inject IAuthorizationService AuthorizationService
+@inject IDialogService DialogService;
+
 
 @if (_userLoaded)
 {
@@ -17,11 +19,15 @@
         <MudForm Model="@_userModel" @ref="@_userEditForm" Validation="@(_userValidator.ValidateValue)" ValidationDelay="0">
             <MudCardHeader>
                 <CardHeaderAvatar>
-                    <MudAvatar Color="Color.Primary" Size="Size.Large">
-                        @(_userClaims.FirstOrDefault(x => x.Type == UserDefaultClaims.AvatarLetters)?.Value ?? "D")
-                    </MudAvatar>
+                    <MudIconButton OnClick="() => AvatarActions()">
+                        <UserAvatar ImageId="@_avatarId" Size="Size.Large" UserId="@_user.Id"/>
+                    </MudIconButton>
                 </CardHeaderAvatar>
                 <CardHeaderContent>
+                    @if (_isDeleted)
+                    {
+                        <MudText Typo="Typo.h4" Color="Color.Primary">Пользователь удален</MudText>
+                    }
                     <MudStack Row="true">
                         <MudTextField @bind-Value="_userModel.Surname" ReadOnly="ReadOnly"
                                       For="() => _userModel.Surname" Immediate="false" Label="Фамилия"/>
@@ -54,8 +60,7 @@
                         </MudStack>
                     </Authorized>
                 </AuthorizeView>
-                <MudTextField @bind-Value="_userModel.PhoneNumber" InputType="InputType.Telephone" 
-                              Mask="@(new PatternMask("+0 (000) 000 00-00"))" Label="Номер телефона" ReadOnly="true"/>
+                <MudTextField @bind-Value="_userModel.PhoneNumber" InputType="InputType.Telephone" Label="Номер телефона" ReadOnly="true"/>
             </MudCardContent>
             <MudCardActions>
                 @if (!ReadOnly)
@@ -82,16 +87,13 @@
                         <MudCardContent>
                             <MudStack Row="true">
                                 <MudTextField @bind-Value="_passportModel.Series" For="() => _passportModel.Series"
-                                              ReadOnly="ReadOnly" Label="Серия" Immediate="false"
-                                              Mask="@(new PatternMask("00 00") { CleanDelimiters = true })"/>
+                                              ReadOnly="ReadOnly" Label="Серия" Immediate="false"/>
                                 <MudTextField @bind-Value="_passportModel.Number" For="() => _passportModel.Number"
-                                              ReadOnly="ReadOnly" Label="Номер" Immediate="false"
-                                              Mask="@(new PatternMask("000 000") { CleanDelimiters = true })"/>
+                                              ReadOnly="ReadOnly" Label="Номер" Immediate="false"/>
                             </MudStack>
                             <MudStack Row="true">
                                 <MudTextField @bind-Value="_passportModel.IssuerCode" For="() => _passportModel.IssuerCode"
-                                              ReadOnly="ReadOnly" Label="Код подразделения" Immediate="false"
-                                              Mask="@(new PatternMask("000-000") { CleanDelimiters = true })"/>
+                                              ReadOnly="ReadOnly" Label="Код подразделения" Immediate="false"/>
                                 <MudDatePicker @bind-Date="_passportModel.IssueDate" OpenTo="OpenTo.Year"
                                                For="() => _passportModel.IssueDate" Label="Дата выдачи"
                                                ReadOnly="ReadOnly"/>
@@ -157,6 +159,8 @@ else
     private bool _userLoaded;
     private User _user = null!;
     private IEnumerable<Claim> _userClaims = Enumerable.Empty<Claim>();
+    private string _avatarId = Guid.NewGuid().ToString("N");
+    private bool _isDeleted;
 
     protected override async Task OnInitializedAsync()
     {
@@ -165,6 +169,9 @@ else
         else
             _user = await UserService.GetUserByIdAsync(Id);
         _userClaims = await UserService.GetUserClaimsByIdAsync(_user.Identity.Id);
+        _isDeleted = await UserService.IsUserDeletedAsync(_user.Id);
+        if (_isDeleted)
+            ReadOnly = true;
 
         _userModel = new EditUser
         {
@@ -270,5 +277,17 @@ else
         Snackbar.Add("Ошибка при отправке письма. Свяжитесь с администратором", Severity.Error);
     }
 
-}
+    private async Task AvatarActions()
+    {
+        if (!await CheckSelf())
+            return;
 
+        var res = await DialogService.ShowAsync<AvatarActionsDialog>("Выберите действие", new DialogParameters { { "UserId", _user.Id } });
+        var result = await res.Result;
+        if (!result.Canceled)
+        {
+            NavigationManager.NavigateTo("/Cabinet", true);
+        }
+    }
+
+}

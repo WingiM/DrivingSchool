@@ -6,6 +6,7 @@
 @inject SignInManager<IdentityUser<int>> SignInManager
 @inject IIdentityCachingService IdentityCachingService
 @inject NavigationManager NavigationManager
+@inject IUserService UserService;
 
 <PageTitle>Авторизация</PageTitle>
 <MudCard>
@@ -52,13 +53,20 @@
             return;
         }
 
+        var appUser = await UserService.GetUserByLoginAsync(_model.Email);
+        var userBlocked = await UserService.IsUserDeletedAsync(appUser.Id);
+        if (userBlocked)
+        {
+            Snackbar.Add("Пользователя с такими данными не существует", Severity.Error);
+            return;
+        }
 
         if (await SignInManager.CanSignInAsync(user))
         {
             var result = await SignInManager.CheckPasswordSignInAsync(user, _model.Password, true);
             if (result.Succeeded)
             {
-                Guid key = Guid.NewGuid();
+                var key = Guid.NewGuid();
                 AuthenticationMiddleware.Logins[key] = _model;
                 NavigationManager.NavigateTo($"/login?key={key}", true);
                 return;

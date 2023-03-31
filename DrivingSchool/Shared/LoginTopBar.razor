@@ -5,9 +5,7 @@
     <Authorized>
         <div class="d-flex gap-4" style="align-items: center;justify-content: center;">
             <a class="appbar" href="Cabinet">
-                <MudAvatar Color="Color.Secondary">
-                    @(context.User.Claims.FirstOrDefault(x => x.Type == UserDefaultClaims.AvatarLetters)?.Value ?? "А")
-                </MudAvatar>
+                <UserAvatar ImageId="topbar-avatar" BackgroundColor="Color.Secondary"/>
             </a>
             <a style="cursor:pointer;" class="appbar" @onclick="() => Logout()">Выйти</a>
         </div>

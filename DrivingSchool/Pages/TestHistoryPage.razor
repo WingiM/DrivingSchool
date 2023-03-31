@@ -5,6 +5,7 @@
 @using System.Diagnostics
 @using DrivingSchool.Domain.Constants
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize(Roles = "Студент,Администратор")]
 
 <PageTitle>История прохождения тестов</PageTitle>
 @if (_isTeacher)

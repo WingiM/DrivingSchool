@@ -55,7 +55,7 @@ public class UploadImagesHostedService : IHostedService
         _logger.LogInformation("Images are already loaded. Skipping image initialization");
     }
 
-    private async Task LoadImagesToFileSystem(IServiceScope scope, ApplicationContext context)
+    private async Task LoadImagesToFileSystem(IServiceScope scope, DbContext context)
     {
         var imageService = scope.ServiceProvider.GetService<IImageLoadingService>();
 

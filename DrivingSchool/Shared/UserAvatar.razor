@@ -1,0 +1,75 @@
+﻿@using DrivingSchool.Domain.Constants
+@using System.Security.Claims
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthenticationState
+@inject IUserService UserService;
+@inject IJSRuntime JsRuntime
+@inject IImageLoadingService ImageLoadingService
+@inject ILogger<UserDisplay> Logger
+
+
+<MudAvatar Color="BackgroundColor" Size="@Size">
+    @if (_userAvatar is null)
+    {
+        @(_defaultAvatar)
+    }
+    else
+    {
+        <MudImage id="@ImageId" Style="@($"display: block;object-fit: contain; width:{_imageWidth}px; height: auto;")"/>
+    }
+</MudAvatar>
+
+@code {
+
+    [Parameter]
+    public string ImageId { get; set; } = null!;
+
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
+
+    [Parameter]
+    public int? UserId { get; set; }
+
+    [Parameter]
+    public Color BackgroundColor { get; set; } = Color.Primary;
+
+    private string _defaultAvatar = null!;
+    private string? _userAvatar;
+    private bool _avatarLoaded;
+    private int _imageWidth;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _imageWidth = Size switch {
+            Size.Small => 30,
+            Size.Medium => 40,
+            Size.Large => 60,
+            _ => throw new ArgumentOutOfRangeException()};
+        var userId = UserId ?? int.Parse((await AuthenticationState.GetAuthenticationStateAsync()).User.Claims.First(x => x.Type == UserDefaultClaims.Id).Value);
+        _defaultAvatar = await UserService.GetUserDefaultAvatarAsync(userId);
+        _userAvatar = await UserService.GetUserAvatarAsync(userId);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_userAvatar is null)
+            return;
+        try
+        {
+            if (_avatarLoaded) return;
+            var stream = await ImageLoadingService.GetImageForExamQuestion(_userAvatar);
+            var dotnetImageStream = new DotNetStreamReference(stream);
+            var res = await JsRuntime.InvokeAsync<bool>("getById", ImageId);
+            if (res)
+            {
+                await JsRuntime.InvokeVoidAsync("setImage", ImageId, dotnetImageStream);
+                _avatarLoaded = true;
+            }
+        }
+        catch (Exception)
+        {
+            Logger.LogError("Could not connect to file system");
+        }
+    }
+
+}

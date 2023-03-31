@@ -8,7 +8,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddFileSystem(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<MongoConnection>(x =>
+        services.AddSingleton<MongoConnection>(_ =>
             new MongoConnection(configuration["FileSystemSettings:ConnectionString"]!,
                 configuration["FileSystemSettings:DatabaseName"]!));
         services.AddScoped<IFileStorage, FileStorage>();

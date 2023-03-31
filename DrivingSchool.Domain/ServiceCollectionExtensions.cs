@@ -27,15 +27,15 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthorizationService, AuthorizationService>();
         services.AddScoped<IExamService, ExamService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
-        services.AddScoped<IUserService, UserService>();
+        services.AddTransient<IUserService, UserService>();
         services.AddScoped<IListService<UserGeneral>, UserGeneralListService>();
         services.AddScoped<IPassportService, PassportService>();
         services.AddScoped<IIdentityCachingService, IdentityCachingService>();
         services.AddScoped<IImageLoadingService, ImageLoadingService>();
         services.AddScoped<ILessonService, LessonService>();
 
-        services.AddTransient<ISmtpClient, SmtpClient>();
-        services.AddTransient<IMailingService, MailingService>();
+        services.AddScoped<ISmtpClient, SmtpClient>();
+        services.AddScoped<IMailingService, MailingService>();
 
         services.AddFluentValidationAutoValidation().AddValidatorsFromAssembly(typeof(PassportValidator).Assembly);
         return services;
