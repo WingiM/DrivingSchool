@@ -9,6 +9,7 @@
 @inject IJSRuntime JsRuntime
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ILogger<ExamTicketDisplay> Logger
+@implements IDisposable
 
 @if (_ticketLoaded)
 {
@@ -251,6 +252,11 @@ else
         if (questionAnswer.IsCorrect)
             return Colors.Green.Lighten1;
         return questionAnswer.Id == _selectedAnswer ? Colors.Red.Lighten1 : Colors.Grey.Lighten3;
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
     }
 
 }
