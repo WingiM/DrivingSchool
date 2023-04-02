@@ -24,16 +24,18 @@
     <RowTemplate>
         <AuthorizeView Roles="Учитель">
             <Authorized Context="_">
-                <MudLink Href="@($"/user/{context.UserId}")">
-                    @(string.Join(" ", context.User?.Surname, context.User?.Name, context.User?.Patronymic))
-                </MudLink>
+                <MudTd DataLabel="Студент">
+                    <MudLink Href="@($"/user/{context.UserId}")">
+                        @(string.Join(" ", context.User?.Surname, context.User?.Name, context.User?.Patronymic))
+                    </MudLink>
+                </MudTd>
             </Authorized>
         </AuthorizeView>
-        <MudTd>@context.Date</MudTd>
-        <MudTd>@context.TicketNumber</MudTd>
-        <MudTd>@context.TotalTime</MudTd>
-        <MudTd>@context.CorrectAnswers</MudTd>
-        <MudTd>@context.WrongAnswers</MudTd>
+        <MudTd DataLabel="Дата прохождения">@context.Date</MudTd>
+        <MudTd DataLabel="Номер билета">@context.TicketNumber</MudTd>
+        <MudTd DataLabel="Затрачено времени">@context.TotalTime</MudTd>
+        <MudTd DataLabel="Правильных ответов">@context.CorrectAnswers</MudTd>
+        <MudTd DataLabel="Неправильных ответов">@context.WrongAnswers</MudTd>
     </RowTemplate>
     <NoRecordsContent>
         <MudText>Не найдено записей</MudText>

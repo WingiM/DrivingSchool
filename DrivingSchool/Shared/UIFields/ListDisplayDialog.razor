@@ -17,21 +17,21 @@
                 }
                 @foreach (var field in _entityFields)
                 {
-                    <MudTh>@(typeof(TListEntity).GetProperty(field)!.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? field)</MudTh>
+                    <MudTh>@_entityFieldNames[field]</MudTh>
                 }
             </HeaderContent>
             <RowTemplate>
                 <MudCheckBox Checked="@(_selectedEntity?.Id == context.Id)" Disabled="true"/>
                 @if (ShowId)
                 {
-                    <MudTd>@context.Id</MudTd>
+                    <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
                 }
                 @foreach (var field in _entityFields)
                 {
                     var value = typeof(TListEntity).GetProperty(field)!.GetValue(context);
                     if (value is DateTime dt)
                         value = dt.ToString("d");
-                    <MudTd>
+                    <MudTd DataLabel="@_entityFieldNames[field]">
                         @value
                     </MudTd>
                 }
@@ -70,6 +70,7 @@
     private MudTable<TListEntity> _table = null!;
     private TListEntity? _selectedEntity;
     private IEnumerable<string> _entityFields = null!;
+    private IDictionary<string, string> _entityFieldNames = null!;
     private readonly Type[] _availableTypes = {typeof(string), typeof(int), typeof(DateTime), typeof(DateTime?)};
 
     protected override void OnInitialized()
@@ -78,6 +79,9 @@
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(x => _availableTypes.Contains(x.PropertyType) && x.Name != "Id")
             .Select(x => x.Name);
+        _entityFieldNames = _entityFields
+            .ToDictionary(x => x, 
+                x => typeof(TListEntity).GetProperty(x)!.GetCustomAttribute<DisplayNameAttribute>()?.DisplayName ?? x);
     }
 
     private async Task<TableData<TListEntity>> GetData(TableState state)
