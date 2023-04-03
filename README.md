@@ -70,6 +70,18 @@ ServiceCollectionExtensions
 (
 см. [DependencyProjectsServiceInstaller](DrivingSchool/ServiceInstallation/ServiceInstallers/DependencyProjectsServiceInstaller.cs)).
 
+В зависимости от состояния системы (таблица system_info.system_state в PostgreSQL) при запуске клиента будут
+запущены [программы инициализации](DrivingSchool/HostedServices).
+Для корректной работы в папке клиента должна лежать директория `Startups`, с поддиректориями:
+
+* `sqls` - SQL-скрипты, каждый содержащий данные для одного теоритического билета ГАИ (вставки в таблицы билетов,
+  вопросов и ответов);
+* `images` - изображения в форматах `.png`, `.jpg`, `.jpeg`, имеющие названия соответсвующие названиям картинок для
+  вопросов из скриптов в предыдущей папке. Также должен содержаться файл `default.jpg` - изображение, которое
+  отображается для вопросов без картинки;
+
+ После корректной инициализации приложения эти папки можно удалить.
+
 ### [DrivingSchool.Domain](DrivingSchool.Domain)
 
 Ядро приложения, содержит все основные бизнес-сущности, сервисы для их
@@ -132,10 +144,15 @@ ServiceCollectionExtensions
 * Выполнить в этой директории команду `docker compose up -d` для создания и запуска контейнеров.
 
 ### Примечания
-* Для корректного взаимодействия контейнеров между собой необходимо правильно указывать строки подключения к ним. Например, в compose-файле контейнер, содержащий базу данных, называется `storage`, поэтому для соединения приложения с ним необходимо в конфигурационном файле использовать примерно такую строку подключения:
-  * `"Host=storage;Port=5432;Database=driving_school;Username=postgres;Password=postgres;"`
-* Чтобы не запутаться в конфигурационных файлах при локальном запуске и запуске через Docker, можно создать 2 отдельных файла для разных конфигураций окружения (для Docker поменять переменную ASPNETCORE_ENVIRONMENT=xxx), например:
-  * `appsettings.Docker.json`;
-  * `appsettings.Development.json`;
-* В качестве SSL-сертификата можно использовать [self-signed сертификат](https://learn.microsoft.com/en-us/aspnet/core/security/docker-https#windows-using-linux-containers).
+
+* Для корректного взаимодействия контейнеров между собой необходимо правильно указывать строки подключения к ним.
+  Например, в compose-файле контейнер, содержащий базу данных, называется `storage`, поэтому для соединения приложения с
+  ним необходимо в конфигурационном файле использовать примерно такую строку подключения:
+    * `"Host=storage;Port=5432;Database=driving_school;Username=postgres;Password=postgres;"`
+* Чтобы не запутаться в конфигурационных файлах при локальном запуске и запуске через Docker, можно создать 2 отдельных
+  файла для разных конфигураций окружения (для Docker поменять переменную ASPNETCORE_ENVIRONMENT=xxx), например:
+    * `appsettings.Docker.json`;
+    * `appsettings.Development.json`;
+* В качестве SSL-сертификата можно
+  использовать [self-signed сертификат](https://learn.microsoft.com/en-us/aspnet/core/security/docker-https#windows-using-linux-containers).
 * Все пути в файле `.env` следует оказывать в UNIX-формате (используя знак `/` для разделения директорий) 
