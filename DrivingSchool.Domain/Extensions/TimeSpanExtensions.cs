@@ -6,4 +6,9 @@ public static class TimeSpanExtensions
     {
         return TimeSpan.FromHours(span.TotalHours * 0.75);
     }
+
+    public static bool Between(this TimeSpan span, TimeSpan first, TimeSpan second)
+    {
+        return span >= first && span <= second;
+    }
 }
