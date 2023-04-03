@@ -36,7 +36,7 @@
                         <MudTextField @bind-Value="_userModel.Patronymic" ReadOnly="ReadOnly"
                                       For="() => _userModel.Patronymic" Immediate="false" Label="Отчество"/>
                     </MudStack>
-                    <MudDatePicker @bind-Date="_userModel.BirthDate" OpenTo="OpenTo.Year"
+                    <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="_userModel.BirthDate" OpenTo="OpenTo.Year"
                                    MaxDate="DrivingSchoolRestrictions.MaximumBirthDate"
                                    For="() => _userModel.BirthDate" Label="Дата рождения"/>
                 </CardHeaderContent>
@@ -94,7 +94,7 @@
                             <MudStack Row="true">
                                 <MudTextField @bind-Value="_passportModel.IssuerCode" For="() => _passportModel.IssuerCode"
                                               ReadOnly="ReadOnly" Label="Код подразделения" Immediate="false"/>
-                                <MudDatePicker @bind-Date="_passportModel.IssueDate" OpenTo="OpenTo.Year"
+                                <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="_passportModel.IssueDate" OpenTo="OpenTo.Year"
                                                For="() => _passportModel.IssueDate" Label="Дата выдачи"
                                                ReadOnly="ReadOnly"/>
                             </MudStack>

@@ -22,9 +22,9 @@
         <MudForm Model="@_model" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
             <MudCardContent>
                 <MudSwitch @bind-Checked="@IsWithStudent" Label="Занятие с конкретным студентом" Color="Color.Primary"/>
-                <MudDatePicker @bind-Date="_model.Date" Label="Дата проведения занятия" OpenTo="OpenTo.Date"
+                <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="_model.Date" Label="Дата проведения занятия" OpenTo="OpenTo.Date"
                                MinDate="DateTime.Now.Date" For="() => _model.Date"/>
-                <MudTimePicker @bind-Time="_model.TimeStart" Label="Время начала занятия" OpenTo="OpenTo.Hours"
+                <MudTimePicker PickerVariant="PickerVariant.Dialog" @bind-Time="_model.TimeStart" Label="Время начала занятия" OpenTo="OpenTo.Hours"
                                For="() => _model.TimeStart"/>
                 <MudTimePicker @bind-Time="_model.Duration" Label="Длительность занятия" OpenTo="OpenTo.Hours"
                                For="() => _model.Duration"/>
