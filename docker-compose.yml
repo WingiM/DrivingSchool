@@ -47,12 +47,12 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: $ASPNETCORE_ENVIRONMENT
       ASPNETCORE_URLS: https://+;http://+;
-      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/aspnetapp.pfx
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/$CERTIFICATE_NAME
       ASPNETCORE_Kestrel__Certificates__Default__Password: $ASPNETCORE_Password
       TZ: Europe/Moscow
     stdin_open: true
     tty: true
     volumes:
       - type: bind
-        source: $USERPROFILE/.aspnet/https
+        source: $CERTIFICATE_PATH
         target: /https/
