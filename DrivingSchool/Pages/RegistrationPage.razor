@@ -21,7 +21,7 @@
             <MudTextField @bind-Value="_model.Surname" For="() => _model.Surname" Immediate="false" Label="Фамилия"/>
             <MudTextField @bind-Value="_model.Name" For="() => _model.Name" Immediate="false" Label="Имя"/>
             <MudTextField @bind-Value="_model.Patronymic" For="() => _model.Patronymic" Immediate="false" Label="Отчество"/>
-            <MudDatePicker @bind-Date="_model.BirthDate" OpenTo="OpenTo.Year" MaxDate="DrivingSchoolRestrictions.MaximumBirthDate" For="() => _model.BirthDate" Label="Дата рождения"/>
+            <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="_model.BirthDate" OpenTo="OpenTo.Year" MaxDate="DrivingSchoolRestrictions.MaximumBirthDate" For="() => _model.BirthDate" Label="Дата рождения"/>
             <MudTextField @bind-Value="_model.Email" For="() => _model.Email" Immediate="false" Label="Электронная почта"/>
             <MudTextField @bind-Value="_model.PhoneNumber" For="() => _model.PhoneNumber" Immediate="false"
                           Label="Номер телефона"/>

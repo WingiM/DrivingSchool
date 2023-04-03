@@ -2,6 +2,7 @@
 @using DrivingSchool.Data
 @using DrivingSchool.Domain.Constants
 @using DrivingSchool.Domain.Enums
+@using DrivingSchool.Domain.Extensions
 @using DrivingSchool.Domain.Results
 @using DrivingSchool.Validators
 @using DrivingSchool.Validators.ValidationMessages
@@ -22,12 +23,12 @@
         <MudForm Model="@_model" @ref="@_form" Validation="@(_validator.ValidateValue)" ValidationDelay="0">
             <MudCardContent>
                 <MudSwitch @bind-Checked="@IsWithStudent" Label="Занятие с конкретным студентом" Color="Color.Primary"/>
-                <MudDatePicker @bind-Date="_model.Date" Label="Дата проведения занятия" OpenTo="OpenTo.Date"
+                <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="_model.Date" Label="Дата проведения занятия" OpenTo="OpenTo.Date"
                                MinDate="DateTime.Now.Date" For="() => _model.Date"/>
-                <MudTimePicker @bind-Time="_model.TimeStart" Label="Время начала занятия" OpenTo="OpenTo.Hours"
+                <MudTimePicker PickerVariant="PickerVariant.Dialog" @bind-Time="_model.TimeStart" Label="Время начала занятия" OpenTo="OpenTo.Hours"
                                For="() => _model.TimeStart"/>
-                <MudTimePicker @bind-Time="_model.Duration" Label="Длительность занятия" OpenTo="OpenTo.Hours"
-                               For="() => _model.Duration"/>
+                <MudNumericField @bind-Value="_model.Duration" Label="Длительность занятия (в академических часах)"
+                               For="() => _model.Duration" Min="1" Max="4"/>
                 <ListDisplay TListEntity="UserGeneral" TOutValue="int?" @bind-Value="_model.StudentId" ValueCallback="x => x.Id" 
                              DisplayCallback="@(x => string.Join(" ", x.Surname, x.Name, x.Patronymic))" 
                              Filter="x => x.Role == Roles.Student" Label="Студент" Disabled="@(!IsWithStudent)"/>
@@ -95,7 +96,8 @@ else
 
             var lesson = new StudentLesson
             {
-                StudentId = _model.StudentId!.Value, Date = _model.Date!.Value, Duration = _model.Duration!.Value,
+                StudentId = _model.StudentId!.Value, Date = _model.Date!.Value, 
+                Duration = TimeSpan.FromHours(_model.Duration!.Value).ToAcademicHours(),
                 TimeStart = _model.TimeStart!.Value, TeacherId = _userId
             };
 
@@ -105,7 +107,7 @@ else
         {
             var lesson = new AvailableLesson
             {
-                Date = _model.Date!.Value, Duration = _model.Duration!.Value,
+                Date = _model.Date!.Value, Duration = TimeSpan.FromHours(_model.Duration!.Value).ToAcademicHours(),
                 TimeStart = _model.TimeStart!.Value, TeacherId = _userId
             };
 
