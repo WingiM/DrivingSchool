@@ -1,0 +1,67 @@
+﻿@page "/lessons"
+@using DrivingSchool.Domain.Constants
+@using DrivingSchool.Data
+@using DrivingSchool.Domain.Enums
+@using DrivingSchool.Domain.Extensions
+@using System.Security.Claims
+@using DrivingSchool.BlazorWebClient.Data
+@inject ILessonService LessonService
+@inject AuthenticationStateProvider AuthenticationStateProvider 
+@attribute [Authorize(Roles = "Учитель,Студент")]
+
+<PageTitle>Просмотр занятий</PageTitle>
+@if (_lessonsInitialized)
+{
+    <RadzenScheduler Style="height: 90vh;" TItem="DisplayLesson" Data="_lessons" StartProperty="TimeStart" EndProperty="TimeEnd" 
+                     Date="DateTime.Now.Date" TextProperty="Text" TodayText="Сегодня" AppointmentRender="OnAppointmentRender">
+        <RadzenDayView Text="День" TimeFormat="HH:mm" StartTime="TimeSpan.Zero"/>
+        <RadzenWeekView Text="Неделя" TimeFormat="HH:mm" StartTime="TimeSpan.Zero"/>
+    </RadzenScheduler>
+}
+else
+{
+    <div style="transform: translateY(25%); text-align: center">
+        <MudProgressCircular Style="width: 40%; height: 40%;" Color="Color.Primary" Indeterminate="true"/>
+    </div>
+}
+
+
+@code {
+    private int _userId;
+    private bool _lessonsInitialized;
+
+    private DisplayLesson[] _lessons = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User;
+        var userRole = user.Claims.First(x => x.Type == ClaimTypes.Role);
+        var isTeacher = userRole.Value == Roles.Teacher.GetDisplayName();
+        int.TryParse(user.Claims.First(x => x.Type == UserDefaultClaims.Id).Value, out _userId);
+        if (isTeacher)
+        {
+            var res = (await LessonService.ListLessonsForTeacherAsync(_userId)).Items;
+            _lessons = res.Select(x => new DisplayLesson
+            {
+                TimeStart = x.LessonStartDateTime, TimeEnd = x.LessonEndDateTime, 
+                Text = x is StudentLesson sl ? sl.StudentInitials!.ToString() : string.Empty
+            }).ToArray();
+        }
+        else
+        {
+            _lessons = (await LessonService.ListLessonsForStudentAsync(_userId)).Items.Select(x => new DisplayLesson
+            {
+                TimeStart = x.LessonStartDateTime, TimeEnd = x.LessonEndDateTime, Text = x.TeacherInitials!.ToString()
+            }).ToArray();
+        }
+        _lessonsInitialized = true;
+    }
+
+    private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<DisplayLesson> args)
+    {
+        if (args.Start < DateTime.Now)
+            args.Attributes["style"] = $"background: {Colors.Grey.Darken2}";
+        else
+            args.Attributes["style"] = $"background: {Colors.Red.Darken2}";
+    }
+}

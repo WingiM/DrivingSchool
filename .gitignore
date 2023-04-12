@@ -5,6 +5,5 @@ drivingSchool.sql
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
-DrivingSchool/appsettings.development.json
-DrivingSchool/appsettings.docker.json
-DrivingSchool/Startups/
+appsettings.*.json
+DrivingSchool.BlazorWebClient/Startups/
