@@ -23,16 +23,20 @@ public abstract class BaseRepository
         res = Context.Set<T>().FirstOrDefault(filter);
         return res;
     }
-    
-    protected IList<T> GetPossiblyTrackedEntities<T>(Expression<Func<T, bool>> filter) where T : class
+
+    protected IList<T> GetPossiblyTrackedEntities<T>(Expression<Func<T, bool>> idFilter) where T : class
     {
         var idProperty = typeof(T).GetProperty("Id") ?? throw new NotFoundException();
         var fromTracker = Context.ChangeTracker.Entries<T>()
-            .Where(x => filter.Compile()(x.Entity))
+            .Where(x => idFilter.Compile()(x.Entity))
             .Select(x => x.Entity)
             .ToList();
-        var fromTrackerIds = fromTracker.Select(x => (int)idProperty.GetValue(x)!);
-        var fromDatabase = Context.Set<T>().Where(filter).ToList().Where(x => !fromTrackerIds.Contains((int)idProperty.GetValue(x)!));
+        var fromTrackerIds = fromTracker.Select(x => (int) idProperty.GetValue(x)!);
+        var fromDatabase = Context
+            .Set<T>()
+            .Where(idFilter)
+            .ToList()
+            .Where(x => !fromTrackerIds.Contains((int) idProperty.GetValue(x)!));
         return fromTracker.Concat(fromDatabase).ToList();
     }
 }
