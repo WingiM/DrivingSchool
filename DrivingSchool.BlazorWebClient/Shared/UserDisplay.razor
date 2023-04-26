@@ -1,0 +1,294 @@
+﻿@using System.Security.Claims
+@using DrivingSchool.BlazorWebClient.Data
+@using DrivingSchool.BlazorWebClient.Validators
+@using DrivingSchool.Data
+@using DrivingSchool.Domain.Constants
+@using Microsoft.AspNetCore.Identity
+@using IAuthorizationService = DrivingSchool.Domain.Services.IAuthorizationService
+@inject NavigationManager NavigationManager
+@inject IUserService UserService
+@inject AuthenticationStateProvider AuthenticationState
+@inject IPassportService PassportService
+@inject IEncryptionService EncryptionService
+@inject IAuthorizationService AuthorizationService
+@inject IDialogService DialogService;
+
+
+@if (_userLoaded)
+{
+    <MudCard>
+        <MudForm Model="@_userModel" @ref="@_userEditForm" Validation="@(_userValidator.ValidateValue)" ValidationDelay="0">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudIconButton OnClick="() => AvatarActions()">
+                        <UserAvatar ImageId="@_avatarId" Size="Size.Large" UserId="@_user.Id"/>
+                    </MudIconButton>
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    @if (_isDeleted)
+                    {
+                        <MudText Typo="Typo.h4" Color="Color.Primary">Пользователь удален</MudText>
+                    }
+                    <MudStack Row="true">
+                        <MudTextField @bind-Value="_userModel.Surname" ReadOnly="ReadOnly"
+                                      For="() => _userModel.Surname" Immediate="false" Label="Фамилия"/>
+                        <MudTextField @bind-Value="_userModel.Name" ReadOnly="ReadOnly"
+                                      For="() => _userModel.Name" Immediate="false" Label="Имя"/>
+                        <MudTextField @bind-Value="_userModel.Patronymic" ReadOnly="ReadOnly"
+                                      For="() => _userModel.Patronymic" Immediate="false" Label="Отчество"/>
+                    </MudStack>
+                    <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="_userModel.BirthDate" OpenTo="OpenTo.Year"
+                                   MaxDate="DrivingSchoolRestrictions.MaximumBirthDate"
+                                   For="() => _userModel.BirthDate" Label="Дата рождения"/>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTextField @bind-Value="_userModel.Email" InputType="InputType.Email"
+                              Label="Электронная почта" ReadOnly="ReadOnly"/>
+                <AuthorizeView Roles="Администратор">
+                    <Authorized>
+                        <MudStack Row="true">
+                            <MudText>Статус верификации:</MudText>
+                            @if (_user.Identity.EmailConfirmed)
+                            {
+                                <MudText Color="Color.Success">Верифицирован</MudText>
+                            }
+                            else
+                            {
+                                <MudText Color="Color.Error">Не верифицирован</MudText>
+                                <MudButton OnClick="SendVerification">Повторно отправить сообщение на почту</MudButton>
+                            }
+                        </MudStack>
+                    </Authorized>
+                </AuthorizeView>
+                <MudTextField @bind-Value="_userModel.PhoneNumber" InputType="InputType.Telephone" Label="Номер телефона" ReadOnly="true"/>
+            </MudCardContent>
+            <MudCardActions>
+                @if (!ReadOnly)
+                {
+                    <MudButton Disabled="@_formLoading" Variant="Variant.Filled" Color="Color.Primary"
+                               OnClick="async () => await SaveUserChanges()">
+                        Сохранить изменения
+                    </MudButton>
+                    @if (_formLoading)
+                    {
+                        <MudProgressCircular Style="margin-left: 10px;" Color="Color.Primary" Indeterminate="true"/>
+                    }
+                }
+            </MudCardActions>
+        </MudForm>
+    </MudCard>
+    <MudExpansionPanels MultiExpansion="true">
+        @if (CanViewPassport)
+        {
+            <MudExpansionPanel Text="Паспортные данные">
+                <MudCard>
+                    <MudForm Model="@_passportModel" @ref="@_passportEditForm"
+                             Validation="@(_passportValidator.ValidateValue)" ValidationDelay="0">
+                        <MudCardContent>
+                            <MudStack Row="true">
+                                <MudTextField @bind-Value="_passportModel.Series" For="() => _passportModel.Series"
+                                              ReadOnly="ReadOnly" Label="Серия" Immediate="false"/>
+                                <MudTextField @bind-Value="_passportModel.Number" For="() => _passportModel.Number"
+                                              ReadOnly="ReadOnly" Label="Номер" Immediate="false"/>
+                            </MudStack>
+                            <MudStack Row="true">
+                                <MudTextField @bind-Value="_passportModel.IssuerCode" For="() => _passportModel.IssuerCode"
+                                              ReadOnly="ReadOnly" Label="Код подразделения" Immediate="false"/>
+                                <MudDatePicker PickerVariant="PickerVariant.Dialog" @bind-Date="_passportModel.IssueDate" OpenTo="OpenTo.Year"
+                                               For="() => _passportModel.IssueDate" Label="Дата выдачи"
+                                               ReadOnly="ReadOnly"/>
+                            </MudStack>
+                            <MudTextField @bind-Value="_passportModel.IssuedBy" For="() => _passportModel.IssuedBy"
+                                          ReadOnly="ReadOnly" Label="Кем выдано" Immediate="false"
+                                          Placeholder="Точно по паспорту" Variant="Variant.Text"/>
+                            <MudTextField @bind-Value="_passportModel.PlaceOfBirth" For="() => _passportModel.PlaceOfBirth"
+                                          ReadOnly="ReadOnly" Label="Место рождения" Immediate="false" Variant="Variant.Text"/>
+                        </MudCardContent>
+                        <MudCardActions>
+                            @if (!ReadOnly)
+                            {
+                                <MudButton Disabled="@_formLoading" Variant="Variant.Filled" Color="Color.Primary"
+                                           OnClick="async () => await SavePassportChanges()">
+                                    Сохранить изменения
+                                </MudButton>
+                                @if (_formLoading)
+                                {
+                                    <MudProgressCircular Style="margin-left: 10px;" Color="Color.Primary" Indeterminate="true"/>
+                                }
+                            }
+                        </MudCardActions>
+                    </MudForm>
+                </MudCard>
+            </MudExpansionPanel>
+        }
+    </MudExpansionPanels>
+}
+else
+{
+    <div style="transform: translateY(25%); text-align: center">
+        <MudProgressCircular Style="width: 40%; height: 40%;" Color="Color.Primary" Indeterminate="true"/>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    [Parameter]
+    public string? Login { get; set; }
+
+    [Parameter]
+    public bool CanViewPassport { get; set; } = true;
+
+    [Inject]
+    ISnackbar Snackbar { get; set; } = null!;
+
+    MudForm _userEditForm = null!;
+    readonly EditUserValidator _userValidator = new();
+    private EditUser _userModel = null!;
+
+    MudForm _passportEditForm = null!;
+    readonly EditPassportValidator _passportValidator = new();
+    private EditPassport _passportModel = new();
+
+    private bool _formLoading;
+    private bool _userLoaded;
+    private User _user = null!;
+    private IEnumerable<Claim> _userClaims = Enumerable.Empty<Claim>();
+    private string _avatarId = Guid.NewGuid().ToString("N");
+    private bool _isDeleted;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Login is not null)
+            _user = await UserService.GetUserByLoginAsync(Login);
+        else
+            _user = await UserService.GetUserByIdAsync(Id);
+        _userClaims = await UserService.GetUserClaimsByIdAsync(_user.Identity.Id);
+        _isDeleted = await UserService.IsUserDeletedAsync(_user.Id);
+        if (_isDeleted)
+            ReadOnly = true;
+
+        _userModel = new EditUser
+        {
+            BirthDate = _user.BirthDate, Name = _user.Name, Patronymic = _user.Patronymic, Surname = _user.Surname,
+            Email = _user.Identity.Email!, PhoneNumber = _user.Identity.PhoneNumber!
+        };
+
+        var passport = _user.Passport;
+        if (passport is not null)
+        {
+            _passportModel = new EditPassport
+            {
+                Id = passport.Id, Number = passport.Number, Series = passport.Series, IssueDate = passport.IssueDate,
+                IssuerCode = passport.IssuerCode, IssuedBy = passport.IssuedBy, PlaceOfBirth = passport.PlaceOfBirth
+            };
+        }
+
+        _userLoaded = true;
+    }
+
+    private async Task SaveUserChanges()
+    {
+        _formLoading = true;
+        await _userEditForm.Validate();
+        if (!_userEditForm.IsValid)
+        {
+            Snackbar.Add("Не все данные заполнены верно!");
+            _formLoading = false;
+            return;
+        }
+        var user = new User
+        {
+            Surname = _userModel.Surname, Name = _userModel.Name,
+            Patronymic = _userModel.Patronymic, BirthDate = _userModel.BirthDate!.Value,
+            Id = Id == 0 ? _user.Id : Id, Identity = _user.Identity, Role = _user.Role
+        };
+        if (_user.Identity.Email != _userModel.Email)
+        {
+            _userModel.EmailUpdated = true;
+            _user.Identity.Email = _userModel.Email;
+        }
+
+        var res = await UserService.UpdateUserAsync(user, _userModel.EmailUpdated);
+        _formLoading = false;
+        if (!res.Success)
+        {
+            Snackbar.Add($"Ошибка сохранения: {res.Message}", Severity.Error);
+            return;
+        }
+        Snackbar.Add("Успешно сохранено", Severity.Success);
+        if (_userModel.EmailUpdated && await CheckSelf())
+        {
+            await AuthorizationService.VerifyUserAsync(user, EncryptionService.GeneratePasswordForUser());
+            NavigationManager.NavigateTo("/logout", true);
+        }
+    }
+
+    private async Task<bool> CheckSelf()
+    {
+        var identity = (await AuthenticationState.GetAuthenticationStateAsync()).User;
+        return Id.ToString() == identity.Claims.First(x => x.Type == UserDefaultClaims.Id).Value
+               || Login == identity.Claims.First(x => x.Type == ClaimTypes.Name).Value;
+    }
+
+    private async Task SavePassportChanges()
+    {
+        _formLoading = true;
+        await _passportEditForm.Validate();
+        if (!_passportEditForm.IsValid)
+        {
+            Snackbar.Add("Не все данные заполнены верно!");
+            _formLoading = false;
+            return;
+        }
+        _formLoading = true;
+        var passport = new Passport
+        {
+            Series = _passportModel.Series, Number = _passportModel.Number,
+            IssueDate = _passportModel.IssueDate!.Value, IssuedBy = _passportModel.IssuedBy,
+            IssuerCode = _passportModel.IssuerCode, PlaceOfBirth = _passportModel.PlaceOfBirth,
+            UserId = Id == 0 ? _user.Id : Id, Id = _user.Passport?.Id ?? 0
+        };
+
+        var res = await PassportService.AddOrUpdatePassportAsync(passport);
+        _formLoading = false;
+        if (!res.Success)
+        {
+            Snackbar.Add($"Ошибка сохранения: {res.Message}", Severity.Error);
+            return;
+        }
+        Snackbar.Add("Успешно сохранено", Severity.Success);
+    }
+
+    private async Task SendVerification()
+    {
+        var res = await AuthorizationService.VerifyUserAsync(_user, EncryptionService.GeneratePasswordForUser());
+        if (res)
+        {
+            Snackbar.Add("Письмо отправлено успешно", Severity.Success);
+            return;
+        }
+
+        Snackbar.Add("Ошибка при отправке письма. Свяжитесь с администратором", Severity.Error);
+    }
+
+    private async Task AvatarActions()
+    {
+        if (!await CheckSelf())
+            return;
+
+        var res = await DialogService.ShowAsync<AvatarActionsDialog>("Выберите действие", new DialogParameters { { "UserId", _user.Id } });
+        var result = await res.Result;
+        if (!result.Canceled)
+        {
+            NavigationManager.NavigateTo("/Cabinet", true);
+        }
+    }
+
+}
