@@ -35,13 +35,13 @@ public class UserRepository : BaseRepository, IUserRepository
 
     public Task<bool> IsUserExistsByPhoneNumberAsync(string phoneNumber)
     {
-        var entity = TryGetSingleEntityFromChangeTrackerAsync<IdentityUser<int>>(x => x.PhoneNumber == phoneNumber);
+        var entity = GetPossiblyTrackedEntity<IdentityUser<int>>(x => x.PhoneNumber == phoneNumber);
         return Task.FromResult(entity is not null);
     }
 
     public async Task<User?> GetUserByLoginAsync(string login)
     {
-        var identity = TryGetSingleEntityFromChangeTrackerAsync<IdentityUser<int>>(x => x.Email == login);
+        var identity = GetPossiblyTrackedEntity<IdentityUser<int>>(x => x.Email == login);
         if (identity is null)
             return null;
 
@@ -60,7 +60,7 @@ public class UserRepository : BaseRepository, IUserRepository
         var user = await Context.Users
             .Include(x => x.Passport)
             .SingleOrDefaultAsync(x => x.Id == id) ?? throw new NotFoundException();
-        var identity = TryGetSingleEntityFromChangeTrackerAsync<IdentityUser<int>>(x => x.Id == user.IdentityId);
+        var identity = GetPossiblyTrackedEntity<IdentityUser<int>>(x => x.Id == user.IdentityId);
         user.Identity = identity!;
 
         return EntityConverter.ConvertUser(user);
@@ -78,10 +78,8 @@ public class UserRepository : BaseRepository, IUserRepository
             .Skip(pageNumber * itemCount)
             .Take(itemCount)
             .ToListAsync();
-        var identities = users
-            .Select(x => x.IdentityId)
-            .Select(x => TryGetSingleEntityFromChangeTrackerAsync<IdentityUser<int>>(z => z.Id == x)!)
-            .ToList();
+        var ids = users.Select(x => x.IdentityId).ToList();
+        var identities = GetPossiblyTrackedEntities<IdentityUser<int>>(x => ids.Contains(x.Id));
         foreach (var user in users)
         {
             user.Identity = identities.Single(x => user.IdentityId == x.Id);
@@ -105,7 +103,7 @@ public class UserRepository : BaseRepository, IUserRepository
             .ToListAsync();
         var identities = users
             .Select(x => x.IdentityId)
-            .Select(x => TryGetSingleEntityFromChangeTrackerAsync<IdentityUser<int>>(z => z.Id == x)!)
+            .Select(x => GetPossiblyTrackedEntity<IdentityUser<int>>(z => z.Id == x)!)
             .ToList();
         foreach (var user in users)
         {
