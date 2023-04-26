@@ -14,7 +14,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPassportRepository, PassportRepository>();
         services.AddScoped<IExamRepository, ExamRepository>();
         services.AddScoped<ILessonRepository, LessonRepository>();
-        services.AddScoped<IIdentityCachingRepository, IdentityCachingRepository>();
         services.AddDbContext<ApplicationContext>(options =>
         {
             options.UseNpgsql(connectionString,

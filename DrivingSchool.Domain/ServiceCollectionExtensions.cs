@@ -22,7 +22,6 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton(userSecrets);
         services.AddSingleton(mailSettings);
-        services.AddSingleton<IdentityCache>();
 
         services.AddScoped<IAuthorizationService, AuthorizationService>();
         services.AddScoped<IExamService, ExamService>();
@@ -30,7 +29,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUserService, UserService>();
         services.AddScoped<IListService<UserGeneral>, UserGeneralListService>();
         services.AddScoped<IPassportService, PassportService>();
-        services.AddScoped<IIdentityCachingService, IdentityCachingService>();
         services.AddScoped<IImageLoadingService, ImageLoadingService>();
         services.AddScoped<ILessonService, LessonService>();
 
