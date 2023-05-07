@@ -57,25 +57,32 @@ public class UploadImagesHostedService : IHostedService
 
     private async Task LoadImagesToFileSystem(IServiceScope scope, DbContext context)
     {
-        var imageService = scope.ServiceProvider.GetService<IImageLoadingService>();
-
-        if (imageService is null)
-            throw new Exception();
-
-        foreach (var filename in Directory.GetFiles(ImagesPath))
+        try
         {
-            var name = Path.GetFileName(filename);
-            if (!SupportedImageTypes.Contains(Path.GetExtension(name)))
+            var imageService = scope.ServiceProvider.GetService<IImageLoadingService>();
+
+            if (imageService is null)
+                throw new Exception();
+
+            foreach (var filename in Directory.GetFiles(ImagesPath))
             {
-                _logger.LogWarning("Skipping file {Filename} because its extension is not supported", name);
-                continue;
+                var name = Path.GetFileName(filename);
+                if (!SupportedImageTypes.Contains(Path.GetExtension(name)))
+                {
+                    _logger.LogWarning("Skipping file {Filename} because its extension is not supported", name);
+                    continue;
+                }
+
+                await imageService.UploadImageAsync(name, File.Open(filename, FileMode.Open));
             }
 
-            await imageService.UploadImageAsync(name, File.Open(filename, FileMode.Open));
+            await context.Database.ExecuteSqlAsync($"UPDATE system_info.system_state SET images_loaded = true");
+            _logger.LogInformation("All images uploaded to file system successfully");
         }
-
-        await context.Database.ExecuteSqlAsync($"UPDATE system_info.system_state SET images_loaded = true");
-        _logger.LogInformation("All images uploaded to file system successfully");
+        catch (TimeoutException)
+        {
+            _logger.LogWarning("File system could not be reached. Skipping image initialization");
+        }
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
