@@ -1,11 +1,9 @@
 ﻿@page "/login"
 @using Microsoft.AspNetCore.Identity
-@using DrivingSchool.Data
 @using DrivingSchool.BlazorWebClient.Validators
 @using DrivingSchool.BlazorWebClient.Data
 @using DrivingSchool.BlazorWebClient.Middleware
 @inject SignInManager<IdentityUser<int>> SignInManager
-@inject IIdentityCachingService IdentityCachingService
 @inject NavigationManager NavigationManager
 @inject IUserService UserService;
 
@@ -47,24 +45,23 @@
             return;
         }
 
-        var user = await IdentityCachingService.GetByEmailAsync(_model.Email);
+        var user = await UserService.GetUserByLoginAsync(_model.Email);
         if (user is null)
         {
             Snackbar.Add("Пользователя с такими данными не существует", Severity.Error);
             return;
         }
 
-        var appUser = await UserService.GetUserByLoginAsync(_model.Email);
-        var userBlocked = await UserService.IsUserDeletedAsync(appUser.Id);
+        var userBlocked = await UserService.IsUserDeletedAsync(user.Id);
         if (userBlocked)
         {
             Snackbar.Add("Пользователя с такими данными не существует", Severity.Error);
             return;
         }
 
-        if (await SignInManager.CanSignInAsync(user))
+        if (await SignInManager.CanSignInAsync(user.Identity))
         {
-            var result = await SignInManager.CheckPasswordSignInAsync(user, _model.Password, true);
+            var result = await SignInManager.CheckPasswordSignInAsync(user.Identity, _model.Password, true);
             if (result.Succeeded)
             {
                 var key = Guid.NewGuid();

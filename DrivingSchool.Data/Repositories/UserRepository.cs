@@ -5,18 +5,14 @@ using DrivingSchool.Data.Queries;
 using DrivingSchool.Domain.Constants;
 using DrivingSchool.Domain.Enums;
 using DrivingSchool.Domain.Exceptions;
-using DrivingSchool.Domain.Services;
+using Microsoft.AspNetCore.Identity;
 
 namespace DrivingSchool.Data.Repositories;
 
 public class UserRepository : BaseRepository, IUserRepository
 {
-    private readonly IIdentityCachingService _identityCachingService;
-
-    public UserRepository(ApplicationContext context, NpgsqlContext connection,
-        IIdentityCachingService identityCachingService) : base(context, connection)
+    public UserRepository(ApplicationContext context, NpgsqlContext connection) : base(context, connection)
     {
-        _identityCachingService = identityCachingService;
     }
 
     public async Task<DatabaseEntityCreationResult> CreateUserAsync(User user)
@@ -37,17 +33,23 @@ public class UserRepository : BaseRepository, IUserRepository
         return entity.Id;
     }
 
-    public async Task<bool> IsUserExistsByPhoneNumberAsync(string phoneNumber)
+    public Task<bool> IsUserExistsByPhoneNumberAsync(string phoneNumber)
     {
-        return await _identityCachingService.GetByPhoneAsync(phoneNumber) is not null;
+        var entity = GetPossiblyTrackedEntity<IdentityUser<int>>(x => x.PhoneNumber == phoneNumber);
+        return Task.FromResult(entity is not null);
     }
 
-    public async Task<User> GetUserByLoginAsync(string login)
+    public async Task<User?> GetUserByLoginAsync(string login)
     {
-        var identity = (await _identityCachingService.GetByEmailAsync(login))!;
+        var identity = GetPossiblyTrackedEntity<IdentityUser<int>>(x => x.Email == login);
+        if (identity is null)
+            return null;
+
         var user = await Context.Users
             .Include(x => x.Passport)
-            .SingleAsync(x => x.IdentityId == identity.Id);
+            .SingleOrDefaultAsync(x => x.IdentityId == identity.Id);
+        if (user is null)
+            return null;
         user.Identity = identity;
 
         return EntityConverter.ConvertUser(user);
@@ -58,7 +60,7 @@ public class UserRepository : BaseRepository, IUserRepository
         var user = await Context.Users
             .Include(x => x.Passport)
             .SingleOrDefaultAsync(x => x.Id == id) ?? throw new NotFoundException();
-        var identity = await _identityCachingService.GetIdentityAsync(user.IdentityId);
+        var identity = GetPossiblyTrackedEntity<IdentityUser<int>>(x => x.Id == user.IdentityId);
         user.Identity = identity!;
 
         return EntityConverter.ConvertUser(user);
@@ -76,8 +78,8 @@ public class UserRepository : BaseRepository, IUserRepository
             .Skip(pageNumber * itemCount)
             .Take(itemCount)
             .ToListAsync();
-        var identityIds = users.Select(x => x.IdentityId).ToList();
-        var identities = (await _identityCachingService.GetMultipleAsync(identityIds)).ToList();
+        var ids = users.Select(x => x.IdentityId).ToList();
+        var identities = GetPossiblyTrackedEntities<IdentityUser<int>>(x => ids.Contains(x.Id));
         foreach (var user in users)
         {
             user.Identity = identities.Single(x => user.IdentityId == x.Id);
@@ -99,11 +101,13 @@ public class UserRepository : BaseRepository, IUserRepository
             .Skip(pageNumber * itemCount)
             .Take(itemCount)
             .ToListAsync();
-        var identityIds = users.Select(x => x.IdentityId).ToList();
-        var identities = (await _identityCachingService.GetMultipleAsync(identityIds)).ToList();
+        var identities = users
+            .Select(x => x.IdentityId)
+            .Select(x => GetPossiblyTrackedEntity<IdentityUser<int>>(z => z.Id == x)!)
+            .ToList();
         foreach (var user in users)
         {
-            user.Identity = identities.Single(x => user.IdentityId == x.Id);
+            user.Identity = identities.Single(x => user.IdentityId == x.Id)!;
         }
 
         return new ListDataResult<User>
@@ -144,7 +148,8 @@ public class UserRepository : BaseRepository, IUserRepository
 
     public async Task<string?> GetUserAvatarAsync(int userId)
     {
-        return await Connection.QueryFirstOrDefaultAsync<string>(UserRepositoryQueries.GetUserAvatar, new { id = userId });
+        return await Connection.QueryFirstOrDefaultAsync<string>(UserRepositoryQueries.GetUserAvatar,
+            new { id = userId });
     }
 
     public async Task<string> GetUserDefaultAvatarAsync(int userId)
@@ -165,7 +170,7 @@ public class UserRepository : BaseRepository, IUserRepository
 
     public async Task<bool> IsUserDeletedAsync(int userId)
     {
-        return await Connection.QuerySingleAsync<bool>(UserRepositoryQueries.IsUserDeleted, new {id = userId});
+        return await Connection.QuerySingleAsync<bool>(UserRepositoryQueries.IsUserDeleted, new { id = userId });
     }
 
     private static Expression<Func<UserDb, object>> GetOrderProperty(string field) =>

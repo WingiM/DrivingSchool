@@ -10,27 +10,25 @@ public class AuthorizationService : IAuthorizationService
 {
     private readonly ILogger<AuthorizationService> _logger;
     private readonly IMailingService _mailingService;
-    private readonly IIdentityCachingService _identityCachingService;
     private readonly UserManager<IdentityUser<int>> _identityManager;
     private readonly IUserService _userService;
     private readonly IEncryptionService _encryptionService;
 
     public AuthorizationService(UserManager<IdentityUser<int>> identityManager, IUserService userService,
         IEncryptionService encryptionService, IMailingService mailingService,
-        ILogger<AuthorizationService> logger, IIdentityCachingService identityCachingService)
+        ILogger<AuthorizationService> logger)
     {
         _identityManager = identityManager;
         _userService = userService;
         _encryptionService = encryptionService;
         _mailingService = mailingService;
         _logger = logger;
-        _identityCachingService = identityCachingService;
     }
 
     public async Task<BaseResult> RegisterAsync(User user, string phoneNumber, string email,
         bool sendVerificationEmail = false)
     {
-        if (await _identityCachingService.GetByEmailAsync(email) is not null)
+        if (await _userService.GetUserByLoginAsync(email) is not null)
         {
             return new BaseResult { Message = ResultMessages.UserWithThisEmailAlreadyExists };
         }
@@ -49,7 +47,6 @@ public class AuthorizationService : IAuthorizationService
             return new BaseResult { Message = ResultMessages.InternalRegisterError };
         }
 
-        await _identityCachingService.AddIdentityAsync(identityUser);
         user.Identity = identityUser;
         await _identityManager.AddToRoleAsync(identityUser, user.Role.GetDisplayName()!);
 
