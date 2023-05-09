@@ -58,7 +58,7 @@
 
 В решении используются 4 проекта, связанных между собой:
 
-### [DrivingSchool](DrivingSchool)
+### [DrivingSchool.BlazorWebClient](DrivingSchool.BlazorWebClient)
 
 Содержит клиентское приложение Blazor Server (ServerPrerendered). Является зависимым от всех остальных проектов решения,
 подключает все необходимые реализации интерфейсов посредством использования
