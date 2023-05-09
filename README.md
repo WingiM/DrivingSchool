@@ -62,16 +62,16 @@
 
 Содержит клиентское приложение Blazor Server (ServerPrerendered). Является зависимым от всех остальных проектов решения,
 подключает все необходимые реализации интерфейсов посредством использования
-интерфейса [IServiceInstaller](DrivingSchool/ServiceInstallation/IServiceInstaller.cs). Реализации этого интерфейса
+интерфейса [IServiceInstaller](DrivingSchool.BlazorWebClient/ServiceInstallation/IServiceInstaller.cs). Реализации этого интерфейса
 подключают необходимые зависимости в IoC-контейнер, как из других проектов решения, так и для внутренних нужд
 клиентского приложения. <br/>
 Внутренние реализации проектов определяются в самих проектах через класс
 ServiceCollectionExtensions
 (
-см. [DependencyProjectsServiceInstaller](DrivingSchool/ServiceInstallation/ServiceInstallers/DependencyProjectsServiceInstaller.cs)).
+см. [DependencyProjectsServiceInstaller](DrivingSchool.BlazorWebClient/ServiceInstallation/ServiceInstallers/DependencyProjectsServiceInstaller.cs)).
 
 В зависимости от состояния системы (таблица system_info.system_state в PostgreSQL) при запуске клиента будут
-запущены [программы инициализации](DrivingSchool/HostedServices).
+запущены [программы инициализации](DrivingSchool.BlazorWebClient/HostedServices).
 Для корректной работы в папке клиента должна лежать директория `Startups`, с поддиректориями:
 
 * `sqls` - SQL-скрипты, каждый содержащий данные для одного теоритического билета ГАИ (вставки в таблицы билетов,
@@ -106,7 +106,7 @@ ServiceCollectionExtensions
   и редактирование сущностей, бо́льшая часть запросов на получение данных;
 * [Dapper](https://github.com/DapperLib/Dapper) - точечные запросы на получение или изменение небольших данных.
 
-Конфигурация проекта содержится в блоке `ConnectionStrings` файла [appsettings.json](DrivingSchool/appsettings.json).
+Конфигурация проекта содержится в блоке `ConnectionStrings` файла [appsettings.json](DrivingSchool.BlazorWebClient/appsettings.json).
 
 ### [DrivingSchool.GridFS](DrivingSchool.GridFS)
 
@@ -114,7 +114,7 @@ ServiceCollectionExtensions
 аватаров пользователей. Все хранящиеся в хранилище картинки выгружаются из него в качестве потоков данных и отображаются
 на клиенте без фактического сохранения в оперативной или постоянной памяти.
 
-Конфигурация проекта содержится в блоке `FileSystemSettings` файла [appsettings.json](DrivingSchool/appsettings.json).
+Конфигурация проекта содержится в блоке `FileSystemSettings` файла [appsettings.json](DrivingSchool.BlazorWebClient/appsettings.json).
 
 ## Развертывание системы с использованием Docker
 
