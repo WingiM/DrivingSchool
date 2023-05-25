@@ -44,7 +44,7 @@ else
             _lessons = res.Select(x => new DisplayLesson
             {
                 TimeStart = x.LessonStartDateTime, TimeEnd = x.LessonEndDateTime, 
-                Text = x is StudentLesson sl ? sl.StudentInitials!.ToString() : string.Empty
+                Text = x.StudentInitials is not null ? x.StudentInitials.ToString() : string.Empty
             }).ToArray();
         }
         else

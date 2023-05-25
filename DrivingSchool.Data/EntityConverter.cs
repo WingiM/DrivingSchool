@@ -47,7 +47,7 @@ public static class EntityConverter
         };
     }
 
-    public static AvailableLesson ConvertLesson(AvailableLessonDb lesson)
+    public static AvailableLesson ConvertLesson(AvailableLessonDb lesson, bool useStudentInitials = false)
     {
         return new AvailableLesson
         {
@@ -60,7 +60,14 @@ public static class EntityConverter
                     Name = lesson.Teacher.Name, Surname = lesson.Teacher.Surname,
                     Patronymic = lesson.Teacher.Patronymic
                 }
-                : null
+                : null,
+            StudentInitials = useStudentInitials && lesson.Student is not null
+                ? new UserGeneral
+                {
+                    Name = lesson.Student.Name, Surname = lesson.Student.Surname,
+                    Patronymic = lesson.Student.Patronymic
+                }
+                : null,
         };
     }
 

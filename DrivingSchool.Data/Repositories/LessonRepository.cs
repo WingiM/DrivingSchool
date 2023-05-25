@@ -50,13 +50,13 @@ public class LessonRepository : BaseRepository, ILessonRepository
 
         var availableLessons = await Context.AvailableLessons
             .Include(x => x.Student)
-            .Where(x => x.TeacherId == teacherId && !x.IsTaken)
+            .Where(x => x.TeacherId == teacherId)
             .ToArrayAsync();
 
         return new ListDataResult<LessonBase>
         {
             Items = lessons.Select(x => EntityConverter.ConvertLesson(x, true))
-                .Concat<LessonBase>(availableLessons.Select(x => EntityConverter.ConvertLesson(x)))
+                .Concat<LessonBase>(availableLessons.Select(x => EntityConverter.ConvertLesson(x, true)))
         };
     }
 
@@ -80,7 +80,7 @@ public class LessonRepository : BaseRepository, ILessonRepository
         var res = await Context.AvailableLessons
             .Include(x => x.Teacher)
             .Where(x => !x.IsTaken && !userSignedDays.Contains(x.Date))
-            .Select(x => EntityConverter.ConvertLesson(x))
+            .Select(x => EntityConverter.ConvertLesson(x, false))
             .ToArrayAsync();
         return new ListDataResult<AvailableLesson> { Items = res, Success = true };
     }
