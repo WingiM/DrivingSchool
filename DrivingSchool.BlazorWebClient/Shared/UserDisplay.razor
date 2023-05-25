@@ -166,7 +166,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         if (Login is not null)
-            _user = await UserService.GetUserByLoginAsync(Login);
+            _user = (await UserService.GetUserByLoginAsync(Login))!;
         else
             _user = await UserService.GetUserByIdAsync(Id);
         _userClaims = await UserService.GetUserClaimsByIdAsync(_user.Identity.Id);
